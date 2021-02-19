@@ -3,24 +3,52 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.11.9",
-    "@testing-library/react": "^11.2.5",
-    "@testing-library/user-event": "^12.7.1",
-    "@types/jest": "^26.0.20",
-    "@types/node": "^12.20.4",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.1",
+    "@types/styled-components": "5.1.7",
+    "aria2": "^4.1.2",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-icons": "4.2.0",
+    "snyk": "1.456.0",
+    "styled-components": "5.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "14.14.28",
+    "@types/webpack": "4.41.26",
+    "@typescript-eslint/eslint-plugin": "4.15.1",
+    "@typescript-eslint/parser": "4.15.1",
+    "eslint": "7.20.0",
+    "eslint-config-prettier": "7.2.0",
+    "eslint-config-standard": "16.0.2",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-promise": "4.3.1",
+    "eslint-plugin-react": "7.22.0",
+    "eslint-plugin-standard": "4.1.0",
+    "husky": "4.3.8",
+    "lint-staged": "10.5.4",
+    "prettier": "2.2.1",
     "react-scripts": "4.0.2",
-    "typescript": "^4.1.5",
-    "web-vitals": "^1.1.0"
+    "ts-loader": "8.0.17",
+    "typescript": "4.1.5",
+    "web-ext": "5.5.0",
+    "webextension-polyfill-ts": "0.25.0",
+    "webpack-cli": "4.5.0"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build_scripts": "webpack --config webpack.config.js",
+    "build": "INLINE_RUNTIME_CHUNK=false react-scripts build && npm run build_scripts",
+    "package": "web-ext build --config=webext.config.js",
+    "complete": "npm run build && npm run package",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect",
+    "type-check": "tsc --pretty --noEmit",
+    "format": "prettier --write .",
+    "lint": "eslint . --ext ts --ext tsx --ext js"
   },
   "eslintConfig": {
     "extends": [
@@ -39,5 +67,19 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "snyk": true,
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run type-check"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js}": [
+      "npm run lint",
+      "npm run format"
+    ],
+    "*.{js,css,md}": "prettier --write"
   }
 }
