@@ -3,15 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.1",
-    "@types/styled-components": "5.1.7",
     "aria2": "^4.1.2",
+    "fontsource-roboto": "^4.0.0",
+    "jschardet": "^2.3.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-icons": "4.2.0",
-    "snyk": "1.456.0",
-    "styled-components": "5.2.1"
+    "snyk": "^1.456.0"
   },
   "devDependencies": {
     "@types/node": "14.14.28",
@@ -29,7 +31,7 @@
     "husky": "4.3.8",
     "lint-staged": "10.5.4",
     "prettier": "2.2.1",
-    "react-scripts": "4.0.2",
+    "react-scripts": "4.0.3",
     "ts-loader": "8.0.17",
     "typescript": "4.1.5",
     "web-ext": "5.5.0",
@@ -39,7 +41,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build_scripts": "webpack --config webpack.config.js",
-    "build": "INLINE_RUNTIME_CHUNK=false react-scripts build && npm run build_scripts",
+    "build": "INLINE_RUNTIME_CHUNK=false react-scripts build && npm run build_scripts && cp -rf AriaNg build",
     "package": "web-ext build --config=webext.config.js",
     "complete": "npm run build && npm run package",
     "test": "react-scripts test",

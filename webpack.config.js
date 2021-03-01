@@ -5,7 +5,7 @@ module.exports = {
   context: path.resolve(__dirname, 'src'),
   entry: {
     // Background scripts.
-    // 'background/index.js': './background/index.ts',
+    'background/index.js': './background/index.ts',
     // Content scripts.
     // "content/index.js": "./content/index.js"
   },
