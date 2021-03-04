@@ -18,6 +18,14 @@ export interface IJob {
 
 export interface IDownload {
   out: string;
+  dir?: string;
+  header?: string[];
+}
+
+export interface IFileDetail {
+  url: string;
+  fileName?: string;
+  fileSize?: string;
   header?: string[];
 }
 

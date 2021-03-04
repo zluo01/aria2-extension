@@ -12,7 +12,6 @@ Firefox web extension for Aria2
 ## Todo
 
 - Allow multiple Aria2 instance, currently only support local default
-- Download panel
 - Custom configuration
 - Background job monitor
 

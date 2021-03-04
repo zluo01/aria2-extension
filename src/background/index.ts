@@ -1,12 +1,13 @@
 import { browser, WebRequest } from 'webextension-polyfill-ts';
 import { AddUri } from '../aria2';
-import { OpenDetail, RemoveBlankTab } from '../browser';
+import { createDownloadPanel, openDetail, removeBlankTab } from '../browser';
 import {
   correctFileName,
-  download,
   getFileName,
   getRequestHeaders,
+  parseBytes,
 } from '../utils';
+import { IFileDetail } from '../types';
 import ResourceType = WebRequest.ResourceType;
 import OnSendHeadersDetailsType = WebRequest.OnSendHeadersDetailsType;
 import OnHeadersReceivedDetailsType = WebRequest.OnHeadersReceivedDetailsType;
@@ -14,6 +15,7 @@ import OnErrorOccurredDetailsType = WebRequest.OnErrorOccurredDetailsType;
 import BlockingResponseOrPromise = WebRequest.BlockingResponseOrPromise;
 
 const request: OnSendHeadersDetailsType[] = [];
+const processQueue: IFileDetail[] = [];
 const CONTEXT_ID = 'download-with-aria';
 
 browser.contextMenus.create({
@@ -42,22 +44,20 @@ function escapeHTML(str: string) {
 
 browser.commands.onCommand.addListener((command: string) => {
   if (command === 'open_detail') {
-    OpenDetail(false);
+    openDetail(false);
   }
 });
 
 async function prepareDownload(d: OnHeadersReceivedDetailsType) {
+  const detail: IFileDetail = { url: d.url };
   // get request item
   const id = request.findIndex(x => x.requestId === d.requestId);
   const reqFound = { ...request[id] };
-  let requestHeaders;
   if (id >= 0) {
     // create header
-    requestHeaders = getRequestHeaders(reqFound);
+    detail.header = getRequestHeaders(reqFound);
     // delete request item
     request.splice(id, 1);
-  } else {
-    requestHeaders = '[]';
   }
 
   // process file name
@@ -78,11 +78,23 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
     fileName = name;
   });
 
-  // create download panel
-  download(d.url, fileName, requestHeaders);
+  detail.fileName = fileName;
 
-  // avoid blank new tab
-  RemoveBlankTab().catch(err => console.error(err));
+  // get file size
+  if (d.responseHeaders) {
+    const fid = d.responseHeaders.findIndex(
+      x => x.name.toLowerCase() === 'content-length'
+    );
+    detail.fileSize =
+      id >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
+  }
+
+  // create download panel
+  processQueue.push(detail);
+  createDownloadPanel()
+    .then(() => removeBlankTab())
+    .catch(err => console.error(err));
+  // download(d.url, fileName, requestHeaders);
 }
 
 function observeResponse(
@@ -163,4 +175,10 @@ function requestError(d: OnErrorOccurredDetailsType): void {
 browser.webRequest.onErrorOccurred.addListener(requestError, {
   urls: ['<all_urls>'],
   types: types,
+});
+
+browser.runtime.onMessage.addListener((data, _sender) => {
+  if (data.type === 'all') {
+    return Promise.resolve(processQueue.pop());
+  }
 });

@@ -1,14 +1,30 @@
 import { browser, WebRequest } from 'webextension-polyfill-ts';
-import { AddUri } from '../aria2';
-import { IDownload } from '../types';
 
-import OnHeadersReceivedDetailsType = WebRequest.OnHeadersReceivedDetailsType;
-import OnSendHeadersDetailsType = WebRequest.OnSendHeadersDetailsType;
+// eslint-disable-next-line no-control-regex
+const regex = /[<>:"/\\|?*\x00-\x1F]/g;
+
+export function verifyFileName(name: string): Promise<boolean> {
+  return browser.runtime
+    .getPlatformInfo()
+    .then(e => {
+      let tmp: any = name.match(regex) || [];
+      if (e.os === 'win') {
+        if (name.search(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i) !== -1) {
+          tmp = tmp.concat(name);
+        }
+        if (name[name.length - 1] === ' ' || name[name.length - 1] === '.') {
+          tmp = tmp.concat('Filenames cannot end in a space or dot.');
+        }
+      }
+      return tmp;
+    })
+    .then(result => result.length !== 0);
+}
 
 export async function correctFileName(name: string): Promise<string> {
   let tmp = name;
   await browser.runtime.getPlatformInfo().then(e => {
-    tmp = tmp.replace('/[<>:"/\\|?*\x00-\x1F]/g', '_');
+    tmp = tmp.replace(regex, '_');
     if (e.os === 'win') {
       if (tmp.search(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i) !== -1)
         tmp = '_' + tmp;
@@ -19,7 +35,9 @@ export async function correctFileName(name: string): Promise<string> {
   return tmp;
 }
 
-export function getFileName(d: OnHeadersReceivedDetailsType): string {
+export function getFileName(
+  d: WebRequest.OnHeadersReceivedDetailsType
+): string {
   if (!d.responseHeaders) {
     return '';
   }
@@ -73,7 +91,9 @@ function getFileNameURL(url: string) {
   return '';
 }
 
-export function getRequestHeaders(d: OnSendHeadersDetailsType): string[] {
+export function getRequestHeaders(
+  d: WebRequest.OnSendHeadersDetailsType
+): string[] {
   // create header
   const requestHeaders: string[] = [];
   if (!d.requestHeaders) {
@@ -90,16 +110,14 @@ export function getRequestHeaders(d: OnSendHeadersDetailsType): string[] {
   return requestHeaders;
 }
 
-export function download(
-  url: string,
-  fileName: string,
-  header: string | string[]
-): void {
-  const options: IDownload = {
-    out: fileName,
-  };
-  if (header !== '[]') {
-    options.header = header as string[];
+export function parseBytes(value: string): string {
+  const symbol = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  let speed = parseFloat(value);
+  let order = 0;
+  while (speed >= 1000 && order < symbol.length - 1) {
+    order++;
+    speed = speed / 1000;
   }
-  AddUri(url, fileName, options);
+
+  return `${speed.toFixed(2)} ${symbol[order]}`;
 }

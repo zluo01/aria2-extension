@@ -8,7 +8,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
 import { PauseJobs, RemoveJobs, StartJobs } from '../../aria2';
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '../../types';
-import { OpenDetail } from '../../browser';
+import { openDetail } from '../../browser';
 
 interface IHeader {
   jobs: IJob[];
@@ -22,6 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: '98%',
+      minWidth: 360,
       margin: 'auto',
       display: 'flex',
       flexFlow: 'row nowrap',
@@ -95,9 +96,7 @@ function Header({
     <div className={classes.root}>
       <Checkbox
         size={'small'}
-        disabled={
-          jobs.filter(o => o.status === ACTIVE_JOB).length === 0 || show
-        }
+        disabled={show}
         checked={isChecked}
         onChange={handleChange}
       />
@@ -133,7 +132,7 @@ function Header({
         >
           <DeleteIcon />
         </IconButton>
-        <IconButton size="small" onClick={() => OpenDetail(true)}>
+        <IconButton size="small" onClick={() => openDetail(true)}>
           <MoreVertIcon />
         </IconButton>
       </div>

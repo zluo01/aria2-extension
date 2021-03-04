@@ -1,5 +1,5 @@
 import { IDownload, IJob } from '../types';
-import { Notify } from '../browser';
+import { notify } from '../browser';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Aria2 = require('aria2');
@@ -50,13 +50,13 @@ export function AddUri(
 ): void {
   aria2
     .call('addUri', [link], options || {})
-    .then(() => Notify(`Start downloading ${fileName || ''} using Aria2`))
+    .then(() => notify(`Start downloading ${fileName || ''} using Aria2`))
     .catch(() => {
       setTimeout(() => {
         aria2
           .call('addUri', [link], options || {})
-          .then(() => Notify(`Start downloading ${fileName || ''} using Aria2`))
-          .catch((err: any) => Notify(err.message || err));
+          .then(() => notify(`Start downloading ${fileName || ''} using Aria2`))
+          .catch((err: any) => notify(err.message || err));
       }, 3000);
     });
 }

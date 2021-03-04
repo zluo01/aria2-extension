@@ -16,6 +16,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '../../types';
 import { PauseJob, StartJob } from '../../aria2';
+import { parseBytes } from '../../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,18 +47,6 @@ interface IDownloadList {
   jobs: IJob[];
   checked: string[];
   toggle: (value: string) => () => void;
-}
-
-function parseBytes(value: string): string {
-  const symbol = ['B', 'KB', 'MB', 'GB'];
-  let speed = parseFloat(value);
-  let order = 0;
-  while (speed >= 1000 && order < symbol.length - 1) {
-    order++;
-    speed = speed / 1000;
-  }
-
-  return `${speed.toFixed(2)} ${symbol[order]}`;
 }
 
 function getFileName(job: IJob): string {
