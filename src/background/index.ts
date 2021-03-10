@@ -86,7 +86,7 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
       x => x.name.toLowerCase() === 'content-length'
     );
     detail.fileSize =
-      id >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
+      fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
   }
 
   // create download panel

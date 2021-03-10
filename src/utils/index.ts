@@ -41,16 +41,16 @@ export function getFileName(
   if (!d.responseHeaders) {
     return '';
   }
-
   // get file name
   const id = d.responseHeaders.findIndex(
     x => x.name.toLowerCase() === 'content-disposition'
   );
-  if (id && id >= 0) {
+  if (id >= 0) {
     // eslint-disable-next-line no-control-regex
     const PARAM_REGEXP = /;[\x09\x20]*([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*=[\x09\x20]*("(?:[\x20!\x23-\x5b\x5d-\x7e\x80-\xff]|\\[\x20-\x7e])*"|[!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*/g;
     const EXT_VALUE_REGEXP = /^([A-Za-z0-9!#$%&+\-^_`{}~]+)'(?:[A-Za-z]{2,3}(?:-[A-Za-z]{3}){0,3}|[A-Za-z]{4,8}|)'((?:%[0-9A-Fa-f]{2}|[A-Za-z0-9!#$&+.^_`|~-])+)$/;
-    const QESC_REGEXP = '/\\([\u0000-\u007f])/g';
+    // eslint-disable-next-line no-control-regex
+    const QESC_REGEXP = /\\([\u0000-\u007f])/g;
 
     const string = d.responseHeaders[id].value;
 

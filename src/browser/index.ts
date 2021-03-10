@@ -18,7 +18,7 @@ export function removeBlankTab(): Promise<void> {
       windowType: 'normal',
     })
     .then(tabsInfo => {
-      if (tabsInfo[0].url === 'about:blank') {
+      if (tabsInfo && tabsInfo[0].url === 'about:blank') {
         return browser.tabs.remove(tabsInfo[0].id as number);
       }
     });

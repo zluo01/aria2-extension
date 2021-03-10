@@ -1,6 +1,6 @@
 {
   "name": "aria2-extension",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "dependencies": {
     "@fontsource/roboto": "4.2.2",
