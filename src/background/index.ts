@@ -1,6 +1,11 @@
 import { browser, WebRequest } from 'webextension-polyfill-ts';
-import { AddUri } from '../aria2';
-import { createDownloadPanel, openDetail, removeBlankTab } from '../browser';
+import { AddUri, GetNumJobs } from '../aria2';
+import {
+  createDownloadPanel,
+  openDetail,
+  removeBlankTab,
+  updateBadge,
+} from '../browser';
 import {
   correctFileName,
   getFileName,
@@ -182,3 +187,12 @@ browser.runtime.onMessage.addListener((data, _sender) => {
     return Promise.resolve(processQueue.pop());
   }
 });
+
+function updateActiveJobNumber() {
+  GetNumJobs()
+    .then(num => updateBadge(num))
+    .catch(err => console.error(err));
+}
+
+updateActiveJobNumber();
+setInterval(updateActiveJobNumber, 1000);

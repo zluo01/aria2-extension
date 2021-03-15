@@ -1,4 +1,4 @@
-import { browser, Windows } from 'webextension-polyfill-ts';
+import { browser, BrowserAction, Windows } from 'webextension-polyfill-ts';
 import { IDownload, IFileDetail } from '../types';
 import { AddUri } from '../aria2';
 
@@ -30,7 +30,6 @@ export function notify(msg: string): Promise<string> {
     iconUrl: browser.extension.getURL('logo48.png'),
     title: 'Aria2 Extension',
     message: msg,
-    eventTime: 2000,
   });
 }
 
@@ -38,7 +37,7 @@ export function notify(msg: string): Promise<string> {
 export function createDownloadPanel(): Promise<Windows.Window> {
   const w = 520;
   const h = 330;
-  // Fixes dual-screen position                             Most browsers      Firefox
+  // Fixes dual-screen position  Most browsers      Firefox
   const dualScreenLeft =
     window.screenLeft !== undefined ? window.screenLeft : window.screenX;
   const dualScreenTop =
@@ -136,4 +135,15 @@ export function saveFile(url: string, fileName: string, as: boolean): void {
 
 function getCurrentWindow(): Promise<Windows.Window> {
   return browser.windows.getCurrent();
+}
+
+export async function updateBadge(num: number): Promise<void> {
+  const value = num > 0 ? num.toString() : null;
+  const color =
+    num > 0 ? '#303030' : ([217, 0, 0, 255] as BrowserAction.ColorArray);
+  return browser.browserAction
+    .setBadgeText({ text: value })
+    .then(() =>
+      browser.browserAction.setBadgeBackgroundColor({ color: color })
+    );
 }
