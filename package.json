@@ -15,7 +15,7 @@
     "react-icons": "4.2.0"
   },
   "devDependencies": {
-    "@types/node": "14.14.36",
+    "@types/node": "14.14.37",
     "@types/webpack": "4.41.27",
     "@typescript-eslint/eslint-plugin": "4.19.0",
     "@typescript-eslint/parser": "4.19.0",
