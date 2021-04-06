@@ -1,6 +1,6 @@
 {
   "name": "aria2-extension",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "dependencies": {
     "@fontsource/roboto": "4.2.2",
@@ -28,7 +28,7 @@
     "eslint-plugin-react": "7.23.1",
     "eslint-plugin-standard": "4.1.0",
     "html-webpack-plugin": "4.5.2",
-    "husky": "4.3.8",
+    "husky": "^6.0.0",
     "lint-staged": "10.5.4",
     "prettier": "2.2.1",
     "react-scripts": "4.0.3",
@@ -48,7 +48,8 @@
     "eject": "react-scripts eject",
     "type-check": "tsc --pretty --noEmit",
     "format": "prettier --write .",
-    "lint": "eslint . --ext ts --ext tsx --ext js"
+    "lint": "eslint . --ext ts --ext tsx --ext js",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -67,12 +68,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm run type-check"
-    }
   },
   "lint-staged": {
     "*.{ts,tsx,js}": [

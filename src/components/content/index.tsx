@@ -142,8 +142,8 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
             />
             <ListItemSecondaryAction>
               <IconButton
-                edge="end"
-                aria-label="comments"
+                edge={'end'}
+                aria-label={'comments'}
                 size={'small'}
                 onClick={() => jobAction(o)}
               >

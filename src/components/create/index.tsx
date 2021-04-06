@@ -38,6 +38,7 @@ function CreationArea({ close }: ICreationArea): JSX.Element {
         placeholder="Support multiple URLS, one URL per line"
         value={text}
         onChange={e => setText(e.target.value)}
+        autoFocus
       />
       <Button
         variant="contained"
