@@ -9,7 +9,7 @@
     "@types/react": "17.0.3",
     "@types/react-dom": "17.0.3",
     "aria2": "4.1.2",
-    "jschardet": "2.3.0",
+    "jschardet": "3.0.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-icons": "4.2.0"
