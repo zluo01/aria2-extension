@@ -1,6 +1,6 @@
 {
   "extends": ["config:base"],
-  "schedule": ["after 10pm and before 5am on every weekday", "every weekend"],
+  "schedule": ["every weekend"],
   "packageRules": [
     {
       "updateTypes": ["minor", "patch", "pin", "digest"],
