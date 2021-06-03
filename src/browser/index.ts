@@ -10,7 +10,7 @@ export function openDetail(fromExtension: boolean): void {
   }
 }
 
-export function removeBlankTab(): Promise<void> {
+export function removeBlankTab(): Promise<void | null> {
   return browser.tabs
     .query({
       active: true,
@@ -21,6 +21,7 @@ export function removeBlankTab(): Promise<void> {
       if (tabsInfo && tabsInfo[0].url === 'about:blank') {
         return browser.tabs.remove(tabsInfo[0].id as number);
       }
+      return null;
     });
 }
 
@@ -100,6 +101,7 @@ export function download(
       if (windowInfo.id) {
         return browser.windows.remove(windowInfo.id);
       }
+      return null;
     })
     .catch(err => console.error(err));
 }
@@ -129,6 +131,7 @@ export function saveFile(url: string, fileName: string, as: boolean): void {
       if (windowID && windowID !== 0) {
         return browser.windows.remove(windowID);
       }
+      return null;
     })
     .catch(err => notify(err.message || err));
 }

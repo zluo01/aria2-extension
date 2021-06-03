@@ -23,7 +23,7 @@ export function verifyFileName(name: string): Promise<boolean> {
 
 export async function correctFileName(name: string): Promise<string> {
   let tmp = name;
-  await browser.runtime.getPlatformInfo().then(e => {
+  return browser.runtime.getPlatformInfo().then(e => {
     tmp = tmp.replace(regex, '_');
     if (e.os === 'win') {
       if (tmp.search(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i) !== -1)
@@ -31,8 +31,8 @@ export async function correctFileName(name: string): Promise<string> {
       if (tmp[tmp.length - 1] === ' ' || tmp[tmp.length - 1] === '.')
         tmp = tmp.slice(0, tmp.length - 1);
     }
+    return tmp;
   });
-  return tmp;
 }
 
 export function getFileName(
@@ -46,9 +46,11 @@ export function getFileName(
     x => x.name.toLowerCase() === 'content-disposition'
   );
   if (id >= 0) {
-    // eslint-disable-next-line no-control-regex
-    const PARAM_REGEXP = /;[\x09\x20]*([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*=[\x09\x20]*("(?:[\x20!\x23-\x5b\x5d-\x7e\x80-\xff]|\\[\x20-\x7e])*"|[!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*/g;
-    const EXT_VALUE_REGEXP = /^([A-Za-z0-9!#$%&+\-^_`{}~]+)'(?:[A-Za-z]{2,3}(?:-[A-Za-z]{3}){0,3}|[A-Za-z]{4,8}|)'((?:%[0-9A-Fa-f]{2}|[A-Za-z0-9!#$&+.^_`|~-])+)$/;
+    const PARAM_REGEXP =
+      // eslint-disable-next-line no-control-regex
+      /;[\x09\x20]*([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*=[\x09\x20]*("(?:[\x20!\x23-\x5b\x5d-\x7e\x80-\xff]|\\[\x20-\x7e])*"|[!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*/g;
+    const EXT_VALUE_REGEXP =
+      /^([A-Za-z0-9!#$%&+\-^_`{}~]+)'(?:[A-Za-z]{2,3}(?:-[A-Za-z]{3}){0,3}|[A-Za-z]{4,8}|)'((?:%[0-9A-Fa-f]{2}|[A-Za-z0-9!#$&+.^_`|~-])+)$/;
     // eslint-disable-next-line no-control-regex
     const QESC_REGEXP = /\\([\u0000-\u007f])/g;
 

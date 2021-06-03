@@ -79,27 +79,25 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
   fileName = fileName.replace('"', '');
 
   // correct File Name
-  correctFileName(fileName).then(name => {
-    fileName = name;
-  });
+  correctFileName(fileName)
+    .then(name => {
+      detail.fileName = name;
 
-  detail.fileName = fileName;
+      // get file size
+      if (d.responseHeaders) {
+        const fid = d.responseHeaders.findIndex(
+          x => x.name.toLowerCase() === 'content-length'
+        );
+        detail.fileSize =
+          fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
+      }
 
-  // get file size
-  if (d.responseHeaders) {
-    const fid = d.responseHeaders.findIndex(
-      x => x.name.toLowerCase() === 'content-length'
-    );
-    detail.fileSize =
-      fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
-  }
-
-  // create download panel
-  processQueue.push(detail);
-  createDownloadPanel()
+      // create download panel
+      processQueue.push(detail);
+      return createDownloadPanel();
+    })
     .then(() => removeBlankTab())
     .catch(err => console.error(err));
-  // download(d.url, fileName, requestHeaders);
 }
 
 function observeResponse(

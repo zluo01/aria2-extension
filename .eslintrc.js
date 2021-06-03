@@ -11,6 +11,7 @@ module.exports = {
     'standard',
     'plugin:@typescript-eslint/recommended',
     'prettier',
+    'plugin:promise/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {

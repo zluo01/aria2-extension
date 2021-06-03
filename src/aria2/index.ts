@@ -51,14 +51,7 @@ export function AddUri(
   aria2
     .call('addUri', [link], options || {})
     .then(() => notify(`Start downloading ${fileName || ''} using Aria2`))
-    .catch(() => {
-      setTimeout(() => {
-        aria2
-          .call('addUri', [link], options || {})
-          .then(() => notify(`Start downloading ${fileName || ''} using Aria2`))
-          .catch((err: any) => notify(err.message || err));
-      }, 3000);
-    });
+    .catch((err: any) => notify(err.message || err));
 }
 
 function flatten(input: any[]): any[] {
