@@ -76,30 +76,30 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
   } catch (e) {}
 
   // file name cannot have ""
-  fileName = fileName.replace('";', '');
-  fileName = fileName.replace('"', '');
-  fileName = fileName.replace('"', '');
+  fileName = fileName.replace('UTF-8', '');
+  fileName = fileName.replaceAll(';', '');
+  fileName = fileName.replaceAll('"', '');
+  fileName = fileName.replaceAll("'", '');
 
   // correct File Name
-  correctFileName(fileName)
-    .then(name => {
-      detail.fileName = name;
+  try {
+    detail.fileName = await correctFileName(fileName);
+    // get file size
+    if (d.responseHeaders) {
+      const fid = d.responseHeaders.findIndex(
+        x => x.name.toLowerCase() === 'content-length'
+      );
+      detail.fileSize =
+        fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
+    }
 
-      // get file size
-      if (d.responseHeaders) {
-        const fid = d.responseHeaders.findIndex(
-          x => x.name.toLowerCase() === 'content-length'
-        );
-        detail.fileSize =
-          fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
-      }
-
-      // create download panel
-      processQueue.push(detail);
-      return createDownloadPanel();
-    })
-    .then(() => removeBlankTab())
-    .catch(err => console.error(err));
+    // create download panel
+    processQueue.push(detail);
+    await createDownloadPanel();
+    await removeBlankTab();
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 function observeResponse(
