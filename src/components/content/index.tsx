@@ -1,5 +1,3 @@
-import React from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import {
   Checkbox,
   IconButton,
@@ -10,19 +8,20 @@ import {
   ListItemText,
   Typography,
 } from '@material-ui/core';
-import Progress from '../progress';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import React from 'react';
 
-import { ACTIVE_JOB, IJob, PAUSED_JOB } from '../../types';
 import { PauseJob, StartJob } from '../../aria2';
+import { ACTIVE_JOB, IJob, PAUSED_JOB } from '../../types';
 import { parseBytes } from '../../utils';
+import Progress from '../progress';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '100%',
-      maxWidth: 420,
+      width: 420,
       backgroundColor: theme.palette.background.paper,
     },
     item: {
@@ -66,13 +65,13 @@ function getProgress(job: IJob): number {
   return progress * 100;
 }
 
-function jobAction(job: IJob) {
+async function jobAction(job: IJob) {
   switch (job.status) {
     case ACTIVE_JOB:
-      PauseJob(job.gid).catch(err => console.error(err));
+      await PauseJob(job.gid);
       break;
     case PAUSED_JOB:
-      StartJob(job.gid).catch(err => console.error(err));
+      await StartJob(job.gid);
       break;
     default:
       console.error(`Invalid job status ${job.status}`);

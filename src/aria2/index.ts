@@ -1,57 +1,82 @@
-import { IDownload, IJob } from '../types';
-import { notify } from '../browser';
+import { getConfiguration, notify } from '../browser';
+import { DEFAULT_CONFIG, IConfig, IDownload, IJob } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Aria2 = require('aria2');
 
-const aria2 = new Aria2();
+type Aria2ClientType = string;
 
-export async function GetJobs(): Promise<IJob[]> {
-  const multiCall = [['tellActive'], ['tellWaiting', 0, 25]];
+const Aria2WsClient: Aria2ClientType = 'ws';
+const Aria2HttpClient: Aria2ClientType = 'http';
 
-  return flatten(await aria2.multicall(multiCall));
+let aria2: any;
+let prevConfig: IConfig = DEFAULT_CONFIG;
+
+export async function ConstructAria2Instance(): Promise<Aria2ClientType> {
+  const config: IConfig = await getConfiguration();
+  if (!aria2 || JSON.stringify(prevConfig) === JSON.stringify(config)) {
+    const options = {
+      path: '/jsonrpc',
+      host: config.host,
+      port: config.port,
+      secure: config.protocol === 'https' || config.protocol === 'wss',
+      secret: config.token,
+    };
+    prevConfig = config;
+    aria2 = new Aria2(options);
+  }
+
+  if (config.protocol === 'ws' || config.protocol === 'wss') {
+    return Aria2WsClient;
+  }
+  return Aria2HttpClient;
 }
 
-export function StartJob(gid: string): Promise<string[]> {
-  return aria2.call('unpause', gid);
+export async function GetJobs(): Promise<IJob[]> {
+  const multiCallItems = [['tellActive'], ['tellWaiting', 0, 25]];
+  const data = await multiCall(multiCallItems);
+  return flatten(data);
+}
+
+export async function StartJob(gid: string): Promise<void> {
+  await singleCall(() => aria2.call('unpause', gid));
 }
 
 export async function StartJobs(gid: string[]): Promise<void> {
-  const multiCall = gid.map(o => ['unpause', o]);
-
-  await aria2.multicall(multiCall);
+  const multiCallItems = gid.map(o => ['unpause', o]);
+  await multiCall(multiCallItems);
 }
 
 export async function PauseJob(gid: string): Promise<void> {
-  await aria2.call('pause', gid);
+  await singleCall(() => aria2.call('pause', gid));
 }
 
 export async function PauseJobs(gid: string[]): Promise<void> {
-  const multiCall = gid.map(o => ['pause', o]);
-
-  await aria2.multicall(multiCall);
+  const multiCallItems = gid.map(o => ['pause', o]);
+  await multiCall(multiCallItems);
 }
 
 export async function RemoveJobs(gid: string[]): Promise<void> {
-  const multiCall = gid.map(o => ['remove', o]);
-
-  await aria2.multicall(multiCall);
+  const multiCallItems = gid.map(o => ['remove', o]);
+  await multiCall(multiCallItems);
 }
 
 export async function GetNumJobs(): Promise<number> {
-  const data = await aria2.call('tellActive');
+  const data = await singleCall(() => aria2.call('tellActive'));
   return data.length;
 }
 
-export function AddUri(
+export async function AddUri(
   link: string,
   fileName?: string,
   options?: IDownload
-): void {
-  aria2
-    .call('addUri', [link], options || {})
-    .then(() => notify(`Start downloading ${fileName || ''} using Aria2`))
-    .catch((err: any) => notify(err.message || err));
+): Promise<void> {
+  try {
+    await singleCall(() => aria2.call('addUri', [link], options || {}));
+    await notify(`Start downloading ${fileName || ''} using Aria2`);
+  } catch (e) {
+    await notify(e.message || e);
+  }
 }
 
 function flatten(input: any[]): any[] {
@@ -69,4 +94,30 @@ function flatten(input: any[]): any[] {
   }
   // reverse to restore input order
   return res.reverse();
+}
+
+async function singleCall(func: () => Promise<any>): Promise<any> {
+  const instanceType: Aria2ClientType = await ConstructAria2Instance();
+  const useWebSocket = instanceType === Aria2WsClient;
+  if (useWebSocket) {
+    await aria2.open();
+  }
+  const data = await func();
+  if (useWebSocket) {
+    await aria2.close();
+  }
+  return data;
+}
+
+async function multiCall(callItems: (string | number)[][]): Promise<any> {
+  const instanceType: Aria2ClientType = await ConstructAria2Instance();
+  const useWebSocket = instanceType === Aria2WsClient;
+  if (useWebSocket) {
+    await aria2.open();
+  }
+  const data = await aria2.multicall(callItems);
+  if (useWebSocket) {
+    await aria2.close();
+  }
+  return data;
 }

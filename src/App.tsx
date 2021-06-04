@@ -1,12 +1,13 @@
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import React, { useEffect, useState } from 'react';
-import DownloadList from './components/content';
-import { IJob } from './types';
+
 import { GetJobs } from './aria2';
-import Header from './components/header';
+import DownloadList from './components/content';
 import CreationArea from './components/create';
+import Header from './components/header';
+import { IJob } from './types';
 
 function App(): JSX.Element {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');

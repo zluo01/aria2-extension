@@ -1,4 +1,5 @@
 import { browser, WebRequest } from 'webextension-polyfill-ts';
+
 import { AddUri, GetNumJobs } from '../aria2';
 import {
   createDownloadPanel,
@@ -6,13 +7,14 @@ import {
   removeBlankTab,
   updateBadge,
 } from '../browser';
+import { IFileDetail } from '../types';
 import {
   correctFileName,
   getFileName,
   getRequestHeaders,
   parseBytes,
 } from '../utils';
-import { IFileDetail } from '../types';
+
 import ResourceType = WebRequest.ResourceType;
 import OnSendHeadersDetailsType = WebRequest.OnSendHeadersDetailsType;
 import OnHeadersReceivedDetailsType = WebRequest.OnHeadersReceivedDetailsType;
@@ -31,7 +33,7 @@ browser.contextMenus.create({
 
 browser.contextMenus.onClicked.addListener((info, _tab) => {
   if (info.menuItemId === CONTEXT_ID) {
-    AddUri(escapeHTML(info.linkUrl as string));
+    AddUri(escapeHTML(info.linkUrl as string)).catch(err => console.error(err));
   }
 });
 

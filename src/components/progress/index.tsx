@@ -1,7 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
+import { makeStyles } from '@material-ui/core/styles';
 
 interface IProgressWithLabel {
   value: number;

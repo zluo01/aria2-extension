@@ -3,36 +3,31 @@ import { browser, WebRequest } from 'webextension-polyfill-ts';
 // eslint-disable-next-line no-control-regex
 const regex = /[<>:"/\\|?*\x00-\x1F]/g;
 
-export function verifyFileName(name: string): Promise<boolean> {
-  return browser.runtime
-    .getPlatformInfo()
-    .then(e => {
-      let tmp: any = name.match(regex) || [];
-      if (e.os === 'win') {
-        if (name.search(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i) !== -1) {
-          tmp = tmp.concat(name);
-        }
-        if (name[name.length - 1] === ' ' || name[name.length - 1] === '.') {
-          tmp = tmp.concat('Filenames cannot end in a space or dot.');
-        }
-      }
-      return tmp;
-    })
-    .then(result => result.length !== 0);
+export async function verifyFileName(name: string): Promise<boolean> {
+  const platformInfo = await browser.runtime.getPlatformInfo();
+  let tmp: any = name.match(regex) || [];
+  if (platformInfo.os === 'win') {
+    if (name.search(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i) !== -1) {
+      tmp = tmp.concat(name);
+    }
+    if (name[name.length - 1] === ' ' || name[name.length - 1] === '.') {
+      tmp = tmp.concat('Filenames cannot end in a space or dot.');
+    }
+  }
+  return tmp.length !== 0;
 }
 
 export async function correctFileName(name: string): Promise<string> {
   let tmp = name;
-  return browser.runtime.getPlatformInfo().then(e => {
-    tmp = tmp.replace(regex, '_');
-    if (e.os === 'win') {
-      if (tmp.search(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i) !== -1)
-        tmp = '_' + tmp;
-      if (tmp[tmp.length - 1] === ' ' || tmp[tmp.length - 1] === '.')
-        tmp = tmp.slice(0, tmp.length - 1);
-    }
-    return tmp;
-  });
+  const platformInfo = await browser.runtime.getPlatformInfo();
+  tmp = tmp.replace(regex, '_');
+  if (platformInfo.os === 'win') {
+    if (tmp.search(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i) !== -1)
+      tmp = '_' + tmp;
+    if (tmp[tmp.length - 1] === ' ' || tmp[tmp.length - 1] === '.')
+      tmp = tmp.slice(0, tmp.length - 1);
+  }
+  return tmp;
 }
 
 export function getFileName(

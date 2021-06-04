@@ -1,14 +1,16 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { Checkbox, IconButton } from '@material-ui/core';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import React from 'react';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import AddIcon from '@material-ui/icons/Add';
+import PauseIcon from '@material-ui/icons/Pause';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import SettingsIcon from '@material-ui/icons/Settings';
+import React from 'react';
+
 import { PauseJobs, RemoveJobs, StartJobs } from '../../aria2';
+import { openDetail, openSetting } from '../../browser';
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '../../types';
-import { openDetail } from '../../browser';
 
 interface IHeader {
   jobs: IJob[];
@@ -131,6 +133,13 @@ function Header({
           onClick={() => remove()}
         >
           <DeleteIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          className={classes.margin}
+          onClick={() => openSetting()}
+        >
+          <SettingsIcon />
         </IconButton>
         <IconButton size="small" onClick={() => openDetail(true)}>
           <MoreVertIcon />

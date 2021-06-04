@@ -1,6 +1,7 @@
 import { Button, TextareaAutosize } from '@material-ui/core';
-import { useState } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { useState } from 'react';
+
 import { AddUri } from '../../aria2';
 
 const useStyles = makeStyles((theme: Theme) =>
