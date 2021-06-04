@@ -2,7 +2,7 @@ import { Button, TextareaAutosize } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { useState } from 'react';
 
-import { AddUri } from '../../aria2';
+import { AddUris } from '../../aria2';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,9 +24,8 @@ function CreationArea({ close }: ICreationArea): JSX.Element {
 
   const [text, setText] = useState('');
 
-  function handleSubmit() {
-    const urls = text.split('\n');
-    urls.forEach(o => AddUri(o));
+  async function handleSubmit() {
+    await AddUris(text.split('\n'));
     setText('');
     close();
   }

@@ -58,31 +58,28 @@ function Header({
     setIsChecked(false);
   }
 
-  function start(): void {
+  async function start(): Promise<void> {
     const gid = checked.filter(o => o);
     const context = jobs
       .filter(o => gid.includes(o.gid) && o.status === PAUSED_JOB)
       .map(o => o.gid);
-    StartJobs(context)
-      .then(() => reset())
-      .catch(err => console.error(err));
+    await StartJobs(...context);
+    reset();
   }
 
-  function pause() {
+  async function pause(): Promise<void> {
     const gid = checked.filter(o => o);
     const context = jobs
       .filter(o => gid.includes(o.gid) && o.status === ACTIVE_JOB)
       .map(o => o.gid);
-    PauseJobs(context)
-      .then(() => reset())
-      .catch(err => console.error(err));
+    await PauseJobs(...context);
+    reset();
   }
 
-  function remove() {
+  async function remove(): Promise<void> {
     const gid = checked.filter(o => o);
-    RemoveJobs(gid)
-      .then(() => reset())
-      .catch(err => console.error(err));
+    await RemoveJobs(...gid);
+    reset();
   }
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {

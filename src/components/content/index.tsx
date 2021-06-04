@@ -13,7 +13,7 @@ import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import React from 'react';
 
-import { PauseJob, StartJob } from '../../aria2';
+import { PauseJobs, StartJobs } from '../../aria2';
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '../../types';
 import { parseBytes } from '../../utils';
 import Progress from '../progress';
@@ -68,10 +68,10 @@ function getProgress(job: IJob): number {
 async function jobAction(job: IJob) {
   switch (job.status) {
     case ACTIVE_JOB:
-      await PauseJob(job.gid);
+      await PauseJobs(job.gid);
       break;
     case PAUSED_JOB:
-      await StartJob(job.gid);
+      await StartJobs(job.gid);
       break;
     default:
       console.error(`Invalid job status ${job.status}`);

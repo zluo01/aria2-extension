@@ -38,32 +38,58 @@ export async function GetJobs(): Promise<IJob[]> {
   return flatten(data);
 }
 
-export async function StartJob(gid: string): Promise<void> {
-  await singleCall(() => aria2.call('unpause', gid));
+export async function StartJobs(...gid: string[]): Promise<void> {
+  if (!gid.length) {
+    return;
+  }
+  try {
+    const multiCallItems = gid.map(o => ['unpause', o]);
+    await multiCall(multiCallItems);
+  } catch (e) {
+    console.error(e);
+  }
 }
 
-export async function StartJobs(gid: string[]): Promise<void> {
-  const multiCallItems = gid.map(o => ['unpause', o]);
-  await multiCall(multiCallItems);
+export async function PauseJobs(...gid: string[]): Promise<void> {
+  if (!gid.length) {
+    return;
+  }
+  try {
+    const multiCallItems = gid.map(o => ['pause', o]);
+    await multiCall(multiCallItems);
+  } catch (e) {
+    console.error(e);
+  }
 }
 
-export async function PauseJob(gid: string): Promise<void> {
-  await singleCall(() => aria2.call('pause', gid));
-}
-
-export async function PauseJobs(gid: string[]): Promise<void> {
-  const multiCallItems = gid.map(o => ['pause', o]);
-  await multiCall(multiCallItems);
-}
-
-export async function RemoveJobs(gid: string[]): Promise<void> {
-  const multiCallItems = gid.map(o => ['remove', o]);
-  await multiCall(multiCallItems);
+export async function RemoveJobs(...gid: string[]): Promise<void> {
+  if (!gid.length) {
+    return;
+  }
+  try {
+    const multiCallItems = gid.map(o => ['remove', o]);
+    await multiCall(multiCallItems);
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 export async function GetNumJobs(): Promise<number> {
   const data = await singleCall(() => aria2.call('tellActive'));
   return data.length;
+}
+
+export async function AddUris(uris: string[]): Promise<void> {
+  if (uris.length === 0) {
+    return;
+  }
+  try {
+    const multiCallItems = uris.map(o => ['addUri', o]);
+    await multiCall(multiCallItems);
+    await notify(`Start downloading ${uris.length} files using Aria2`);
+  } catch (e) {
+    await notify(e.message || e);
+  }
 }
 
 export async function AddUri(
