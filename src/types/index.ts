@@ -47,3 +47,15 @@ export const DEFAULT_CONFIG: IConfig = {
   port: 6800,
   token: '',
 };
+
+export interface IScript {
+  name: string;
+  domain: string;
+  code: string;
+}
+
+export const DEFAULT_SCRIPT: IScript = {
+  name: '',
+  domain: '',
+  code: '',
+};

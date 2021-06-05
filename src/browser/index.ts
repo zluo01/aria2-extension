@@ -1,7 +1,13 @@
 import { browser, BrowserAction, Windows } from 'webextension-polyfill-ts';
 
 import { AddUri } from '../aria2';
-import { DEFAULT_CONFIG, IConfig, IDownload, IFileDetail } from '../types';
+import {
+  DEFAULT_CONFIG,
+  IConfig,
+  IDownload,
+  IFileDetail,
+  IScript,
+} from '../types';
 
 export async function getConfiguration(): Promise<IConfig> {
   const config = await browser.storage.local.get('config');
@@ -10,6 +16,15 @@ export async function getConfiguration(): Promise<IConfig> {
 
 export async function setConfiguration(config: IConfig): Promise<void> {
   return browser.storage.local.set({ config: config });
+}
+
+export async function getScripts(): Promise<IScript[]> {
+  const config = await browser.storage.local.get('scripts');
+  return config.scripts || [];
+}
+
+export async function setScripts(scripts: IScript[]): Promise<void> {
+  return browser.storage.local.set({ scripts: scripts });
 }
 
 export function openDetail(fromExtension: boolean): void {
@@ -28,6 +43,7 @@ export function openDetail(fromExtension: boolean): void {
 export async function openSetting(): Promise<void> {
   const url = browser.runtime.getURL('target/settings/index.html');
   await browser.tabs.create({ url: url });
+  window.close();
 }
 
 export async function removeBlankTab(): Promise<void> {

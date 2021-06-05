@@ -25,7 +25,7 @@ function CreationArea({ close }: ICreationArea): JSX.Element {
   const [text, setText] = useState('');
 
   async function handleSubmit() {
-    await AddUris(text.split('\n'));
+    await AddUris(...text.split('\n'));
     setText('');
     close();
   }

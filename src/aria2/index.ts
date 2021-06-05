@@ -79,8 +79,8 @@ export async function GetNumJobs(): Promise<number> {
   return data.length;
 }
 
-export async function AddUris(uris: string[]): Promise<void> {
-  if (uris.length === 0) {
+export async function AddUris(...uris: string[]): Promise<void> {
+  if (!uris.length) {
     return;
   }
   try {
