@@ -84,7 +84,7 @@ export async function AddUris(...uris: string[]): Promise<void> {
     return;
   }
   try {
-    const multiCallItems = uris.map(o => ['addUri', o]);
+    const multiCallItems = uris.map(o => ['addUri', [o]]);
     await multiCall(multiCallItems);
     await notify(`Start downloading ${uris.length} files using Aria2`);
   } catch (e) {
@@ -135,7 +135,9 @@ async function singleCall(func: () => Promise<any>): Promise<any> {
   return data;
 }
 
-async function multiCall(callItems: (string | number)[][]): Promise<any> {
+async function multiCall(
+  callItems: (string | number | string[])[][]
+): Promise<any> {
   const instanceType: Aria2ClientType = await ConstructAria2Instance();
   const useWebSocket = instanceType === Aria2WsClient;
   if (useWebSocket) {
