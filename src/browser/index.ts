@@ -1,30 +1,82 @@
 import { browser, BrowserAction, Windows } from 'webextension-polyfill-ts';
-import { IDownload, IFileDetail } from '../types';
-import { AddUri } from '../aria2';
 
-export function openDetail(fromExtension: boolean): void {
-  const url = 'AriaNg/index.html#!/settings/rpc/set/ws/127.0.0.1/6800/jsonrpc';
-  browser.tabs.create({ url: url }).catch(err => console.error(err));
-  if (fromExtension) {
-    window.close();
+import { AddUri } from '../aria2';
+import {
+  DEFAULT_CONFIG,
+  IConfig,
+  IDownload,
+  IFileDetail,
+  IScript,
+} from '../types';
+
+export async function getConfiguration(): Promise<IConfig> {
+  const config = await browser.storage.local.get('config');
+  return config.config || DEFAULT_CONFIG;
+}
+
+export async function setConfiguration(config: IConfig): Promise<void> {
+  return browser.storage.local.set({ config: config });
+}
+
+export async function getScripts(): Promise<IScript[]> {
+  const config = await browser.storage.local.get('scripts');
+  return config.scripts || [];
+}
+
+export async function updateScripts(scripts: IScript[]): Promise<void> {
+  return browser.storage.local.set({ scripts: scripts });
+}
+
+export async function addScript(script: IScript, index: number): Promise<void> {
+  try {
+    const config = await browser.storage.local.get('scripts');
+    const scripts = (config.scripts as IScript[]) || [];
+    if (index >= 0) {
+      scripts[index] = script;
+    } else {
+      scripts.push(script);
+    }
+    return browser.storage.local.set({ scripts: scripts });
+  } catch (e) {
+    console.error('Add Script', e);
   }
 }
 
-export function removeBlankTab(): Promise<void> {
-  return browser.tabs
-    .query({
+export function openDetail(fromExtension: boolean): void {
+  getConfiguration()
+    .then(
+      config =>
+        `AriaNg/index.html#!/settings/rpc/set/${config.protocol}/${
+          config.host
+        }/${config.port}/jsonrpc/${btoa(config.token)}`
+    )
+    .then(url => browser.tabs.create({ url: url }))
+    .then(() => fromExtension && window.close())
+    .catch(err => console.error('Open Detail Page', err));
+}
+
+export async function openSetting(): Promise<void> {
+  const url = browser.runtime.getURL('target/settings/index.html');
+  await browser.tabs.create({ url: url });
+  window.close();
+}
+
+export async function removeBlankTab(): Promise<void> {
+  try {
+    const tabsInfo = await browser.tabs.query({
       active: true,
       lastFocusedWindow: true,
       windowType: 'normal',
-    })
-    .then(tabsInfo => {
-      if (tabsInfo && tabsInfo[0].url === 'about:blank') {
-        return browser.tabs.remove(tabsInfo[0].id as number);
-      }
     });
+    if (tabsInfo?.length > 0 && tabsInfo[0].url === 'about:blank') {
+      await browser.tabs.remove(tabsInfo[0].id as number);
+    }
+  } catch (err) {
+    console.error('Remove Blank Tab', err);
+  }
 }
 
-export function notify(msg: string): Promise<string> {
+export async function notify(msg: string): Promise<string> {
   return browser.notifications.create({
     type: 'basic',
     iconUrl: browser.extension.getURL('logo48.png'),
@@ -34,7 +86,7 @@ export function notify(msg: string): Promise<string> {
 }
 
 // https://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
-export function createDownloadPanel(): Promise<Windows.Window> {
+export async function createDownloadPanel(): Promise<Windows.Window> {
   const w = 520;
   const h = 330;
   // Fixes dual-screen position  Most browsers      Firefox
@@ -60,56 +112,59 @@ export function createDownloadPanel(): Promise<Windows.Window> {
 
   const url = browser.runtime.getURL('target/download.html');
 
-  return getCurrentWindow().then(windowInfo =>
-    browser.windows.create({
-      top: Math.round(top),
-      left: Math.round(left),
-      url: url,
-      type: 'popup',
-      width: w,
-      height: h,
-      incognito: windowInfo.incognito,
-    })
-  );
+  const windowInfo = await getCurrentWindow();
+  return browser.windows.create({
+    top: Math.round(top),
+    left: Math.round(left),
+    url: url,
+    type: 'popup',
+    width: w,
+    height: h,
+    incognito: windowInfo.incognito,
+  });
 }
 
-export function getJobDetail(): Promise<IFileDetail> {
+export async function getJobDetail(): Promise<IFileDetail> {
   return browser.runtime.sendMessage({
     type: 'all',
   });
 }
 
-export function download(
+export async function download(
   url: string,
   fileName: string,
   filePath: string,
   header: string[]
-): void {
-  const options: IDownload = {
-    out: fileName,
-  };
-  if (filePath) {
-    options.dir = filePath.replace(/\\/g, '\\\\');
+): Promise<void> {
+  try {
+    const options: IDownload = {
+      out: fileName,
+    };
+    if (filePath) {
+      options.dir = filePath.replace(/\\/g, '\\\\');
+    }
+    if (header) {
+      options.header = header as string[];
+    }
+    await AddUri(url, fileName, options);
+    const windowInfo = await getCurrentWindow();
+    if (windowInfo.id) {
+      await browser.windows.remove(windowInfo.id);
+    }
+  } catch (err) {
+    console.error('Download', err);
   }
-  if (header) {
-    options.header = header as string[];
-  }
-  AddUri(url, fileName, options);
-  getCurrentWindow()
-    .then(windowInfo => {
-      if (windowInfo.id) {
-        return browser.windows.remove(windowInfo.id);
-      }
-    })
-    .catch(err => console.error(err));
 }
 
-export function saveFile(url: string, fileName: string, as: boolean): void {
-  let windowID: number | undefined;
-  getCurrentWindow()
-    .then(window => {
-      windowID = window.id;
-      return fileName !== ''
+export async function saveFile(
+  url: string,
+  fileName: string,
+  as: boolean
+): Promise<void> {
+  try {
+    const window = await getCurrentWindow();
+    const downloadOptions =
+      fileName !== ''
         ? {
             // conflictAction: "prompt",  //not work
             filename: fileName,
@@ -123,27 +178,27 @@ export function saveFile(url: string, fileName: string, as: boolean): void {
             saveAs: as,
             url: url,
           };
-    })
-    .then(options => browser.downloads.download(options))
-    .then(() => {
-      if (windowID && windowID !== 0) {
-        return browser.windows.remove(windowID);
-      }
-    })
-    .catch(err => notify(err.message || err));
+    await browser.downloads.download(downloadOptions);
+    if (window.id && window.id !== 0) {
+      await browser.windows.remove(window.id);
+    }
+  } catch (err) {
+    await notify(err.message || err);
+  }
 }
 
-function getCurrentWindow(): Promise<Windows.Window> {
+async function getCurrentWindow(): Promise<Windows.Window> {
   return browser.windows.getCurrent();
 }
 
 export async function updateBadge(num: number): Promise<void> {
-  const value = num > 0 ? num.toString() : null;
-  const color =
-    num > 0 ? '#303030' : ([217, 0, 0, 255] as BrowserAction.ColorArray);
-  return browser.browserAction
-    .setBadgeText({ text: value })
-    .then(() =>
-      browser.browserAction.setBadgeBackgroundColor({ color: color })
-    );
+  try {
+    const value = num > 0 ? num.toString() : null;
+    const color =
+      num > 0 ? '#303030' : ([217, 0, 0, 255] as BrowserAction.ColorArray);
+    await browser.browserAction.setBadgeText({ text: value });
+    await browser.browserAction.setBadgeBackgroundColor({ color: color });
+  } catch (err) {
+    console.error('Update Badge', err);
+  }
 }

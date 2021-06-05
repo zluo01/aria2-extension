@@ -1,7 +1,10 @@
-import ReactDOM from 'react-dom';
-import { useEffect, useState, StrictMode, useMemo, ChangeEvent } from 'react';
-import { getJobDetail, download, saveFile } from '../../browser';
-import { IFileDetail } from '../../types';
+import {
+  Button,
+  TextareaAutosize,
+  TextField,
+  Typography,
+} from '@material-ui/core';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import {
   createMuiTheme,
   createStyles,
@@ -9,14 +12,12 @@ import {
   Theme,
   ThemeProvider,
 } from '@material-ui/core/styles';
-import {
-  Button,
-  TextareaAutosize,
-  TextField,
-  Typography,
-} from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import { useEffect, useState, StrictMode, useMemo, ChangeEvent } from 'react';
+import ReactDOM from 'react-dom';
+
+import { getJobDetail, download, saveFile } from '../../browser';
+import { IFileDetail } from '../../types';
 import { verifyFileName } from '../../utils';
 
 const useStyles = makeStyles((theme: Theme) =>

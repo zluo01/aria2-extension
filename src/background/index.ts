@@ -1,4 +1,5 @@
 import { browser, WebRequest } from 'webextension-polyfill-ts';
+
 import { AddUri, GetNumJobs } from '../aria2';
 import {
   createDownloadPanel,
@@ -6,13 +7,14 @@ import {
   removeBlankTab,
   updateBadge,
 } from '../browser';
+import { IFileDetail } from '../types';
 import {
   correctFileName,
   getFileName,
   getRequestHeaders,
   parseBytes,
 } from '../utils';
-import { IFileDetail } from '../types';
+
 import ResourceType = WebRequest.ResourceType;
 import OnSendHeadersDetailsType = WebRequest.OnSendHeadersDetailsType;
 import OnHeadersReceivedDetailsType = WebRequest.OnHeadersReceivedDetailsType;
@@ -31,7 +33,7 @@ browser.contextMenus.create({
 
 browser.contextMenus.onClicked.addListener((info, _tab) => {
   if (info.menuItemId === CONTEXT_ID) {
-    AddUri(escapeHTML(info.linkUrl as string));
+    AddUri(escapeHTML(info.linkUrl as string)).catch(err => console.error(err));
   }
 });
 
@@ -74,32 +76,30 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
   } catch (e) {}
 
   // file name cannot have ""
-  fileName = fileName.replace('";', '');
-  fileName = fileName.replace('"', '');
-  fileName = fileName.replace('"', '');
+  fileName = fileName.replace('UTF-8', '');
+  fileName = fileName.replaceAll(';', '');
+  fileName = fileName.replaceAll('"', '');
+  fileName = fileName.replaceAll("'", '');
 
   // correct File Name
-  correctFileName(fileName).then(name => {
-    fileName = name;
-  });
+  try {
+    detail.fileName = await correctFileName(fileName);
+    // get file size
+    if (d.responseHeaders) {
+      const fid = d.responseHeaders.findIndex(
+        x => x.name.toLowerCase() === 'content-length'
+      );
+      detail.fileSize =
+        fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
+    }
 
-  detail.fileName = fileName;
-
-  // get file size
-  if (d.responseHeaders) {
-    const fid = d.responseHeaders.findIndex(
-      x => x.name.toLowerCase() === 'content-length'
-    );
-    detail.fileSize =
-      fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
+    // create download panel
+    processQueue.push(detail);
+    await createDownloadPanel();
+    await removeBlankTab();
+  } catch (e) {
+    console.error(e);
   }
-
-  // create download panel
-  processQueue.push(detail);
-  createDownloadPanel()
-    .then(() => removeBlankTab())
-    .catch(err => console.error(err));
-  // download(d.url, fileName, requestHeaders);
 }
 
 function observeResponse(

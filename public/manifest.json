@@ -25,8 +25,9 @@
     "webRequestBlocking",
     "<all_urls>"
   ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
   "manifest_version": 2,
-  "version": "0.2.3",
+  "version": "0.3.0",
   "browser_action": {
     "default_popup": "index.html",
     "default_title": "Aria2Ex"

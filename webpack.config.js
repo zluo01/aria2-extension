@@ -11,6 +11,7 @@ module.exports = {
     // "content/index.js": "./content/index.js"
     // Download Panel Scripts
     'panel/index.js': './components/panel/index.tsx',
+    'settings/index.js': './settings/index.tsx',
   },
   output: {
     path: path.resolve(__dirname, 'build/target'),
@@ -26,6 +27,11 @@ module.exports = {
       template: './components/panel/index.html',
       chunks: ['panel/index.js'],
     }),
+    new HtmlWebpackPlugin({
+      filename: 'settings/index.html',
+      template: './settings/index.html',
+      chunks: ['settings/index.js'],
+    }),
   ],
   module: {
     rules: [
@@ -39,6 +45,10 @@ module.exports = {
           },
         },
         exclude: /node_modules/,
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },

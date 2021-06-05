@@ -11,16 +11,14 @@ Firefox web extension for Aria2
 
 ## Todo
 
-- Allow multiple Aria2 instance, currently only support local default
 - Custom configuration
+- Adding third party scripts support
+- Allow multiple Aria2 instance, currently only support local default
 - Background job monitor
 
 ## Reference
 
-https://github.com/aria2/aria2
-
-https://github.com/mayswind/AriaNg
-
-https://github.com/sonnyp/aria2.js/
-
-https://github.com/RossWang/Aria2-Integration
+- https://github.com/aria2/aria2
+- https://github.com/mayswind/AriaNg
+- https://github.com/sonnyp/aria2.js/
+- https://github.com/RossWang/Aria2-Integration

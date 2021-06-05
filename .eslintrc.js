@@ -11,6 +11,7 @@ module.exports = {
     'standard',
     'plugin:@typescript-eslint/recommended',
     'prettier',
+    'plugin:promise/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -51,6 +52,12 @@ module.exports = {
     ],
     camelcase: 'off',
     '@typescript-eslint/camelcase': 'off',
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: ['@material-ui/*/*/*', '!@material-ui/core/test-utils/*'],
+      },
+    ],
   },
   overrides: [
     {

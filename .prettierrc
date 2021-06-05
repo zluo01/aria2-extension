@@ -1,5 +1,7 @@
 {
   "arrowParens": "avoid",
   "semi": true,
-  "singleQuote": true
+  "singleQuote": true,
+  "importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+  "importOrderSeparation": true
 }
