@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { getScripts } from '../../browser';
+import { addScript, getScripts } from '../../browser';
 import { DEFAULT_SCRIPT, IScript } from '../../types';
 import './index.css';
 
@@ -38,12 +38,13 @@ const useStyles = makeStyles((theme: Theme) =>
 function EditScript(): JSX.Element {
   const classes = useStyles();
   const history = useHistory();
-  const location = useLocation();
 
   const [script, setScript] = useState<IScript>(DEFAULT_SCRIPT);
 
+  const location = useLocation();
+  const id = location.search.replace('?id=', '');
+
   useEffect(() => {
-    const id = location.search.replace('?id=', '');
     if (id) {
       getScripts()
         .then(scripts => setScript(scripts[parseInt(id)]))
@@ -61,6 +62,15 @@ function EditScript(): JSX.Element {
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) {
     setScript(prevState => ({ ...prevState, domain: e.target.value }));
+  }
+
+  async function handleCancel() {
+    history.push('/');
+  }
+
+  async function handleAddScript() {
+    await addScript(script, parseInt(id));
+    await handleCancel();
   }
 
   return (
@@ -108,12 +118,17 @@ function EditScript(): JSX.Element {
           className={classes.button}
           variant="outlined"
           color="secondary"
-          onClick={() => history.push('/')}
+          onClick={handleCancel}
         >
           Cancel
         </Button>
-        <Button className={classes.button} variant="outlined" color="primary">
-          Add
+        <Button
+          className={classes.button}
+          variant="outlined"
+          color="primary"
+          onClick={handleAddScript}
+        >
+          {id ? 'Save' : 'Add'}
         </Button>
       </div>
     </Container>

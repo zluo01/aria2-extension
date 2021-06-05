@@ -24,7 +24,12 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { getConfiguration, getScripts, setConfiguration } from '../../browser';
+import {
+  getConfiguration,
+  getScripts,
+  setConfiguration,
+  updateScripts,
+} from '../../browser';
 import { DEFAULT_CONFIG, IConfig, IScript } from '../../types';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -98,9 +103,13 @@ function Setting(): JSX.Element {
     ) {
       return;
     }
-    history.push('/edit');
     setOpen(false);
   };
+
+  async function handleAddScript() {
+    history.push('/edit');
+    setOpen(false);
+  }
 
   async function updateDownloadPath(
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -140,6 +149,17 @@ function Setting(): JSX.Element {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async function handleEdit(index: number) {
+    history.push(`/edit?id=${index}`);
+  }
+
+  async function handleDelete(index: number) {
+    const result = [...scripts];
+    result.splice(index, 1);
+    await updateScripts(result);
+    setScripts(result);
   }
 
   return (
@@ -234,7 +254,7 @@ function Setting(): JSX.Element {
                 <Paper>
                   <ClickAwayListener onClickAway={handleClose}>
                     <MenuList autoFocusItem={open}>
-                      <MenuItem onClick={handleClose}>New Script</MenuItem>
+                      <MenuItem onClick={handleAddScript}>New Script</MenuItem>
                       <MenuItem onClick={handleClose}>Import</MenuItem>
                       <MenuItem onClick={handleClose}>Export</MenuItem>
                     </MenuList>
@@ -247,17 +267,21 @@ function Setting(): JSX.Element {
       </div>
       <List>
         {scripts.map((value, index) => (
-          <ListItem key={index}>
+          <ListItem key={index} button onDoubleClick={() => handleEdit(index)}>
             <ListItemText primary={value.name} secondary={value.domain} />
             <ListItemSecondaryAction>
               <IconButton
                 edge="end"
                 aria-label="edit"
-                onClick={() => history.push(`/edit?id=${index}`)}
+                onClick={() => handleEdit(index)}
               >
                 <EditIcon />
               </IconButton>
-              <IconButton edge="end" aria-label="delete">
+              <IconButton
+                edge="end"
+                aria-label="delete"
+                onClick={() => handleDelete(index)}
+              >
                 <DeleteIcon />
               </IconButton>
             </ListItemSecondaryAction>

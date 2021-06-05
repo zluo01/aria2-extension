@@ -46,7 +46,7 @@ export async function StartJobs(...gid: string[]): Promise<void> {
     const multiCallItems = gid.map(o => ['unpause', o]);
     await multiCall(multiCallItems);
   } catch (e) {
-    console.error(e);
+    console.error('Start Jobs', e);
   }
 }
 
@@ -58,7 +58,7 @@ export async function PauseJobs(...gid: string[]): Promise<void> {
     const multiCallItems = gid.map(o => ['pause', o]);
     await multiCall(multiCallItems);
   } catch (e) {
-    console.error(e);
+    console.error('Pause Jobs', e);
   }
 }
 
@@ -70,7 +70,7 @@ export async function RemoveJobs(...gid: string[]): Promise<void> {
     const multiCallItems = gid.map(o => ['remove', o]);
     await multiCall(multiCallItems);
   } catch (e) {
-    console.error(e);
+    console.error('Remove Jobs', e);
   }
 }
 

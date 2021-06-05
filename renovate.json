@@ -5,6 +5,18 @@
     {
       "updateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
+    },
+    {
+      "matchPackagePatterns": ["eslint"],
+      "groupName": "eslint"
+    },
+    {
+      "matchPackagePatterns": ["@types/"],
+      "groupName": "types"
+    },
+    {
+      "matchPackagePatterns": ["react-"],
+      "groupName": "react"
     }
   ],
   "postUpdateOptions": ["npmDedupe"]

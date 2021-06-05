@@ -23,8 +23,23 @@ export async function getScripts(): Promise<IScript[]> {
   return config.scripts || [];
 }
 
-export async function setScripts(scripts: IScript[]): Promise<void> {
+export async function updateScripts(scripts: IScript[]): Promise<void> {
   return browser.storage.local.set({ scripts: scripts });
+}
+
+export async function addScript(script: IScript, index: number): Promise<void> {
+  try {
+    const config = await browser.storage.local.get('scripts');
+    const scripts = (config.scripts as IScript[]) || [];
+    if (index >= 0) {
+      scripts[index] = script;
+    } else {
+      scripts.push(script);
+    }
+    return browser.storage.local.set({ scripts: scripts });
+  } catch (e) {
+    console.error('Add Script', e);
+  }
 }
 
 export function openDetail(fromExtension: boolean): void {
@@ -37,7 +52,7 @@ export function openDetail(fromExtension: boolean): void {
     )
     .then(url => browser.tabs.create({ url: url }))
     .then(() => fromExtension && window.close())
-    .catch(err => console.error(err));
+    .catch(err => console.error('Open Detail Page', err));
 }
 
 export async function openSetting(): Promise<void> {
@@ -57,7 +72,7 @@ export async function removeBlankTab(): Promise<void> {
       await browser.tabs.remove(tabsInfo[0].id as number);
     }
   } catch (err) {
-    console.error(err);
+    console.error('Remove Blank Tab', err);
   }
 }
 
@@ -137,7 +152,7 @@ export async function download(
       await browser.windows.remove(windowInfo.id);
     }
   } catch (err) {
-    console.error(err);
+    console.error('Download', err);
   }
 }
 
@@ -184,6 +199,6 @@ export async function updateBadge(num: number): Promise<void> {
     await browser.browserAction.setBadgeText({ text: value });
     await browser.browserAction.setBadgeBackgroundColor({ color: color });
   } catch (err) {
-    console.error(err);
+    console.error('Update Badge', err);
   }
 }

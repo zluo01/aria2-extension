@@ -1,6 +1,6 @@
 {
   "name": "aria2-extension",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "private": true,
   "dependencies": {
     "@material-ui/core": "4.11.4",

@@ -18,10 +18,7 @@ Firefox web extension for Aria2
 
 ## Reference
 
-https://github.com/aria2/aria2
-
-https://github.com/mayswind/AriaNg
-
-https://github.com/sonnyp/aria2.js/
-
-https://github.com/RossWang/Aria2-Integration
+- https://github.com/aria2/aria2
+- https://github.com/mayswind/AriaNg
+- https://github.com/sonnyp/aria2.js/
+- https://github.com/RossWang/Aria2-Integration
