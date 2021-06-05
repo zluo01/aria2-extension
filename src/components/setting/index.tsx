@@ -1,20 +1,17 @@
 import Button from '@material-ui/core/Button';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Container from '@material-ui/core/Container';
+import Fade from '@material-ui/core/Fade';
 import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import Grow from '@material-ui/core/Grow';
 import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
+import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
 import NativeSelect from '@material-ui/core/NativeSelect';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -58,6 +55,12 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'space-between',
       alignItems: 'center',
     },
+    placeHolder: {
+      height: 382,
+      border: '1px solid',
+      borderColor: theme.palette.text.secondary,
+      overflow: 'auto',
+    },
   })
 );
 
@@ -78,7 +81,7 @@ function Setting(): JSX.Element {
 
   // dropdown button
   const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLButtonElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
     getConfiguration()
@@ -92,19 +95,13 @@ function Setting(): JSX.Element {
       .catch(err => console.error(err));
   }, []);
 
-  const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen);
-  };
+  async function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
+    setAnchorEl(event.currentTarget);
+  }
 
-  const handleClose = (event: React.MouseEvent<EventTarget>) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
-      return;
-    }
-    setOpen(false);
-  };
+  async function handleClose() {
+    setAnchorEl(null);
+  }
 
   async function handleAddScript() {
     history.push('/edit');
@@ -229,65 +226,56 @@ function Setting(): JSX.Element {
         </Typography>
         <div>
           <IconButton
-            ref={anchorRef}
             aria-controls={open ? 'menu-list-grow' : undefined}
             aria-haspopup="true"
-            onClick={handleToggle}
+            onClick={handleClick}
           >
             <MoreVertIcon />
           </IconButton>
-          <Popper
-            open={open}
-            anchorEl={anchorRef.current}
-            role={undefined}
-            transition
-            disablePortal
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            TransitionComponent={Fade}
           >
-            {({ TransitionProps, placement }) => (
-              <Grow
-                {...TransitionProps}
-                style={{
-                  transformOrigin:
-                    placement === 'bottom' ? 'center top' : 'center bottom',
-                }}
-              >
-                <Paper>
-                  <ClickAwayListener onClickAway={handleClose}>
-                    <MenuList autoFocusItem={open}>
-                      <MenuItem onClick={handleAddScript}>New Script</MenuItem>
-                      <MenuItem onClick={handleClose}>Import</MenuItem>
-                      <MenuItem onClick={handleClose}>Export</MenuItem>
-                    </MenuList>
-                  </ClickAwayListener>
-                </Paper>
-              </Grow>
-            )}
-          </Popper>
+            <MenuItem onClick={handleAddScript}>New Script</MenuItem>
+            <MenuItem onClick={handleClose}>Import</MenuItem>
+            <MenuItem onClick={handleClose}>Export</MenuItem>
+          </Menu>
         </div>
       </div>
-      <List>
-        {scripts.map((value, index) => (
-          <ListItem key={index} button onDoubleClick={() => handleEdit(index)}>
-            <ListItemText primary={value.name} secondary={value.domain} />
-            <ListItemSecondaryAction>
-              <IconButton
-                edge="end"
-                aria-label="edit"
-                onClick={() => handleEdit(index)}
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                edge="end"
-                aria-label="delete"
-                onClick={() => handleDelete(index)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
+      <div className={classes.placeHolder}>
+        <List>
+          {scripts.map((value, index) => (
+            <ListItem
+              key={index}
+              button
+              onDoubleClick={() => handleEdit(index)}
+              divider
+              dense
+            >
+              <ListItemText primary={value.name} secondary={value.domain} />
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  aria-label="edit"
+                  onClick={() => handleEdit(index)}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  onClick={() => handleDelete(index)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+      </div>
       <div className={classes.buttonGroup}>
         <Button
           className={classes.button}
