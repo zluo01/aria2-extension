@@ -1,0 +1,35 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Build/release
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Node.js, NPM
+      uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+    - run: npm install
+    
+    - name: build extension
+      run: npm run complete
+      
+    - name: Get VERSION
+      run: |
+        echo "VERSION=$(awk -F'"' '/"version": ".+"/{ print $4; exit; }' package.json)" >> $GITHUB_ENV
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: aria2_integration_extension-_${{ env.VERSION }}
+        path: artifacts/aria2_integration_extension--${{ env.VERSION }}.zip
