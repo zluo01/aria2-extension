@@ -57,7 +57,7 @@ export interface IScript {
 export const DEFAULT_SCRIPT: IScript = {
   name: '',
   domain: '',
-  code: `(function() {
+  code: `(function(url) {
   'use strict';
   
   // Your code here...
