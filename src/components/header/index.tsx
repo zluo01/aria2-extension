@@ -23,8 +23,9 @@ interface IHeader {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '98%',
-      minWidth: 360,
+      width: 420,
+      paddingLeft: 3,
+      paddingRight: 3,
       margin: 'auto',
       display: 'flex',
       flexFlow: 'row nowrap',

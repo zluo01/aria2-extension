@@ -5,31 +5,30 @@ name: Build/release
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Install Node.js, NPM
-      uses: actions/setup-node@v2
-      with:
-        node-version: '12'
-    - run: npm install
-    
-    - name: build extension
-      run: npm run complete
-      
-    - name: Get VERSION
-      run: |
-        echo "VERSION=$(awk -F'"' '/"version": ".+"/{ print $4; exit; }' package.json)" >> $GITHUB_ENV
-    
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: aria2_integration_extension-_${{ env.VERSION }}
-        path: artifacts/aria2_integration_extension--${{ env.VERSION }}.zip
+      - name: Install Node.js, NPM
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - run: npm install
+
+      - name: build extension
+        run: npm run complete
+
+      - name: Get VERSION
+        run: |
+          echo "VERSION=$(awk -F'"' '/"version": ".+"/{ print $4; exit; }' package.json)" >> $GITHUB_ENV
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: aria2_integration_extension-_${{ env.VERSION }}
+          path: artifacts/aria2_integration_extension--${{ env.VERSION }}.zip
