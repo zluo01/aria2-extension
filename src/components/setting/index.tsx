@@ -19,7 +19,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -94,7 +94,6 @@ function Setting(): JSX.Element {
   const [scripts, setScripts] = useState<IScript[]>([]);
 
   // dropdown button
-  const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
@@ -119,7 +118,7 @@ function Setting(): JSX.Element {
 
   async function handleAddScript() {
     history.push('/edit');
-    setOpen(false);
+    await handleClose();
   }
 
   async function updateDownloadPath(
@@ -173,7 +172,7 @@ function Setting(): JSX.Element {
     setScripts(result);
   }
 
-  async function handleUpload(e: any) {
+  async function handleImport(e: any) {
     const fileReader = new FileReader();
 
     fileReader.readAsText(e.target.files[0]);
@@ -183,6 +182,20 @@ function Setting(): JSX.Element {
       setScripts(res);
       await handleClose();
     };
+  }
+
+  async function handleExport() {
+    const fileName = 'scripts';
+    const json = JSON.stringify(scripts);
+    const blob = new Blob([json], { type: 'application/json' });
+    const href = await URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = fileName + '.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    await handleClose();
   }
 
   return (
@@ -250,9 +263,11 @@ function Setting(): JSX.Element {
         <Typography variant="body1" className={classes.text}>
           Scripts
         </Typography>
-        <div>
+        <Fragment>
           <IconButton
-            aria-controls={open ? 'menu-list-grow' : undefined}
+            color="inherit"
+            aria-label="menu"
+            aria-controls="option-menu"
             aria-haspopup="true"
             onClick={handleClick}
           >
@@ -274,15 +289,17 @@ function Setting(): JSX.Element {
                 inputProps={{
                   accept: 'application/json',
                 }}
-                onChange={handleUpload}
+                onChange={handleImport}
               />
               <InputLabel className={classes.inputLabel} htmlFor={'file'}>
                 Import
               </InputLabel>
             </MenuItem>
-            <MenuItem onClick={handleClose}>Export</MenuItem>
+            <MenuItem onClick={handleExport} disabled={!scripts.length}>
+              Export
+            </MenuItem>
           </Menu>
-        </div>
+        </Fragment>
       </div>
       <div className={classes.placeHolder}>
         <List>
