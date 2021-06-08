@@ -4,6 +4,7 @@ import Fade from '@material-ui/core/Fade';
 import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import IconButton from '@material-ui/core/IconButton';
+import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -60,6 +61,19 @@ const useStyles = makeStyles((theme: Theme) =>
       border: '1px solid',
       borderColor: theme.palette.text.secondary,
       overflow: 'auto',
+    },
+    input: {
+      display: 'none',
+    },
+    inputLabel: {
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      paddingTop: 6,
+      paddingBottom: 6,
+      color: 'inherit',
+      cursor: 'inherit',
     },
   })
 );
@@ -159,6 +173,18 @@ function Setting(): JSX.Element {
     setScripts(result);
   }
 
+  async function handleUpload(e: any) {
+    const fileReader = new FileReader();
+
+    fileReader.readAsText(e.target.files[0]);
+    fileReader.onload = async e => {
+      const res = JSON.parse(e.target?.result as string);
+      await updateScripts(res);
+      setScripts(res);
+      await handleClose();
+    };
+  }
+
   return (
     <Container maxWidth={'md'} fixed>
       <TextField
@@ -240,7 +266,20 @@ function Setting(): JSX.Element {
             TransitionComponent={Fade}
           >
             <MenuItem onClick={handleAddScript}>New Script</MenuItem>
-            <MenuItem onClick={handleClose}>Import</MenuItem>
+            <MenuItem>
+              <Input
+                className={classes.input}
+                type={'file'}
+                id={'file'}
+                inputProps={{
+                  accept: 'application/json',
+                }}
+                onChange={handleUpload}
+              />
+              <InputLabel className={classes.inputLabel} htmlFor={'file'}>
+                Import
+              </InputLabel>
+            </MenuItem>
             <MenuItem onClick={handleClose}>Export</MenuItem>
           </Menu>
         </div>
