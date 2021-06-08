@@ -23,10 +23,7 @@ interface IHeader {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: 420,
       paddingLeft: 3,
-      paddingRight: 3,
-      margin: 'auto',
       display: 'flex',
       flexFlow: 'row nowrap',
       justifyContent: 'space-between',
@@ -139,7 +136,11 @@ function Header({
         >
           <SettingsIcon />
         </IconButton>
-        <IconButton size="small" onClick={() => openDetail(true)}>
+        <IconButton
+          size="small"
+          className={classes.margin}
+          onClick={() => openDetail(true)}
+        >
           <MoreVertIcon />
         </IconButton>
       </div>

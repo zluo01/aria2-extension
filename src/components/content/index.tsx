@@ -21,7 +21,6 @@ import Progress from '../progress';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: 420,
       backgroundColor: theme.palette.background.paper,
     },
     item: {

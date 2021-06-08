@@ -1,5 +1,12 @@
+import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import {
+  createMuiTheme,
+  createStyles,
+  makeStyles,
+  Theme,
+  ThemeProvider,
+} from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import React, { useEffect, useState } from 'react';
 
@@ -9,18 +16,19 @@ import CreationArea from './components/create';
 import Header from './components/header';
 import { IJob } from './types';
 
-function App(): JSX.Element {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      width: '100%',
+      minWidth: 360,
+      maxWidth: 420,
+      backgroundColor: theme.palette.background.paper,
+    },
+  })
+);
 
-  const theme = React.useMemo(
-    () =>
-      createMuiTheme({
-        palette: {
-          type: prefersDarkMode ? 'dark' : 'light',
-        },
-      }),
-    [prefersDarkMode]
-  );
+function Display(): JSX.Element {
+  const classes = useStyles();
 
   const [jobs, setJobs] = useState<IJob[]>([]);
   const [checked, setChecked] = useState(['']);
@@ -53,8 +61,7 @@ function App(): JSX.Element {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <Container className={classes.root} maxWidth={false} disableGutters>
       <Header
         jobs={jobs}
         checked={checked}
@@ -67,6 +74,26 @@ function App(): JSX.Element {
       ) : (
         <DownloadList jobs={jobs} checked={checked} toggle={handleToggle} />
       )}
+    </Container>
+  );
+}
+function App(): JSX.Element {
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+  const theme = React.useMemo(
+    () =>
+      createMuiTheme({
+        palette: {
+          type: prefersDarkMode ? 'dark' : 'light',
+        },
+      }),
+    [prefersDarkMode]
+  );
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Display />
     </ThemeProvider>
   );
 }
