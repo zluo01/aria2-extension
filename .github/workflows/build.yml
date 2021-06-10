@@ -30,4 +30,5 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
+          name: aria2_integration_extension_${{ env.VERSION }}
           path: artifacts/aria2_integration_extension-${{ env.VERSION }}.zip
