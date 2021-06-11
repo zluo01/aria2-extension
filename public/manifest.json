@@ -14,7 +14,6 @@
     "scripts": ["target/background/index.js"]
   },
   "permissions": [
-    "activeTab",
     "tabs",
     "contextMenus",
     "notifications",
