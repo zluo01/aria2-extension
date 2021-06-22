@@ -5,7 +5,7 @@ Web extension for Aria2
 ## Installation
 
 - [Firefox](https://addons.mozilla.org/en-US/firefox/addon/aria2-integration-extension/?utm_content=addons-manager-reviews-link&utm_medium=firefox-browser&utm_source=firefox-browser)
-
+- [Chrome](https://chrome.google.com/webstore/detail/aria2-integration-extensi/chehmbmmchaagpilhabnocngnmjllgfi?hl=en&authuser=0)
 ## Features
 
 - Replace browser default download manager with Aria2
