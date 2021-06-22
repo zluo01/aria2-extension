@@ -118,3 +118,17 @@ export function parseBytes(value: string): string {
 
   return `${speed.toFixed(2)} ${symbol[order]}`;
 }
+
+const Function = Object.getPrototypeOf(function () {
+  // do nothing.
+}).constructor;
+
+export async function applyScript(url: string, code: string): Promise<string> {
+  let c = code.slice(0, -3) + '(url);';
+  c = 'return ' + c;
+  const func = new Function('url', c);
+  if (c.startsWith('(async')) {
+    return await func(url);
+  }
+  return func(url);
+}

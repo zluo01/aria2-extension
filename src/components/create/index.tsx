@@ -3,7 +3,8 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { useState } from 'react';
 
 import { AddUris } from '../../aria2';
-import { getScripts } from '../../browser';
+import { getScripts, notify } from '../../browser';
+import { applyScript } from '../../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -26,21 +27,24 @@ function CreationArea({ close }: ICreationArea): JSX.Element {
   const [text, setText] = useState('');
 
   async function handleSubmit() {
-    let uris = text.split('\n');
+    const uris = text.split('\n');
     const scripts = await getScripts();
-    uris = uris.map(uri => {
-      let copyUri = uri;
-      scripts.forEach(o => {
-        if (uri.match(o.domain)) {
-          let code = 'return ' + o.code;
-          code = code.slice(0, -3) + `(url);`;
-          // eslint-disable-next-line no-new-func
-          const func = new Function('url', code);
-          copyUri = func(copyUri);
+    for (let i = 0; i < uris.length; i++) {
+      let copyUri = uris[i];
+      for (let j = 0; j < scripts.length; j++) {
+        if (uris[i].match(scripts[j].domain)) {
+          try {
+            copyUri = await applyScript(copyUri, scripts[j].code);
+          } catch (e) {
+            await notify(e);
+            setText('');
+            close();
+            return;
+          }
         }
-      });
-      return copyUri;
-    });
+      }
+      uris[i] = copyUri;
+    }
 
     await AddUris(...uris);
     setText('');
