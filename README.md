@@ -49,7 +49,6 @@ and download all automatically in batch.
 
 - Allow multiple Aria2 instances, currently only support one instance.
 - Background job monitor.
-- Import & export scripts to local.
 
 ## Reference
 
