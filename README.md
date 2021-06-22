@@ -6,6 +6,7 @@ Web extension for Aria2
 
 - [Firefox](https://addons.mozilla.org/en-US/firefox/addon/aria2-integration-extension/?utm_content=addons-manager-reviews-link&utm_medium=firefox-browser&utm_source=firefox-browser)
 - [Chrome](https://chrome.google.com/webstore/detail/aria2-integration-extensi/chehmbmmchaagpilhabnocngnmjllgfi?hl=en&authuser=0)
+
 ## Features
 
 - Replace browser default download manager with Aria2
@@ -25,18 +26,15 @@ The new script extension allows user to download certain resources on websites w
 (async function (url) {
     'use strict';
 
-    try {
-        const res = await fetch(url);
-        if (res.ok) {
-          	const data = await res.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(data, "text/html");
-            const matches = doc.querySelector("<SOME-QUERY-SELECTOR>");
-            return matches.src;
-        } 
-    } catch (error) {
-        console.error(error);
+    const res = await fetch(url);
+    if (res.ok) {
+        const data = await res.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data, "text/html");
+        const matches = doc.querySelector("<SOME-QUERY-SELECTOR>");
+        return matches.src;
     }
+    throw res.statusText;
 })();
 ```
 
