@@ -19,24 +19,29 @@ Web extension for Aria2
 
 The new script extension allows user to download certain resources on websites without going into page source manually.
 
-For example, if one have domain filter as [exmaple.com](https://example.com). By applying the following code, one should
-be able to change the website as google and download the html files.
+### Example
 
 ```
-(function(url) {
-  'use strict';
+(async function (url) {
+    'use strict';
 
-  function changeDomain(){
-    return url.replace('example', 'google');
-  }
-
-  return changeDomain();
+    try {
+        const res = await fetch(url);
+        if (res.ok) {
+          	const data = await res.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data, "text/html");
+            const matches = doc.querySelector("<SOME-QUERY-SELECTOR>");
+            return matches.src;
+        } 
+    } catch (error) {
+        console.error(error);
+    }
 })();
 ```
 
 <p>
-The previous example is just a very easy demonstration on how the script works. With the input url as a parameter, user
-should be able to implement scripts utilize xPath search to find out media sources or batch images on define domains 
+With the input url as a parameter, user should be able to implement scripts utilize xPath or query selector to find out media sources or batch images on define domains 
 and download all automatically in batch.
 </p>
 
