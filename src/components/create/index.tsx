@@ -3,8 +3,8 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { useState } from 'react';
 
 import { AddUris } from '../../aria2';
-import { getScripts, notify } from '../../browser';
-import { applyScript } from '../../utils';
+import { notify } from '../../browser';
+import { applyScripts } from '../../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -27,26 +27,12 @@ function CreationArea({ close }: ICreationArea): JSX.Element {
   const [text, setText] = useState('');
 
   async function handleSubmit() {
-    const uris = text.split('\n');
-    const scripts = await getScripts();
-    for (let i = 0; i < uris.length; i++) {
-      let copyUri = uris[i];
-      for (let j = 0; j < scripts.length; j++) {
-        if (uris[i].match(scripts[j].domain)) {
-          try {
-            copyUri = await applyScript(copyUri, scripts[j].code);
-          } catch (e) {
-            await notify(e);
-            setText('');
-            close();
-            return;
-          }
-        }
-      }
-      uris[i] = copyUri;
+    try {
+      const uris = await applyScripts(...text.split('\n'));
+      await AddUris(...uris);
+    } catch (e) {
+      await notify(`fail to download files, msg: ${e.message || e}.`);
     }
-
-    await AddUris(...uris);
     setText('');
     close();
   }

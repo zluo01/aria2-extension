@@ -3,12 +3,14 @@ import { browser, WebRequest } from 'webextension-polyfill-ts';
 import { AddUri, GetNumJobs } from '../aria2';
 import {
   createDownloadPanel,
+  notify,
   openDetail,
   removeBlankTab,
   updateBadge,
 } from '../browser';
 import { IFileDetail } from '../types';
 import {
+  applyScripts,
   correctFileName,
   getFileName,
   getRequestHeaders,
@@ -28,12 +30,18 @@ const CONTEXT_ID = 'download-with-aria';
 browser.contextMenus.create({
   id: CONTEXT_ID,
   title: 'Download with Aria2',
-  contexts: ['link'],
+  contexts: ['link', 'video', 'audio'],
 });
 
-browser.contextMenus.onClicked.addListener((info, _tab) => {
+browser.contextMenus.onClicked.addListener(async (info, _tab) => {
   if (info.menuItemId === CONTEXT_ID) {
-    AddUri(escapeHTML(info.linkUrl as string)).catch(err => console.error(err));
+    try {
+      const uri = escapeHTML(info.linkUrl as string);
+      const processed = await applyScripts(uri);
+      await AddUri(processed[0]);
+    } catch (e) {
+      await notify(`fail to download url, msg: ${e.message || e}`);
+    }
   }
 });
 

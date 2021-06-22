@@ -77,6 +77,7 @@ function Display(): JSX.Element {
     </Container>
   );
 }
+
 function App(): JSX.Element {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
