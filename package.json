@@ -8,7 +8,7 @@
     "@types/react": "17.0.11",
     "@types/react-dom": "17.0.8",
     "aria2": "4.1.2",
-    "codemirror": "5.61.1",
+    "codemirror": "5.62.0",
     "react": "17.0.2",
     "react-codemirror2": "7.2.1",
     "react-dom": "17.0.2",
