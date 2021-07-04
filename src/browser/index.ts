@@ -1,4 +1,4 @@
-import { browser, BrowserAction, Windows } from 'webextension-polyfill-ts';
+import { Action, browser, Windows } from 'webextension-polyfill-ts';
 
 import { AddUri } from '../aria2';
 import {
@@ -79,7 +79,7 @@ export async function removeBlankTab(): Promise<void> {
 export async function notify(msg: string): Promise<string> {
   return browser.notifications.create({
     type: 'basic',
-    iconUrl: browser.extension.getURL('logo48.png'),
+    iconUrl: browser.runtime.getURL('logo48.png'),
     title: 'Aria2 Extension',
     message: msg,
   });
@@ -194,8 +194,7 @@ async function getCurrentWindow(): Promise<Windows.Window> {
 export async function updateBadge(num: number): Promise<void> {
   try {
     const value = num > 0 ? num.toString() : null;
-    const color =
-      num > 0 ? '#303030' : ([217, 0, 0, 255] as BrowserAction.ColorArray);
+    const color = num > 0 ? '#303030' : ([217, 0, 0, 255] as Action.ColorArray);
     await browser.browserAction.setBadgeText({ text: value });
     await browser.browserAction.setBadgeBackgroundColor({ color: color });
   } catch (err) {

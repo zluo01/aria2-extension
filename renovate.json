@@ -8,11 +8,15 @@
     },
     {
       "matchPackagePatterns": ["eslint"],
-      "groupName": "eslint"
+      "groupName": "minorDependencies"
     },
     {
-      "matchPackagePatterns": ["@types/"],
-      "groupName": "types"
+      "matchPackagePatterns": ["@types"],
+      "groupName": "minorDependencies"
+    },
+    {
+      "matchPackagePatterns": ["prettier"],
+      "groupName": "minorDependencies"
     },
     {
       "matchPackagePatterns": ["react-"],
