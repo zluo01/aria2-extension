@@ -40,7 +40,9 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
       const processed = await applyScripts(uri);
       await AddUri(processed[0]);
     } catch (e) {
-      await notify(`fail to download url, msg: ${e.message || e}`);
+      if (e instanceof Error) {
+        await notify(`fail to download url, msg: ${e.message}`);
+      }
     }
   }
 });

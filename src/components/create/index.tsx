@@ -31,7 +31,9 @@ function CreationArea({ close }: ICreationArea): JSX.Element {
       const uris = await applyScripts(...text.split('\n'));
       await AddUris(...uris);
     } catch (e) {
-      await notify(`fail to download files, msg: ${e}.`);
+      if (e instanceof Error) {
+        await notify(`fail to download files, msg: ${e.message}.`);
+      }
     }
     setText('');
     close();

@@ -88,7 +88,9 @@ export async function AddUris(...uris: string[]): Promise<void> {
     await multiCall(multiCallItems);
     await notify(`Start downloading ${uris.length} files using Aria2`);
   } catch (e) {
-    await notify(e);
+    if (e instanceof Error) {
+      await notify(e.message);
+    }
   }
 }
 
@@ -101,7 +103,9 @@ export async function AddUri(
     await singleCall(() => aria2.call('addUri', [link], options || {}));
     await notify(`Start downloading ${fileName || ''} using Aria2`);
   } catch (e) {
-    await notify(e);
+    if (e instanceof Error) {
+      await notify(e.message);
+    }
   }
 }
 

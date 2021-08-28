@@ -183,7 +183,9 @@ export async function saveFile(
       await browser.windows.remove(window.id);
     }
   } catch (err) {
-    await notify(err);
+    if (err instanceof Error) {
+      await notify(err.message);
+    }
   }
 }
 
