@@ -43,8 +43,10 @@ With the input url as a parameter, user should be able to implement scripts util
 and download all automatically in batch.
 </p>
 
+## Unknown Issues
+ - [#165 - The right click context menu can't be downloaded](https://github.com/zluo01/aria2-extension/issues/165)
+ 
 ## Todo
-
 - Allow multiple Aria2 instances, currently only support one instance.
 - Background job monitor.
 
