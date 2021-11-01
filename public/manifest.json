@@ -26,9 +26,13 @@
   ],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
   "manifest_version": 2,
-  "version": "0.3.4",
+  "version": "0.3.5",
   "browser_action": {
     "default_popup": "index.html",
     "default_title": "Aria2Ex"
+  },
+  "options_ui": {
+    "page": "index.html#/setting",
+    "open_in_tab": true
   }
 }

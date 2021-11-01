@@ -1,4 +1,4 @@
-import { Action, browser, Windows } from 'webextension-polyfill-ts';
+import browser, { Action, Windows } from 'webextension-polyfill';
 
 import { AddUri } from '../aria2';
 import {
@@ -56,8 +56,7 @@ export function openDetail(fromExtension: boolean): void {
 }
 
 export async function openSetting(): Promise<void> {
-  const url = browser.runtime.getURL('target/settings/index.html');
-  await browser.tabs.create({ url: url });
+  await browser.runtime.openOptionsPage();
   window.close();
 }
 
@@ -87,8 +86,8 @@ export async function notify(msg: string): Promise<string> {
 
 // https://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
 export async function createDownloadPanel(): Promise<Windows.Window> {
-  const w = 520;
-  const h = 330;
+  const w = 560;
+  const h = 365;
   // Fixes dual-screen position  Most browsers      Firefox
   const dualScreenLeft =
     window.screenLeft !== undefined ? window.screenLeft : window.screenX;
@@ -110,13 +109,13 @@ export async function createDownloadPanel(): Promise<Windows.Window> {
   const left = (width - w) / 2 / systemZoom + dualScreenLeft;
   const top = (height - h) / 2 / systemZoom + dualScreenTop;
 
-  const url = browser.runtime.getURL('target/download.html');
+  const url = browser.runtime.getURL('index.html');
 
   const windowInfo = await getCurrentWindow();
   return browser.windows.create({
     top: Math.round(top),
     left: Math.round(left),
-    url: url,
+    url: url.concat('#/download'),
     type: 'popup',
     width: w,
     height: h,

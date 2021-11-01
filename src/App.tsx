@@ -1,35 +1,27 @@
-import Container from '@material-ui/core/Container';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import {
-  createMuiTheme,
-  createStyles,
-  makeStyles,
-  Theme,
-  ThemeProvider,
-} from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Container from '@mui/material/Container';
+import CssBaseline from '@mui/material/CssBaseline';
+import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import React, { useEffect, useState } from 'react';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 
 import { GetJobs } from './aria2';
 import DownloadList from './components/content';
 import CreationArea from './components/create';
 import Header from './components/header';
+import DownloadPanel from './components/panel';
+import Scripts from './components/scripts';
+import Setting from './components/setting';
 import { IJob } from './types';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
-      minWidth: 360,
-      maxWidth: 420,
-      backgroundColor: theme.palette.background.paper,
-    },
-  })
-);
+const DisplayHolder = styled(Container)(({ theme }) => ({
+  width: '100%',
+  minWidth: 360,
+  maxWidth: 420,
+  backgroundColor: theme.palette.background.paper,
+}));
 
 function Display(): JSX.Element {
-  const classes = useStyles();
-
   const [jobs, setJobs] = useState<IJob[]>([]);
   const [checked, setChecked] = useState(['']);
   const [show, setShow] = useState(false);
@@ -61,7 +53,7 @@ function Display(): JSX.Element {
   };
 
   return (
-    <Container className={classes.root} maxWidth={false} disableGutters>
+    <DisplayHolder maxWidth={false} disableGutters>
       <Header
         jobs={jobs}
         checked={checked}
@@ -74,7 +66,7 @@ function Display(): JSX.Element {
       ) : (
         <DownloadList jobs={jobs} checked={checked} toggle={handleToggle} />
       )}
-    </Container>
+    </DisplayHolder>
   );
 }
 
@@ -83,9 +75,9 @@ function App(): JSX.Element {
 
   const theme = React.useMemo(
     () =>
-      createMuiTheme({
+      createTheme({
         palette: {
-          type: prefersDarkMode ? 'dark' : 'light',
+          mode: prefersDarkMode ? 'dark' : 'light',
         },
       }),
     [prefersDarkMode]
@@ -94,7 +86,22 @@ function App(): JSX.Element {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Display />
+      <Router>
+        <Switch>
+          <Route path="/download">
+            <DownloadPanel />
+          </Route>
+          <Route path="/script">
+            <Scripts />
+          </Route>
+          <Route path="/setting">
+            <Setting />
+          </Route>
+          <Route path="/">
+            <Display />
+          </Route>
+        </Switch>
+      </Router>
     </ThemeProvider>
   );
 }

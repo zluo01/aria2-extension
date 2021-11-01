@@ -1,4 +1,4 @@
-import { browser, WebRequest } from 'webextension-polyfill-ts';
+import browser, { WebRequest } from 'webextension-polyfill';
 
 import { AddUri, GetNumJobs } from '../aria2';
 import {

@@ -1,7 +1,7 @@
-import Box from '@material-ui/core/Box';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
+import Typography from '@mui/material/Typography';
+import styled from '@mui/system/styled';
 
 interface IProgressWithLabel {
   value: number;
@@ -23,20 +23,16 @@ function LinearProgressWithLabel(props: IProgressWithLabel) {
   );
 }
 
-const useStyles = makeStyles({
-  root: {
-    width: '100%',
-  },
+const ProgressHolder = styled('div')({
+  width: '100%',
 });
 
 export default function LinearWithValueLabel({
   value,
 }: IProgressWithLabel): JSX.Element {
-  const classes = useStyles();
-
   return (
-    <div className={classes.root}>
+    <ProgressHolder>
       <LinearProgressWithLabel value={value} />
-    </div>
+    </ProgressHolder>
   );
 }

@@ -1,50 +1,28 @@
-import {
-  Button,
-  TextareaAutosize,
-  TextField,
-  Typography,
-} from '@material-ui/core';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import {
-  createMuiTheme,
-  createStyles,
-  makeStyles,
-  Theme,
-  ThemeProvider,
-} from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useEffect, useState, StrictMode, useMemo, ChangeEvent } from 'react';
-import ReactDOM from 'react-dom';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import Typography from '@mui/material/Typography';
+import styled from '@mui/system/styled';
+import { ChangeEvent, useEffect, useState } from 'react';
 
-import { getJobDetail, download, saveFile } from '../../browser';
+import { download, getJobDetail, saveFile } from '../../browser';
 import { IFileDetail } from '../../types';
 import { verifyFileName } from '../../utils';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '98%',
-      height: '100%',
-      minWidth: 480,
-      minHeight: 320,
-      display: 'flex',
-      flexFlow: 'column nowrap',
-      justifyContent: 'space-between',
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      backgroundColor: theme.palette.background.paper,
-    },
-    buttonGroup: {
-      width: 'inherit',
-      display: 'flex',
-      flexFlow: 'row nowrap',
-      justifyContent: 'space-between',
-    },
-    button: {
-      width: 130,
-    },
-  })
-);
+const Panel = styled(Stack)(({ theme }) => ({
+  width: '98%',
+  height: '100%',
+  minWidth: 480,
+  minHeight: 320,
+  marginLeft: 'auto',
+  marginRight: 'auto',
+  backgroundColor: theme.palette.background.paper,
+}));
+
+const PanelButton = styled(Button)({
+  width: 130,
+});
 
 const initialDetail: IFileDetail = {
   fileName: '',
@@ -53,9 +31,7 @@ const initialDetail: IFileDetail = {
   url: '',
 };
 
-function Panel() {
-  const classes = useStyles();
-
+function DownloadPanel(): JSX.Element {
   const [detail, setDetail] = useState<IFileDetail>(initialDetail);
   const [inValid, isInValid] = useState(false);
   const [filePath, setFilePath] = useState('');
@@ -81,33 +57,62 @@ function Panel() {
   }
 
   return (
-    <div className={classes.root}>
+    <Panel
+      direction="column"
+      justifyContent="space-around"
+      alignItems="center"
+      spacing={1}
+    >
       <TextField
         label="File Name"
         error={inValid}
         value={detail.fileName}
         onChange={updateFileName}
+        variant="standard"
+        margin="dense"
+        fullWidth
       />
       <TextField
         required
         label="File Path"
         value={filePath}
         onChange={e => setFilePath(e.target.value)}
+        variant="standard"
+        margin="dense"
+        fullWidth
       />
-      <TextField label="From" value={detail.url} disabled />
+      <TextField
+        label="From"
+        value={detail.url}
+        variant="standard"
+        margin="dense"
+        fullWidth
+        disabled
+      />
       <Typography
         variant="body2"
         component="span"
         color="textSecondary"
         display="inline"
         align="right"
+        sx={{ width: 1 }}
       >
         {detail.fileSize}
       </Typography>
-      <TextareaAutosize rowsMin={6} value={detail.header} />
-      <div className={classes.buttonGroup}>
-        <Button
-          className={classes.button}
+      <TextareaAutosize
+        minRows={6}
+        maxRows={6}
+        value={detail.header}
+        style={{ width: '100%' }}
+      />
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        spacing={1}
+        sx={{ pt: 1, width: 1 }}
+      >
+        <PanelButton
           variant="contained"
           color="primary"
           onClick={() =>
@@ -120,52 +125,24 @@ function Panel() {
           }
         >
           Download
-        </Button>
-        <Button
-          className={classes.button}
+        </PanelButton>
+        <PanelButton
           variant="contained"
           color="primary"
           onClick={() => saveFile(detail.url, detail.fileName as string, false)}
         >
           Save
-        </Button>
-        <Button
-          className={classes.button}
+        </PanelButton>
+        <PanelButton
           variant="contained"
           color="primary"
           onClick={() => saveFile(detail.url, detail.fileName as string, true)}
         >
           Save As
-        </Button>
-      </div>
-    </div>
+        </PanelButton>
+      </Stack>
+    </Panel>
   );
 }
 
-function DownloadPanel(): JSX.Element {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
-  const theme = useMemo(
-    () =>
-      createMuiTheme({
-        palette: {
-          type: prefersDarkMode ? 'dark' : 'light',
-        },
-      }),
-    [prefersDarkMode]
-  );
-
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Panel />
-    </ThemeProvider>
-  );
-}
-
-ReactDOM.render(
-  <StrictMode>
-    <DownloadPanel />
-  </StrictMode>,
-  document.getElementById('panel')
-);
+export default DownloadPanel;

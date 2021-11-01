@@ -55,7 +55,7 @@ module.exports = {
     'no-restricted-imports': [
       'error',
       {
-        patterns: ['@material-ui/*/*/*', '!@material-ui/core/test-utils/*'],
+        patterns: ['@mui/*/*/*', '!@mui/material/test-utils/*'],
       },
     ],
   },

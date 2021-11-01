@@ -1,29 +1,24 @@
-import { Button, TextareaAutosize } from '@material-ui/core';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Button from '@mui/material/Button';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import styled from '@mui/system/styled';
 import { useState } from 'react';
 
 import { AddUris } from '../../aria2';
 import { notify } from '../../browser';
 import { applyScripts } from '../../utils';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: 420,
-      backgroundColor: theme.palette.background.paper,
-      display: 'flex',
-      flexFlow: 'column nowrap',
-    },
-  })
-);
+const CreationSection = styled('div')(({ theme }) => ({
+  width: 420,
+  backgroundColor: theme.palette.background.paper,
+  display: 'flex',
+  flexFlow: 'column nowrap',
+}));
 
 interface ICreationArea {
   close: () => void;
 }
 
 function CreationArea({ close }: ICreationArea): JSX.Element {
-  const classes = useStyles();
-
   const [text, setText] = useState('');
 
   async function handleSubmit() {
@@ -40,10 +35,10 @@ function CreationArea({ close }: ICreationArea): JSX.Element {
   }
 
   return (
-    <div className={classes.root}>
+    <CreationSection>
       <TextareaAutosize
         aria-label="minimum height"
-        rowsMin={6}
+        minRows={6}
         placeholder="Support multiple URLS, one URL per line"
         value={text}
         onChange={e => setText(e.target.value)}
@@ -57,7 +52,7 @@ function CreationArea({ close }: ICreationArea): JSX.Element {
       >
         Submit
       </Button>
-    </div>
+    </CreationSection>
   );
 }
 

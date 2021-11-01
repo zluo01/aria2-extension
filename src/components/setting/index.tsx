@@ -1,25 +1,26 @@
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Fade from '@material-ui/core/Fade';
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import IconButton from '@material-ui/core/IconButton';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import NativeSelect from '@material-ui/core/NativeSelect';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import React, { useEffect, useState, Fragment } from 'react';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Fade from '@mui/material/Fade';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import IconButton from '@mui/material/IconButton';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import NativeSelect from '@mui/material/NativeSelect';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -30,56 +31,47 @@ import {
 } from '../../browser';
 import { DEFAULT_CONFIG, IConfig, IScript } from '../../types';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    buttonGroup: {
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'flex-end',
+const EditSection = styled('div')({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+});
 
-      '& > *': {
-        margin: theme.spacing(1),
-      },
-    },
-    button: {
-      width: 80,
-      height: 40,
-    },
-    text: {
-      color: theme.palette.text.secondary,
-      marginTop: 6,
-      marginBottom: 6,
-    },
-    row: {
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    placeHolder: {
-      height: 382,
-      border: '1px solid',
-      borderColor: theme.palette.text.secondary,
-      overflow: 'auto',
-    },
-    input: {
-      display: 'none',
-    },
-    inputLabel: {
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      paddingTop: 6,
-      paddingBottom: 6,
-      color: 'inherit',
-      cursor: 'inherit',
-    },
-  })
-);
+const ScriptList = styled('div')(({ theme }) => ({
+  height: 382,
+  border: '1px solid',
+  borderColor: theme.palette.text.secondary,
+  overflow: 'auto',
+}));
+
+const SettingButton = styled(Button)({
+  width: 80,
+  height: 40,
+});
+
+const HiddenMenuInput = styled(Input)({
+  display: 'none',
+});
+
+const HiddenMenuInputLabel = styled(InputLabel)({
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  paddingTop: 6,
+  paddingBottom: 6,
+  color: 'inherit',
+  cursor: 'inherit',
+});
+
+const ScriptTitle = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  marginTop: 6,
+  marginBottom: 6,
+}));
 
 function Setting(): JSX.Element {
-  const classes = useStyles();
   const history = useHistory();
 
   const protocol = {
@@ -117,7 +109,7 @@ function Setting(): JSX.Element {
   }
 
   async function handleAddScript() {
-    history.push('/edit');
+    history.push('/script');
     await handleClose();
   }
 
@@ -162,7 +154,7 @@ function Setting(): JSX.Element {
   }
 
   async function handleEdit(index: number) {
-    history.push(`/edit?id=${index}`);
+    history.push(`/script?id=${index}`);
   }
 
   async function handleDelete(index: number) {
@@ -188,7 +180,7 @@ function Setting(): JSX.Element {
     const fileName = 'scripts';
     const json = JSON.stringify(scripts);
     const blob = new Blob([json], { type: 'application/json' });
-    const href = await URL.createObjectURL(blob);
+    const href = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = href;
     link.download = fileName + '.json';
@@ -203,66 +195,72 @@ function Setting(): JSX.Element {
       <TextField
         label="Default Download Path"
         helperText="Download path of Aria2(only), optional"
-        fullWidth
-        margin="normal"
         InputLabelProps={{
           shrink: true,
         }}
         value={config?.path}
         onChange={updateDownloadPath}
+        variant="standard"
+        margin="normal"
+        fullWidth
       />
       <FormControl fullWidth margin="normal" required>
-        <InputLabel shrink>Protocol</InputLabel>
-        <NativeSelect value={config?.protocol} onChange={updateProtocol}>
+        <InputLabel variant={'standard'}>Protocol</InputLabel>
+        <NativeSelect
+          variant="standard"
+          value={config?.protocol}
+          onChange={updateProtocol}
+        >
           {Object.entries(protocol).map(([key, value]) => (
             <option key={key} value={key}>
               {value}
             </option>
           ))}
         </NativeSelect>
-        <FormHelperText>
+        <FormHelperText variant={'standard'}>
           RPC connection protocol of Aria2. Support ws, wss, http and https.
         </FormHelperText>
       </FormControl>
       <TextField
         label="Host"
         helperText="RPC host of Aria2. You can use ip or domain name."
-        fullWidth
-        margin="normal"
         InputLabelProps={{
           shrink: true,
         }}
         value={config?.host}
         onChange={updateHost}
+        variant="standard"
+        margin="normal"
+        fullWidth
         required
       />
       <TextField
         label="Port"
         helperText="Aria2 RPC port"
-        fullWidth
-        margin="normal"
         InputLabelProps={{
           shrink: true,
         }}
         value={config?.port}
         onChange={updatePort}
+        variant="standard"
+        margin="normal"
+        fullWidth
         required
       />
       <TextField
         label="Token"
         helperText="Aria2 RPC secret, optional."
-        fullWidth
-        margin="normal"
         InputLabelProps={{
           shrink: true,
         }}
         value={config?.token}
         onChange={updateToken}
+        variant="standard"
+        margin="normal"
+        fullWidth
       />
-      <div className={classes.row}>
-        <Typography variant="body1" className={classes.text}>
-          Scripts
-        </Typography>
+      <EditSection>
+        <ScriptTitle variant="body1">Scripts</ScriptTitle>
         <Fragment>
           <IconButton
             color="inherit"
@@ -282,8 +280,7 @@ function Setting(): JSX.Element {
           >
             <MenuItem onClick={handleAddScript}>New Script</MenuItem>
             <MenuItem>
-              <Input
-                className={classes.input}
+              <HiddenMenuInput
                 type={'file'}
                 id={'file'}
                 inputProps={{
@@ -291,17 +288,17 @@ function Setting(): JSX.Element {
                 }}
                 onChange={handleImport}
               />
-              <InputLabel className={classes.inputLabel} htmlFor={'file'}>
+              <HiddenMenuInputLabel htmlFor={'file'}>
                 Import
-              </InputLabel>
+              </HiddenMenuInputLabel>
             </MenuItem>
             <MenuItem onClick={handleExport} disabled={!scripts.length}>
               Export
             </MenuItem>
           </Menu>
         </Fragment>
-      </div>
-      <div className={classes.placeHolder}>
+      </EditSection>
+      <ScriptList>
         <List>
           {scripts.map((value, index) => (
             <ListItem
@@ -331,27 +328,31 @@ function Setting(): JSX.Element {
             </ListItem>
           ))}
         </List>
-      </div>
-      <div className={classes.buttonGroup}>
-        <Button
-          className={classes.button}
+      </ScriptList>
+      <Stack
+        direction="row"
+        justifyContent="flex-end"
+        alignItems="center"
+        spacing={1}
+        sx={{ pt: 1 }}
+      >
+        <SettingButton
           variant="outlined"
           color="secondary"
           disabled={loading}
           onClick={() => window.close()}
         >
           Close
-        </Button>
-        <Button
-          className={classes.button}
+        </SettingButton>
+        <SettingButton
           variant="outlined"
           color="primary"
           disabled={loading}
           onClick={() => updateConfig()}
         >
           Save
-        </Button>
-      </div>
+        </SettingButton>
+      </Stack>
     </Container>
   );
 }

@@ -1,11 +1,13 @@
-import { Checkbox, IconButton } from '@material-ui/core';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import SettingsIcon from '@material-ui/icons/Settings';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SettingsIcon from '@mui/icons-material/Settings';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import styled from '@mui/system/styled';
 import React from 'react';
 
 import { PauseJobs, RemoveJobs, StartJobs } from '../../aria2';
@@ -20,23 +22,16 @@ interface IHeader {
   setCheck: (value: string[]) => void;
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      paddingLeft: 3,
-      display: 'flex',
-      flexFlow: 'row nowrap',
-      justifyContent: 'space-between',
-      position: 'sticky',
-      top: 0,
-      zIndex: 10,
-      backgroundColor: theme.palette.background.default,
-    },
-    margin: {
-      margin: theme.spacing(1),
-    },
-  })
-);
+const ActionGroup = styled('div')(({ theme }) => ({
+  paddingLeft: 3,
+  display: 'flex',
+  flexFlow: 'row nowrap',
+  justifyContent: 'space-between',
+  position: 'sticky',
+  top: 0,
+  zIndex: 10,
+  backgroundColor: theme.palette.background.default,
+}));
 
 function Header({
   jobs,
@@ -45,8 +40,6 @@ function Header({
   setShow,
   setCheck,
 }: IHeader): JSX.Element {
-  const classes = useStyles();
-
   const disabled = checked.length === 1;
 
   const [isChecked, setIsChecked] = React.useState(false);
@@ -90,61 +83,39 @@ function Header({
   }
 
   return (
-    <div className={classes.root}>
+    <ActionGroup>
       <Checkbox
         size={'small'}
         disabled={show}
         checked={isChecked}
         onChange={handleChange}
       />
-      <div>
-        <IconButton
-          size="small"
-          className={classes.margin}
-          onClick={() => setShow()}
-        >
+      <Stack
+        direction="row"
+        justifyContent="flex-end"
+        alignItems="center"
+        spacing={1}
+      >
+        <IconButton size="small" onClick={() => setShow()}>
           <AddIcon />
         </IconButton>
-        <IconButton
-          size="small"
-          className={classes.margin}
-          disabled={disabled}
-          onClick={() => start()}
-        >
+        <IconButton size="small" disabled={disabled} onClick={() => start()}>
           <PlayArrowIcon />
         </IconButton>
-        <IconButton
-          size="small"
-          className={classes.margin}
-          disabled={disabled}
-          onClick={() => pause()}
-        >
+        <IconButton size="small" disabled={disabled} onClick={() => pause()}>
           <PauseIcon />
         </IconButton>
-        <IconButton
-          size="small"
-          className={classes.margin}
-          disabled={disabled}
-          onClick={() => remove()}
-        >
+        <IconButton size="small" disabled={disabled} onClick={() => remove()}>
           <DeleteIcon />
         </IconButton>
-        <IconButton
-          size="small"
-          className={classes.margin}
-          onClick={() => openSetting()}
-        >
+        <IconButton size="small" onClick={() => openSetting()}>
           <SettingsIcon />
         </IconButton>
-        <IconButton
-          size="small"
-          className={classes.margin}
-          onClick={() => openDetail(true)}
-        >
+        <IconButton size="small" onClick={() => openDetail(true)}>
           <MoreVertIcon />
         </IconButton>
-      </div>
-    </div>
+      </Stack>
+    </ActionGroup>
   );
 }
 

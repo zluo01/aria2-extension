@@ -1,16 +1,14 @@
-import {
-  Checkbox,
-  IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemSecondaryAction,
-  ListItemText,
-  Typography,
-} from '@material-ui/core';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import ListItemText from '@mui/material/ListItemText';
+import Typography from '@mui/material/Typography';
+import styled from '@mui/system/styled';
 import React from 'react';
 
 import { PauseJobs, StartJobs } from '../../aria2';
@@ -18,28 +16,29 @@ import { ACTIVE_JOB, IJob, PAUSED_JOB } from '../../types';
 import { parseBytes } from '../../utils';
 import Progress from '../progress';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      backgroundColor: theme.palette.background.paper,
-    },
-    item: {
-      height: 60,
-    },
-    primaryText: {
-      width: 'inherit',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-    subText: {
-      width: 'inherit',
-      display: 'flex',
-      flexFlow: 'row wrap',
-      justifyContent: 'space-between',
-    },
-  })
-);
+const JobList = styled(List)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+}));
+
+const Job = styled(ListItem)(() => ({
+  height: 60,
+}));
+
+const JobTitleSection = styled(ListItem)(() => ({
+  width: '100%',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  padding: 0,
+}));
+
+const JobSubInfoSection = styled(ListItem)(() => ({
+  width: '100%',
+  display: 'flex',
+  flexFlow: 'row wrap',
+  justifyContent: 'space-between',
+  padding: 0,
+}));
 
 interface IDownloadList {
   jobs: IJob[];
@@ -79,18 +78,12 @@ async function jobAction(job: IJob) {
 }
 
 function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
-  const classes = useStyles();
   return (
-    <List className={classes.root} dense={true}>
+    <JobList dense={true}>
       {jobs.map(o => {
         const labelId = `checkbox-list-label-${o.gid}`;
         return (
-          <ListItem
-            key={o.gid}
-            className={classes.item}
-            dense
-            onClick={toggle(o.gid)}
-          >
+          <Job key={o.gid} dense onClick={toggle(o.gid)}>
             <ListItemIcon>
               <Checkbox
                 edge="start"
@@ -103,7 +96,7 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
             <ListItemText
               id={labelId}
               primary={
-                <div className={classes.primaryText}>
+                <JobTitleSection>
                   <Typography
                     component="span"
                     variant="body2"
@@ -112,11 +105,11 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
                   >
                     {getFileName(o)}
                   </Typography>
-                </div>
+                </JobTitleSection>
               }
               secondary={
                 <React.Fragment>
-                  <div className={classes.subText}>
+                  <JobSubInfoSection>
                     <Typography
                       component="span"
                       variant="body2"
@@ -133,7 +126,7 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
                     >
                       {parseBytes(o.downloadSpeed) + '\\s'}
                     </Typography>
-                  </div>
+                  </JobSubInfoSection>
                   <Progress value={getProgress(o)} />
                 </React.Fragment>
               }
@@ -148,10 +141,10 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
                 {o.status === ACTIVE_JOB ? <PauseIcon /> : <PlayArrowIcon />}
               </IconButton>
             </ListItemSecondaryAction>
-          </ListItem>
+          </Job>
         );
       })}
-    </List>
+    </JobList>
   );
 }
 

@@ -1,4 +1,4 @@
-import { browser, WebRequest } from 'webextension-polyfill-ts';
+import browser, { WebRequest } from 'webextension-polyfill';
 
 import { getScripts } from '../browser';
 
