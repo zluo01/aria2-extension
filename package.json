@@ -9,7 +9,7 @@
     "@mui/icons-material": "5.0.5",
     "@mui/material": "5.0.6",
     "@types/react": "17.0.33",
-    "@types/react-dom": "17.0.10",
+    "@types/react-dom": "17.0.11",
     "aria2": "4.1.2",
     "codemirror": "5.63.3",
     "react": "17.0.2",
