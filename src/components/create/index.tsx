@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import styled from '@mui/system/styled';
+import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 
 import { AddUris } from '../../aria2';

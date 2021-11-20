@@ -3,7 +3,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import React, { useEffect, useState } from 'react';
-import { HashRouter as Router, Route, Switch } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 
 import { GetJobs } from './aria2';
 import DownloadList from './components/content';
@@ -87,20 +87,12 @@ function App(): JSX.Element {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Switch>
-          <Route path="/download">
-            <DownloadPanel />
-          </Route>
-          <Route path="/script">
-            <Scripts />
-          </Route>
-          <Route path="/setting">
-            <Setting />
-          </Route>
-          <Route path="/">
-            <Display />
-          </Route>
-        </Switch>
+        <Routes>
+          <Route path="/download" element={<DownloadPanel />} />
+          <Route path="/script" element={<Scripts />} />
+          <Route path="/setting" element={<Setting />} />
+          <Route path="/" element={<Display />} />
+        </Routes>
       </Router>
     </ThemeProvider>
   );

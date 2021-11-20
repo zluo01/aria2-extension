@@ -8,7 +8,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import styled from '@mui/system/styled';
+import { styled } from '@mui/material/styles';
 import React from 'react';
 
 import { PauseJobs, StartJobs } from '../../aria2';
@@ -46,38 +46,38 @@ interface IDownloadList {
   toggle: (value: string) => () => void;
 }
 
-function getFileName(job: IJob): string {
-  if (job.bittorrent && job.bittorrent.info) {
-    return job.bittorrent.info.name;
-  }
-  const path = job.files[0].path;
-  return path.split('/').slice(-1)[0];
-}
-
-function getProgress(job: IJob): number {
-  const progress =
-    parseFloat(job.completedLength) / parseFloat(job.totalLength);
-  if (isNaN(progress)) {
-    return 0;
-  }
-  return progress * 100;
-}
-
-async function jobAction(job: IJob) {
-  switch (job.status) {
-    case ACTIVE_JOB:
-      await PauseJobs(job.gid);
-      break;
-    case PAUSED_JOB:
-      await StartJobs(job.gid);
-      break;
-    default:
-      console.error(`Invalid job status ${job.status}`);
-      break;
-  }
-}
-
 function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
+  function getFileName(job: IJob): string {
+    if (job.bittorrent && job.bittorrent.info) {
+      return job.bittorrent.info.name;
+    }
+    const path = job.files[0].path;
+    return path.split('/').slice(-1)[0];
+  }
+
+  function getProgress(job: IJob): number {
+    const progress =
+      parseFloat(job.completedLength) / parseFloat(job.totalLength);
+    if (isNaN(progress)) {
+      return 0;
+    }
+    return progress * 100;
+  }
+
+  async function jobAction(job: IJob) {
+    switch (job.status) {
+      case ACTIVE_JOB:
+        await PauseJobs(job.gid);
+        break;
+      case PAUSED_JOB:
+        await StartJobs(job.gid);
+        break;
+      default:
+        console.error(`Invalid job status ${job.status}`);
+        break;
+    }
+  }
+
   return (
     <JobList dense={true}>
       {jobs.map(o => {

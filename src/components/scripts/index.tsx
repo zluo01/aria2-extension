@@ -3,13 +3,13 @@ import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import styled from '@mui/system/styled';
+import { styled } from '@mui/material/styles';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/theme/material.css';
 import React, { useEffect, useState } from 'react';
 import { Controlled as CodeMirror } from 'react-codemirror2';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { addScript, getScripts } from '../../browser';
 import { DEFAULT_SCRIPT, IScript } from '../../types';
@@ -21,7 +21,7 @@ const EditButton = styled(Button)({
 });
 
 function Scripts(): JSX.Element {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [script, setScript] = useState<IScript>(DEFAULT_SCRIPT);
 
@@ -49,7 +49,7 @@ function Scripts(): JSX.Element {
   }
 
   async function handleCancel() {
-    history.push('/setting');
+    navigate('/setting');
   }
 
   async function handleAddScript() {

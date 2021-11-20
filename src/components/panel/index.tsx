@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Typography from '@mui/material/Typography';
-import styled from '@mui/system/styled';
+import { styled } from '@mui/material/styles';
 import { ChangeEvent, useEffect, useState } from 'react';
 
 import { download, getJobDetail, saveFile } from '../../browser';

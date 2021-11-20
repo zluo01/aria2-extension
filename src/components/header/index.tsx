@@ -7,7 +7,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
-import styled from '@mui/system/styled';
+import { styled } from '@mui/material/styles';
 import React from 'react';
 
 import { PauseJobs, RemoveJobs, StartJobs } from '../../aria2';

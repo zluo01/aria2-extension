@@ -21,7 +21,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import React, { Fragment, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
   getConfiguration,
@@ -72,7 +72,7 @@ const ScriptTitle = styled(Typography)(({ theme }) => ({
 }));
 
 function Setting(): JSX.Element {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const protocol = {
     ws: 'WebSocket',
@@ -109,7 +109,7 @@ function Setting(): JSX.Element {
   }
 
   async function handleAddScript() {
-    history.push('/script');
+    navigate('/script');
     await handleClose();
   }
 
@@ -154,7 +154,7 @@ function Setting(): JSX.Element {
   }
 
   async function handleEdit(index: number) {
-    history.push(`/script?id=${index}`);
+    navigate(`/script?id=${index}`);
   }
 
   async function handleDelete(index: number) {

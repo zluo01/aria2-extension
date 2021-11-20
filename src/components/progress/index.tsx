@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
-import styled from '@mui/system/styled';
+import { styled } from '@mui/material/styles';
 
 interface IProgressWithLabel {
   value: number;
