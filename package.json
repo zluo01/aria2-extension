@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "3.2.0",
-    "@types/node": "16.11.32",
+    "@types/node": "16.11.33",
     "@types/react": "17.0.44",
     "@types/react-dom": "17.0.16",
     "@types/webextension-polyfill": "0.8.3",
