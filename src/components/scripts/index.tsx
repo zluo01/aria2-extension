@@ -10,7 +10,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { addScript, getScripts } from '../../browser';
 import { DEFAULT_SCRIPT, IScript } from '../../types';
-import './index.css';
 
 const EditButton = styled(Button)({
   width: 80,

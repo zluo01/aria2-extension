@@ -1,6 +1,6 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { ListItemButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Fade from '@mui/material/Fade';
@@ -11,7 +11,6 @@ import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -303,20 +302,7 @@ function Setting(): JSX.Element {
           {scripts.map((value, index) => (
             <ListItem
               key={index}
-              button
-              onDoubleClick={() => handleEdit(index)}
-              divider
-              dense
-            >
-              <ListItemText primary={value.name} secondary={value.domain} />
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  aria-label="edit"
-                  onClick={() => handleEdit(index)}
-                >
-                  <EditIcon />
-                </IconButton>
+              secondaryAction={
                 <IconButton
                   edge="end"
                   aria-label="delete"
@@ -324,7 +310,15 @@ function Setting(): JSX.Element {
                 >
                   <DeleteIcon />
                 </IconButton>
-              </ListItemSecondaryAction>
+              }
+              disablePadding
+            >
+              <ListItemButton onDoubleClick={() => handleEdit(index)} dense>
+                <ListItemText
+                  primary={value.name}
+                  secondary={value.domain}
+                ></ListItemText>
+              </ListItemButton>
             </ListItem>
           ))}
         </List>
