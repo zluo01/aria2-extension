@@ -166,7 +166,7 @@ browser.webRequest.onSendHeaders.addListener(
   observeRequest,
   {
     urls: ['<all_urls>'],
-    types: types,
+    types,
   },
   ['requestHeaders']
 );
@@ -175,7 +175,7 @@ browser.webRequest.onHeadersReceived.addListener(
   observeResponse,
   {
     urls: ['<all_urls>'],
-    types: types,
+    types,
   },
   ['blocking', 'responseHeaders']
 );
@@ -189,7 +189,7 @@ function requestError(d: OnErrorOccurredDetailsType): void {
 
 browser.webRequest.onErrorOccurred.addListener(requestError, {
   urls: ['<all_urls>'],
-  types: types,
+  types,
 });
 
 browser.runtime.onMessage.addListener((data, _sender) => {

@@ -15,7 +15,7 @@ export async function getConfiguration(): Promise<IConfig> {
 }
 
 export async function setConfiguration(config: IConfig): Promise<void> {
-  return browser.storage.local.set({ config: config });
+  return browser.storage.local.set({ config });
 }
 
 export async function getScripts(): Promise<IScript[]> {
@@ -24,7 +24,7 @@ export async function getScripts(): Promise<IScript[]> {
 }
 
 export async function updateScripts(scripts: IScript[]): Promise<void> {
-  return browser.storage.local.set({ scripts: scripts });
+  return browser.storage.local.set({ scripts });
 }
 
 export async function addScript(script: IScript, index: number): Promise<void> {
@@ -36,7 +36,7 @@ export async function addScript(script: IScript, index: number): Promise<void> {
     } else {
       scripts.push(script);
     }
-    return browser.storage.local.set({ scripts: scripts });
+    return browser.storage.local.set({ scripts });
   } catch (e) {
     console.error('Add Script', e);
   }
@@ -50,7 +50,7 @@ export function openDetail(fromExtension: boolean): void {
           config.host
         }/${config.port}/jsonrpc/${btoa(config.token)}`
     )
-    .then(url => browser.tabs.create({ url: url }))
+    .then(url => browser.tabs.create({ url }))
     .then(() => fromExtension && window.close())
     .catch(err => console.error('Open Detail Page', err));
 }
@@ -169,13 +169,13 @@ export async function saveFile(
             filename: fileName,
             incognito: window.incognito, // not work under 57
             saveAs: as,
-            url: url,
+            url,
           }
         : {
             // conflictAction: "prompt",  //not work
             incognito: window.incognito, // not work under 57
             saveAs: as,
-            url: url,
+            url,
           };
     await browser.downloads.download(downloadOptions);
     if (window.id && window.id !== 0) {
@@ -197,7 +197,7 @@ export async function updateBadge(num: number): Promise<void> {
     const value = num > 0 ? num.toString() : null;
     const color = num > 0 ? '#303030' : ([217, 0, 0, 255] as Action.ColorArray);
     await browser.browserAction.setBadgeText({ text: value });
-    await browser.browserAction.setBadgeBackgroundColor({ color: color });
+    await browser.browserAction.setBadgeBackgroundColor({ color });
   } catch (err) {
     console.error('Update Badge', err);
   }

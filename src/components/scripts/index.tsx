@@ -2,13 +2,10 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/javascript/javascript.js';
-import 'codemirror/theme/material.css';
 import React, { useEffect, useState } from 'react';
-import { Controlled as CodeMirror } from 'react-codemirror2';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { addScript, getScripts } from '../../browser';
@@ -87,17 +84,16 @@ function Scripts(): JSX.Element {
       <Typography sx={{ mb: 1 }} variant="body1">
         Scripts
       </Typography>
-      <CodeMirror
+      <TextareaAutosize
+        minRows={36}
+        maxRows={50}
+        style={{ width: '100%' }}
+        aria-label="code editor"
+        placeholder="Add your script here"
         value={script.code}
-        options={{
-          theme: 'material',
-          mode: 'javascript',
-          lineNumbers: true,
-          matchBrackets: true,
-        }}
-        onBeforeChange={(_editor, _data, value) => {
-          setScript(prevState => ({ ...prevState, code: value }));
-        }}
+        onChange={event =>
+          setScript(prevState => ({ ...prevState, code: event.target.value }))
+        }
       />
       <Stack
         direction="row"
