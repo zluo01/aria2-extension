@@ -22,7 +22,7 @@
       "groupName": "minorDependencies"
     },
     {
-      "matchPackagePatterns": ["react-"],
+      "matchPackagePatterns": ["react"],
       "groupName": "react"
     }
   ],
