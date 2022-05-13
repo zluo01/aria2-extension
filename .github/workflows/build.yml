@@ -17,7 +17,7 @@ jobs:
       - name: Install Node.js, NPM
         uses: actions/setup-node@v3
         with:
-          node-version: '12'
+          node-version: '16'
       - run: npm install
 
       - name: build extension
