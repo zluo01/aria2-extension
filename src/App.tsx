@@ -1,9 +1,9 @@
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
-import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import React, { useEffect, useState } from 'react';
+import { styled, ThemeProvider } from '@mui/material/styles';
+import { useState } from 'react';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
+import useSWR from 'swr';
 
 import { GetJobs } from './aria2';
 import DownloadList from './components/content';
@@ -12,7 +12,8 @@ import Header from './components/header';
 import DownloadPanel from './components/panel';
 import Scripts from './components/scripts';
 import Setting from './components/setting';
-import { IJob } from './types';
+import usePreferTheme from './theme';
+import { FetchKey } from './types';
 
 const DisplayHolder = styled(Container)(({ theme }) => ({
   width: '100%',
@@ -22,22 +23,12 @@ const DisplayHolder = styled(Container)(({ theme }) => ({
 }));
 
 function Display(): JSX.Element {
-  const [jobs, setJobs] = useState<IJob[]>([]);
   const [checked, setChecked] = useState(['']);
   const [show, setShow] = useState(false);
 
-  useEffect(() => getJobStatus(), []);
-
-  useEffect(() => {
-    const interval = setInterval(() => getJobStatus(), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  function getJobStatus() {
-    GetJobs()
-      .then((data: IJob[]) => setJobs(data))
-      .catch((err: any) => console.error(err));
-  }
+  const { data: jobs } = useSWR(FetchKey.TASKS, GetJobs, {
+    refreshInterval: 1000,
+  });
 
   const handleToggle = (value: string) => () => {
     const currentIndex = checked.indexOf(value);
@@ -55,7 +46,7 @@ function Display(): JSX.Element {
   return (
     <DisplayHolder maxWidth={false} disableGutters>
       <Header
-        jobs={jobs}
+        jobs={jobs || []}
         checked={checked}
         show={show}
         setShow={() => setShow(prevState => !prevState)}
@@ -64,27 +55,21 @@ function Display(): JSX.Element {
       {show ? (
         <CreationArea close={() => setShow(false)} />
       ) : (
-        <DownloadList jobs={jobs} checked={checked} toggle={handleToggle} />
+        <DownloadList
+          jobs={jobs || []}
+          checked={checked}
+          toggle={handleToggle}
+        />
       )}
     </DisplayHolder>
   );
 }
 
 function App(): JSX.Element {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: prefersDarkMode ? 'dark' : 'light',
-        },
-      }),
-    [prefersDarkMode]
-  );
+  const preferTheme = usePreferTheme();
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={preferTheme}>
       <CssBaseline />
       <Router>
         <Routes>

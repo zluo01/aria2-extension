@@ -32,12 +32,19 @@ export interface IFileDetail {
 export const ACTIVE_JOB = 'active';
 export const PAUSED_JOB = 'paused';
 
+export enum Theme {
+  LIGHT = 'Light',
+  DARK = 'Dark',
+  FOLLOWING_SYSTEM = 'Following System',
+}
+
 export interface IConfig {
   path: string;
   protocol: string;
   host: string;
   port: number;
   token: string;
+  theme: Theme;
 }
 
 export const DEFAULT_CONFIG: IConfig = {
@@ -46,6 +53,7 @@ export const DEFAULT_CONFIG: IConfig = {
   host: '127.0.0.1',
   port: 6800,
   token: '',
+  theme: Theme.FOLLOWING_SYSTEM,
 };
 
 export interface IScript {
@@ -63,3 +71,9 @@ export const DEFAULT_SCRIPT: IScript = {
   // Your code here...
 })();`,
 };
+
+export enum FetchKey {
+  TASKS = 'tasks',
+  SETTING = 'setting',
+  SCRIPTS = 'scripts',
+}

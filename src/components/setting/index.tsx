@@ -1,7 +1,6 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ListItemButton } from '@mui/material';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Fade from '@mui/material/Fade';
 import FormControl from '@mui/material/FormControl';
@@ -15,12 +14,12 @@ import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import NativeSelect from '@mui/material/NativeSelect';
-import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useSWR from 'swr';
 
 import {
   getConfiguration,
@@ -28,7 +27,7 @@ import {
   setConfiguration,
   updateScripts,
 } from '../../browser';
-import { DEFAULT_CONFIG, IConfig, IScript } from '../../types';
+import { FetchKey, IConfig, Theme } from '../../types';
 
 const EditSection = styled('div')({
   width: '100%',
@@ -43,11 +42,6 @@ const ScriptList = styled('div')(({ theme }) => ({
   borderColor: theme.palette.text.secondary,
   overflow: 'auto',
 }));
-
-const SettingButton = styled(Button)({
-  width: 80,
-  height: 40,
-});
 
 const HiddenMenuInput = styled(Input)({
   display: 'none',
@@ -80,24 +74,17 @@ function Setting(): JSX.Element {
     https: 'Https',
   };
 
-  const [loading, setLoading] = useState(false);
-  const [config, setConfig] = useState<IConfig>(DEFAULT_CONFIG);
-  const [scripts, setScripts] = useState<IScript[]>([]);
+  const { data: config, mutate: mutateConfig } = useSWR(
+    FetchKey.SETTING,
+    getConfiguration
+  );
+  const { data: scripts, mutate: mutateScripts } = useSWR(
+    FetchKey.SCRIPTS,
+    getScripts
+  );
 
   // dropdown button
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  useEffect(() => {
-    getConfiguration()
-      .then(config => setConfig(config))
-      .catch(err => console.error(err));
-  }, []);
-
-  useEffect(() => {
-    getScripts()
-      .then(scripts => setScripts(scripts))
-      .catch(err => console.error(err));
-  }, []);
 
   async function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     setAnchorEl(event.currentTarget);
@@ -112,41 +99,58 @@ function Setting(): JSX.Element {
     await handleClose();
   }
 
+  async function updateTheme(
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ): Promise<void> {
+    if (config) {
+      await updateConfig({ ...config, theme: e.target.value as Theme });
+    }
+  }
+
   async function updateDownloadPath(
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ): Promise<void> {
-    setConfig(prevState => ({ ...prevState, path: e.target.value }));
+    if (config) {
+      await updateConfig({ ...config, path: e.target.value });
+    }
   }
 
   async function updateHost(
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ): Promise<void> {
-    setConfig(prevState => ({ ...prevState, host: e.target.value }));
+    if (config) {
+      await updateConfig({ ...config, host: e.target.value });
+    }
   }
 
   async function updatePort(
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ): Promise<void> {
-    setConfig(prevState => ({ ...prevState, port: parseInt(e.target.value) }));
+    if (config) {
+      await updateConfig({ ...config, port: parseInt(e.target.value) });
+    }
   }
 
   async function updateToken(
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ): Promise<void> {
-    setConfig(prevState => ({ ...prevState, token: e.target.value }));
+    if (config) {
+      await updateConfig({ ...config, token: e.target.value });
+    }
   }
 
   async function updateProtocol(
     e: React.ChangeEvent<HTMLSelectElement>
   ): Promise<void> {
-    setConfig(prevState => ({ ...prevState, protocol: e.target.value }));
+    if (config) {
+      await updateConfig({ ...config, protocol: e.target.value });
+    }
   }
 
-  async function updateConfig() {
+  async function updateConfig(config: IConfig) {
     try {
-      setLoading(true);
       await setConfiguration(config);
-      setLoading(false);
+      await mutateConfig();
     } catch (e) {
       console.error(e);
     }
@@ -157,10 +161,12 @@ function Setting(): JSX.Element {
   }
 
   async function handleDelete(index: number) {
-    const result = [...scripts];
-    result.splice(index, 1);
-    await updateScripts(result);
-    setScripts(result);
+    if (scripts) {
+      const result = [...scripts];
+      result.splice(index, 1);
+      await updateScripts(result);
+      await mutateScripts();
+    }
   }
 
   async function handleImport(e: any) {
@@ -170,7 +176,7 @@ function Setting(): JSX.Element {
     fileReader.onload = async e => {
       const res = JSON.parse(e.target?.result as string);
       await updateScripts(res);
-      setScripts(res);
+      await mutateScripts();
       await handleClose();
     };
   }
@@ -191,6 +197,22 @@ function Setting(): JSX.Element {
 
   return (
     <Container maxWidth={'md'} fixed>
+      <TextField
+        label="Theme"
+        value={config?.theme || Theme.FOLLOWING_SYSTEM}
+        onChange={updateTheme}
+        helperText="Please select prefer theme"
+        variant="standard"
+        margin="normal"
+        fullWidth
+        select
+      >
+        {Object.values(Theme).map(theme => (
+          <MenuItem key={theme} value={theme}>
+            {theme}
+          </MenuItem>
+        ))}
+      </TextField>
       <TextField
         label="Default Download Path"
         helperText="Download path of Aria2(only), optional"
@@ -291,7 +313,7 @@ function Setting(): JSX.Element {
                 Import
               </HiddenMenuInputLabel>
             </MenuItem>
-            <MenuItem onClick={handleExport} disabled={!scripts.length}>
+            <MenuItem onClick={handleExport} disabled={!scripts?.length}>
               Export
             </MenuItem>
           </Menu>
@@ -299,7 +321,7 @@ function Setting(): JSX.Element {
       </EditSection>
       <ScriptList>
         <List>
-          {scripts.map((value, index) => (
+          {scripts?.map((value, index) => (
             <ListItem
               key={index}
               secondaryAction={
@@ -323,30 +345,6 @@ function Setting(): JSX.Element {
           ))}
         </List>
       </ScriptList>
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        alignItems="center"
-        spacing={1}
-        sx={{ pt: 1 }}
-      >
-        <SettingButton
-          variant="outlined"
-          color="secondary"
-          disabled={loading}
-          onClick={() => window.close()}
-        >
-          Close
-        </SettingButton>
-        <SettingButton
-          variant="outlined"
-          color="primary"
-          disabled={loading}
-          onClick={() => updateConfig()}
-        >
-          Save
-        </SettingButton>
-      </Stack>
     </Container>
   );
 }

@@ -5,9 +5,10 @@ import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { ChangeEvent, useEffect, useState } from 'react';
+import { useSWRConfig } from 'swr';
 
 import { download, getJobDetail, saveFile } from '../../browser';
-import { IFileDetail } from '../../types';
+import { FetchKey, IFileDetail } from '../../types';
 import { verifyFileName } from '../../utils';
 
 const Panel = styled(Stack)(({ theme }) => ({
@@ -32,6 +33,8 @@ const initialDetail: IFileDetail = {
 };
 
 function DownloadPanel(): JSX.Element {
+  const { mutate } = useSWRConfig();
+
   const [detail, setDetail] = useState<IFileDetail>(initialDetail);
   const [inValid, isInValid] = useState(false);
   const [filePath, setFilePath] = useState('');
@@ -54,6 +57,16 @@ function DownloadPanel(): JSX.Element {
     verifyFileName(name)
       .then(b => isInValid(b))
       .catch(err => console.error(err));
+  }
+
+  async function downloadFile(
+    url: string,
+    fileName: string,
+    filePath: string,
+    headers: string[]
+  ) {
+    await download(url, fileName, filePath, headers);
+    await mutate(FetchKey.TASKS);
   }
 
   return (
@@ -116,7 +129,7 @@ function DownloadPanel(): JSX.Element {
           variant="contained"
           color="primary"
           onClick={() =>
-            download(
+            downloadFile(
               detail.url,
               detail.fileName as string,
               filePath,
