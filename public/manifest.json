@@ -19,7 +19,6 @@
     "notifications",
     "storage",
     "downloads",
-    "downloads.open",
     "webRequest",
     "webRequestBlocking",
     "<all_urls>"
