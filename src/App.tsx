@@ -3,17 +3,15 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { styled, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
-import useSWR from 'swr';
 
-import { GetJobs } from './aria2';
 import DownloadList from './components/content';
 import CreationArea from './components/create';
 import Header from './components/header';
 import DownloadPanel from './components/panel';
 import Scripts from './components/scripts';
 import Setting from './components/setting';
+import { useGetTasksQuery } from './lib/queries';
 import usePreferTheme from './theme';
-import { FetchKey } from './types';
 
 const DisplayHolder = styled(Container)(({ theme }) => ({
   width: '100%',
@@ -26,9 +24,7 @@ function Display(): JSX.Element {
   const [checked, setChecked] = useState(['']);
   const [show, setShow] = useState(false);
 
-  const { data: jobs } = useSWR(FetchKey.TASKS, GetJobs, {
-    refreshInterval: 1000,
-  });
+  const { data: jobs } = useGetTasksQuery();
 
   const handleToggle = (value: string) => () => {
     const currentIndex = checked.indexOf(value);

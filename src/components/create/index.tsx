@@ -2,11 +2,9 @@ import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
-import { useSWRConfig } from 'swr';
 
-import { AddUris } from '../../aria2';
 import { notify } from '../../browser';
-import { FetchKey } from '../../types';
+import { useSubmitTasksTrigger } from '../../lib/queries';
 import { applyScripts } from '../../utils';
 
 const CreationSection = styled('div')(({ theme }) => ({
@@ -21,15 +19,14 @@ interface ICreationArea {
 }
 
 function CreationArea({ close }: ICreationArea): JSX.Element {
-  const { mutate } = useSWRConfig();
+  const { trigger } = useSubmitTasksTrigger();
 
   const [text, setText] = useState('');
 
   async function handleSubmit() {
     try {
       const uris = await applyScripts(...text.split('\n'));
-      await AddUris(...uris);
-      await mutate(FetchKey.TASKS);
+      await trigger(uris);
     } catch (e) {
       if (e instanceof Error) {
         await notify(`fail to download files, msg: ${e.message}.`);

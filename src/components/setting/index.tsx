@@ -19,15 +19,13 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import React, { Fragment, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useSWR from 'swr';
 
+import { setConfiguration, updateScripts } from '../../browser';
 import {
-  getConfiguration,
-  getScripts,
-  setConfiguration,
-  updateScripts,
-} from '../../browser';
-import { FetchKey, IConfig, Theme } from '../../types';
+  useGetConfigurationQuery,
+  useGetScriptsQuery,
+} from '../../lib/queries';
+import { IConfig, Theme } from '../../types';
 
 const EditSection = styled('div')({
   width: '100%',
@@ -74,14 +72,8 @@ function Setting(): JSX.Element {
     https: 'Https',
   };
 
-  const { data: config, mutate: mutateConfig } = useSWR(
-    FetchKey.SETTING,
-    getConfiguration
-  );
-  const { data: scripts, mutate: mutateScripts } = useSWR(
-    FetchKey.SCRIPTS,
-    getScripts
-  );
+  const { data: config, mutate: mutateConfig } = useGetConfigurationQuery();
+  const { data: scripts, mutate: mutateScripts } = useGetScriptsQuery();
 
   // dropdown button
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

@@ -2,10 +2,9 @@ import { Theme } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
 
-import { getConfiguration } from '../browser';
-import { FetchKey, Theme as ThemeOptions } from '../types';
+import { useGetConfigurationQuery } from '../lib/queries';
+import { Theme as ThemeOptions } from '../types';
 
 const lightTheme = createTheme({
   palette: {
@@ -20,7 +19,7 @@ const darkTheme = createTheme({
 });
 
 function usePreferTheme() {
-  const { data: config } = useSWR(FetchKey.SETTING, getConfiguration);
+  const { data: config } = useGetConfigurationQuery();
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [theme, setTheme] = useState<Theme>(lightTheme);

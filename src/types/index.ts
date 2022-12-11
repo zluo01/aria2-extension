@@ -71,9 +71,3 @@ export const DEFAULT_SCRIPT: IScript = {
   // Your code here...
 })();`,
 };
-
-export enum FetchKey {
-  TASKS = 'tasks',
-  SETTING = 'setting',
-  SCRIPTS = 'scripts',
-}
