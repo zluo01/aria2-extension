@@ -105,8 +105,8 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
 
     // create download panel
     processQueue.push(detail);
-    await createDownloadPanel();
     await removeBlankTab();
+    await createDownloadPanel();
   } catch (e) {
     console.error(e);
   }

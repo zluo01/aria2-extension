@@ -67,7 +67,10 @@ export async function removeBlankTab(): Promise<void> {
       lastFocusedWindow: true,
       windowType: 'normal',
     });
-    if (tabsInfo?.length > 0 && tabsInfo[0].url === 'about:blank') {
+    if (
+      tabsInfo?.length > 0 &&
+      (tabsInfo[0].url === 'about:blank' || tabsInfo[0].title === 'New Tab')
+    ) {
       await browser.tabs.remove(tabsInfo[0].id as number);
     }
   } catch (err) {
