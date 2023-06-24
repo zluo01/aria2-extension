@@ -11,14 +11,14 @@
     "aria2": "4.1.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-router-dom": "6.13.0",
+    "react-router-dom": "6.14.0",
     "swr": "2.1.5"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "4.1.1",
     "@types/node": "18.16.18",
-    "@types/react": "18.2.12",
-    "@types/react-dom": "18.2.5",
+    "@types/react": "18.2.14",
+    "@types/react-dom": "18.2.6",
     "@types/webextension-polyfill": "0.10.0",
     "@types/webpack": "5.28.1",
     "@typescript-eslint/eslint-plugin": "5.59.11",
