@@ -17,15 +17,11 @@ import NativeSelect from '@mui/material/NativeSelect';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import { setConfiguration, updateScripts } from '@src/browser';
+import { useGetConfigurationQuery, useGetScriptsQuery } from '@src/lib/queries';
+import { IConfig, Theme } from '@src/types';
 import React, { Fragment, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { setConfiguration, updateScripts } from '../../browser';
-import {
-  useGetConfigurationQuery,
-  useGetScriptsQuery,
-} from '../../lib/queries';
-import { IConfig, Theme } from '../../types';
 
 const EditSection = styled('div')({
   width: '100%',

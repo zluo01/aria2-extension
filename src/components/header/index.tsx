@@ -8,11 +8,10 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
+import { PauseJobs, RemoveJobs, StartJobs } from '@src/aria2';
+import { openDetail, openSetting } from '@src/browser';
+import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@src/types';
 import React from 'react';
-
-import { PauseJobs, RemoveJobs, StartJobs } from '../../aria2';
-import { openDetail, openSetting } from '../../browser';
-import { ACTIVE_JOB, IJob, PAUSED_JOB } from '../../types';
 
 interface IHeader {
   jobs: IJob[];

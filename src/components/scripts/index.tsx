@@ -5,11 +5,10 @@ import TextField from '@mui/material/TextField';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import { addScript, getScripts } from '@src/browser';
+import { DEFAULT_SCRIPT, IScript } from '@src/types';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-import { addScript, getScripts } from '../../browser';
-import { DEFAULT_SCRIPT, IScript } from '../../types';
 
 const EditButton = styled(Button)({
   width: 80,

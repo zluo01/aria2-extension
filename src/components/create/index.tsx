@@ -1,11 +1,10 @@
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { styled } from '@mui/material/styles';
+import { notify } from '@src/browser';
+import { useSubmitTasksTrigger } from '@src/lib/queries';
+import { applyScripts } from '@src/utils';
 import { useState } from 'react';
-
-import { notify } from '../../browser';
-import { useSubmitTasksTrigger } from '../../lib/queries';
-import { applyScripts } from '../../utils';
 
 const CreationSection = styled('div')(({ theme }) => ({
   width: 420,

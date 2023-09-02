@@ -9,11 +9,11 @@ import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import { PauseJobs, StartJobs } from '@src/aria2';
+import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@src/types';
+import { parseBytes } from '@src/utils';
 import React from 'react';
 
-import { PauseJobs, StartJobs } from '../../aria2';
-import { ACTIVE_JOB, IJob, PAUSED_JOB } from '../../types';
-import { parseBytes } from '../../utils';
 import Progress from '../progress';
 
 const JobList = styled(List)(({ theme }) => ({

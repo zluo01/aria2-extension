@@ -1,9 +1,8 @@
+import { AddUris, GetJobs } from '@src/aria2';
+import { download, getConfiguration, getScripts } from '@src/browser';
+import { IConfig, IJob, IScript } from '@src/types';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-
-import { AddUris, GetJobs } from '../../aria2';
-import { download, getConfiguration, getScripts } from '../../browser';
-import { IConfig, IJob, IScript } from '../../types';
 
 enum FetchKey {
   TASKS = 'tasks',

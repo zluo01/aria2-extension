@@ -4,12 +4,11 @@ import TextField from '@mui/material/TextField';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import { getJobDetail, saveFile } from '@src/browser';
+import { useDownloadTrigger } from '@src/lib/queries';
+import { IFileDetail } from '@src/types';
+import { verifyFileName } from '@src/utils';
 import { ChangeEvent, useEffect, useState } from 'react';
-
-import { getJobDetail, saveFile } from '../../browser';
-import { useDownloadTrigger } from '../../lib/queries';
-import { IFileDetail } from '../../types';
-import { verifyFileName } from '../../utils';
 
 const Panel = styled(Stack)(({ theme }) => ({
   width: '98%',
