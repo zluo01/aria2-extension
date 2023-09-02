@@ -195,4 +195,4 @@ gen
 
 build
 artifacts
-.idea
+public/manifest.json

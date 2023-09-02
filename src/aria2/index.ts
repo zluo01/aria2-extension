@@ -1,8 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import Aria2 from 'aria2';
+
 import { getConfiguration, notify } from '../browser';
 import { DEFAULT_CONFIG, IConfig, IDownload, IJob } from '../types';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Aria2 = require('aria2');
 
 type Aria2ClientType = string;
 
@@ -97,7 +98,7 @@ export async function AddUris(...uris: string[]): Promise<void> {
 export async function AddUri(
   link: string,
   fileName?: string,
-  options?: IDownload
+  options?: IDownload,
 ): Promise<void> {
   try {
     await singleCall(() => aria2.call('addUri', [link], options || {}));
@@ -140,7 +141,7 @@ async function singleCall(func: () => Promise<any>): Promise<any> {
 }
 
 async function multiCall(
-  callItems: (string | number | string[])[][]
+  callItems: (string | number | string[])[][],
 ): Promise<any> {
   const instanceType: Aria2ClientType = await ConstructAria2Instance();
   const useWebSocket = instanceType === Aria2WsClient;

@@ -50,7 +50,7 @@ function DownloadPanel(): JSX.Element {
   }, []);
 
   function updateFileName(
-    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ): void {
     const name = e.target.value;
     setDetail({ ...detail, fileName: name });
@@ -63,7 +63,7 @@ function DownloadPanel(): JSX.Element {
     url: string,
     fileName: string,
     filePath: string,
-    headers: string[]
+    headers: string[],
   ) {
     await trigger({
       url,
@@ -137,7 +137,7 @@ function DownloadPanel(): JSX.Element {
               detail.url,
               detail.fileName as string,
               filePath,
-              detail.header as string[]
+              detail.header as string[],
             )
           }
         >

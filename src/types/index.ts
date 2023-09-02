@@ -12,7 +12,7 @@ export interface IJob {
   files: [
     {
       path: string;
-    }
+    },
   ];
 }
 

@@ -4,14 +4,14 @@ import { styled, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 
-import DownloadList from './components/content';
-import CreationArea from './components/create';
-import Header from './components/header';
-import DownloadPanel from './components/panel';
-import Scripts from './components/scripts';
-import Setting from './components/setting';
-import { useGetTasksQuery } from './lib/queries';
-import usePreferTheme from './theme';
+import DownloadList from '../components/content';
+import CreationArea from '../components/create';
+import Header from '../components/header';
+import DownloadPanel from '../components/panel';
+import Scripts from '../components/scripts';
+import Setting from '../components/setting';
+import { useGetTasksQuery } from '../lib/queries';
+import usePreferTheme from '../theme';
 
 const DisplayHolder = styled(Container)(({ theme }) => ({
   width: '100%',

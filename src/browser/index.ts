@@ -46,9 +46,9 @@ export function openDetail(fromExtension: boolean): void {
   getConfiguration()
     .then(
       config =>
-        `AriaNg/index.html#!/settings/rpc/set/${config.protocol}/${
+        `manager/index.html#!/settings/rpc/set/${config.protocol}/${
           config.host
-        }/${config.port}/jsonrpc/${btoa(config.token)}`
+        }/${config.port}/jsonrpc/${btoa(config.token)}`,
     )
     .then(url => browser.tabs.create({ url }))
     .then(() => fromExtension && window.close())
@@ -136,7 +136,7 @@ export async function download(
   url: string,
   fileName: string,
   filePath: string,
-  header: string[]
+  header: string[],
 ): Promise<void> {
   try {
     const options: IDownload = {
@@ -161,7 +161,7 @@ export async function download(
 export async function saveFile(
   url: string,
   fileName: string,
-  as: boolean
+  as: boolean,
 ): Promise<void> {
   try {
     const window = await getCurrentWindow();

@@ -27,7 +27,7 @@ export function useGetScriptsQuery() {
 
 export function useSubmitTasksTrigger() {
   return useSWRMutation(FetchKey.TASKS, (_url, opts: { arg: string[] }) =>
-    AddUris(...opts.arg)
+    AddUris(...opts.arg),
   );
 }
 
@@ -43,10 +43,10 @@ export function useDownloadTrigger() {
           filePath: string;
           headers: string[];
         };
-      }
+      },
     ) => {
       const { url, fileName, filePath, headers } = opts.arg;
       await download(url, fileName, filePath, headers);
-    }
+    },
   );
 }

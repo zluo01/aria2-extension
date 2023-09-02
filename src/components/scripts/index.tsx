@@ -33,13 +33,13 @@ function Scripts(): JSX.Element {
   }, []);
 
   async function updateScriptName(
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ) {
     setScript(prevState => ({ ...prevState, name: e.target.value }));
   }
 
   async function updateScriptDomain(
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ) {
     setScript(prevState => ({ ...prevState, domain: e.target.value }));
   }

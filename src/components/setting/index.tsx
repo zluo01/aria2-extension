@@ -92,7 +92,7 @@ function Setting(): JSX.Element {
   }
 
   async function updateTheme(
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ): Promise<void> {
     if (config) {
       await updateConfig({ ...config, theme: e.target.value as Theme });
@@ -100,7 +100,7 @@ function Setting(): JSX.Element {
   }
 
   async function updateDownloadPath(
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ): Promise<void> {
     if (config) {
       await updateConfig({ ...config, path: e.target.value });
@@ -108,7 +108,7 @@ function Setting(): JSX.Element {
   }
 
   async function updateHost(
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ): Promise<void> {
     if (config) {
       await updateConfig({ ...config, host: e.target.value });
@@ -116,7 +116,7 @@ function Setting(): JSX.Element {
   }
 
   async function updatePort(
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ): Promise<void> {
     if (config) {
       await updateConfig({ ...config, port: parseInt(e.target.value) });
@@ -124,7 +124,7 @@ function Setting(): JSX.Element {
   }
 
   async function updateToken(
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ): Promise<void> {
     if (config) {
       await updateConfig({ ...config, token: e.target.value });
@@ -132,7 +132,7 @@ function Setting(): JSX.Element {
   }
 
   async function updateProtocol(
-    e: React.ChangeEvent<HTMLSelectElement>
+    e: React.ChangeEvent<HTMLSelectElement>,
   ): Promise<void> {
     if (config) {
       await updateConfig({ ...config, protocol: e.target.value });

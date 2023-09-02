@@ -97,7 +97,7 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
     // get file size
     if (d.responseHeaders) {
       const fid = d.responseHeaders.findIndex(
-        x => x.name.toLowerCase() === 'content-length'
+        x => x.name.toLowerCase() === 'content-length',
       );
       detail.fileSize =
         fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
@@ -113,13 +113,13 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
 }
 
 function observeResponse(
-  d: OnHeadersReceivedDetailsType
+  d: OnHeadersReceivedDetailsType,
 ): BlockingResponseOrPromise | void {
   // bug0001: goo.gl
   if (d.statusCode === 200) {
     if (
       d.responseHeaders?.find(
-        x => x.name.toLowerCase() === 'content-disposition'
+        x => x.name.toLowerCase() === 'content-disposition',
       )
     ) {
       const contentDisposition = d.responseHeaders
@@ -168,7 +168,7 @@ browser.webRequest.onSendHeaders.addListener(
     urls: ['<all_urls>'],
     types,
   },
-  ['requestHeaders']
+  ['requestHeaders'],
 );
 
 browser.webRequest.onHeadersReceived.addListener(
@@ -177,7 +177,7 @@ browser.webRequest.onHeadersReceived.addListener(
     urls: ['<all_urls>'],
     types,
   },
-  ['blocking', 'responseHeaders']
+  ['blocking', 'responseHeaders'],
 );
 
 function requestError(d: OnErrorOccurredDetailsType): void {

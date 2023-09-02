@@ -32,14 +32,14 @@ export async function correctFileName(name: string): Promise<string> {
 }
 
 export function getFileName(
-  d: WebRequest.OnHeadersReceivedDetailsType
+  d: WebRequest.OnHeadersReceivedDetailsType,
 ): string {
   if (!d.responseHeaders) {
     return '';
   }
   // get file name
   const id = d.responseHeaders.findIndex(
-    x => x.name.toLowerCase() === 'content-disposition'
+    x => x.name.toLowerCase() === 'content-disposition',
   );
   if (id >= 0) {
     const PARAM_REGEXP =
@@ -90,7 +90,7 @@ function getFileNameURL(url: string) {
 }
 
 export function getRequestHeaders(
-  d: WebRequest.OnSendHeadersDetailsType
+  d: WebRequest.OnSendHeadersDetailsType,
 ): string[] {
   // create header
   const requestHeaders: string[] = [];
