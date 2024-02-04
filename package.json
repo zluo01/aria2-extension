@@ -33,7 +33,7 @@
     "eslint-plugin-standard": "5.0.0",
     "husky": "8.0.3",
     "lint-staged": "15.2.1",
-    "prettier": "3.2.4",
+    "prettier": "3.2.5",
     "vite": "5.0.12",
     "typescript": "5.3.3",
     "web-ext": "7.11.0",
