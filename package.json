@@ -31,7 +31,7 @@
     "eslint-plugin-promise": "6.1.1",
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-standard": "5.0.0",
-    "husky": "8.0.3",
+    "husky": "9.0.10",
     "lint-staged": "15.2.2",
     "prettier": "3.2.5",
     "vite": "5.0.12",
@@ -47,7 +47,7 @@
     "type-check": "tsc --pretty --noEmit",
     "format": "prettier --write .",
     "lint": "eslint . --ext ts --ext tsx --ext js",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "browserslist": {
     "production": [
