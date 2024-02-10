@@ -8,10 +8,15 @@ interface IProgressWithLabel {
 }
 
 function LinearProgressWithLabel(props: IProgressWithLabel) {
+  const { value } = props;
   return (
     <Box display="flex" alignItems="center">
       <Box width="100%" mr={1}>
-        <LinearProgress variant="determinate" {...props} />
+        <LinearProgress
+          variant="determinate"
+          color={value === 100 ? 'success' : 'primary'}
+          value={value}
+        />
       </Box>
       <Box minWidth={35}>
         <Typography
