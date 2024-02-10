@@ -1,63 +1,33 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base",
-    ":disableDependencyDashboard"
-  ],
-  "schedule": [
-    "every weekend"
-  ],
+  "extends": ["config:base", ":disableDependencyDashboard"],
+  "schedule": ["every weekend"],
   "packageRules": [
     {
-      "updateTypes": [
-        "minor",
-        "patch",
-        "pin",
-        "digest"
-      ],
+      "updateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
     },
     {
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchPackagePatterns": [
-        "lint",
-        "prettier",
-        "husky",
-        "@trivago/"
-      ],
+      "matchDepTypes": ["devDependencies"],
+      "matchPackagePatterns": ["lint", "prettier", "husky", "@trivago/"],
       "automerge": true
     },
     {
       "groupName": "definitelyTyped",
-      "matchPackagePrefixes": [
-        "@types/"
-      ]
+      "matchPackagePrefixes": ["@types/"]
     },
     {
       "groupName": "eslint",
-      "matchPackagePrefixes": [
-        "eslint",
-        "@typescript-eslint/"
-      ]
+      "matchPackagePrefixes": ["eslint", "@typescript-eslint/"]
     },
     {
       "groupName": "styling",
-      "matchPackagePrefixes": [
-        "@emotion/",
-        "@mui/"
-      ]
+      "matchPackagePrefixes": ["@emotion/", "@mui/"]
     },
     {
       "groupName": "build-tools",
-      "matchPackagePrefixes": [
-        "vite",
-        "@vitejs/"
-      ]
+      "matchPackagePrefixes": ["vite", "@vitejs/"]
     }
   ],
-  "postUpdateOptions": [
-    "npmDedupe"
-  ]
+  "postUpdateOptions": ["npmDedupe"]
 }
