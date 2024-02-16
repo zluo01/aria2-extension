@@ -18,6 +18,8 @@ Web extension for Aria2
 
 ## Scripts
 
+> This feature is **removed** after 0.5.0 due to manifest 3 does not allow arbitrary code execution.
+
 The new script extension allows user to download certain resources on websites without going into page source manually.
 
 ### Example

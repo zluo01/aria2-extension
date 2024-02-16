@@ -10,7 +10,6 @@ import {
 } from '../browser';
 import { IFileDetail } from '../types';
 import {
-  applyScripts,
   correctFileName,
   getFileName,
   getRequestHeaders,
@@ -37,8 +36,7 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
   if (info.menuItemId === CONTEXT_ID) {
     try {
       const uri = escapeHTML(info.linkUrl as string);
-      const processed = await applyScripts(uri);
-      await AddUri(processed[0]);
+      await AddUri(uri);
     } catch (e) {
       if (e instanceof Error) {
         await notify(`fail to download url, msg: ${e.message}`);

@@ -8,7 +8,6 @@ import DownloadList from '../components/content';
 import CreationArea from '../components/create';
 import Header from '../components/header';
 import DownloadPanel from '../components/panel';
-import Scripts from '../components/scripts';
 import Setting from '../components/setting';
 import { useGetTasksQuery } from '../lib/queries';
 import usePreferTheme from '../theme';
@@ -70,7 +69,6 @@ function App(): JSX.Element {
       <Router>
         <Routes>
           <Route path="/download" element={<DownloadPanel />} />
-          <Route path="/script" element={<Scripts />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="/" element={<Display />} />
         </Routes>

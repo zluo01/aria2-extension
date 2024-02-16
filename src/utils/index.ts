@@ -1,7 +1,5 @@
 import browser, { WebRequest } from 'webextension-polyfill';
 
-import { getScripts } from '../browser';
-
 // eslint-disable-next-line no-control-regex
 const regex = /[<>:"/\\|?*\x00-\x1F]/g;
 
@@ -118,33 +116,4 @@ export function parseBytes(value: string): string {
   }
 
   return `${speed.toFixed(2)} ${symbol[order]}`;
-}
-
-const Function = Object.getPrototypeOf(function () {
-  // do nothing.
-}).constructor;
-
-async function applyScript(url: string, code: string): Promise<string> {
-  let c = code.slice(0, -3) + '(url);';
-  c = 'return ' + c;
-  const func = new Function('url', c);
-  if (c.startsWith('(async')) {
-    return await func(url);
-  }
-  return func(url);
-}
-
-export async function applyScripts(...uris: string[]): Promise<string[]> {
-  const copy = [...uris];
-  const scripts = await getScripts();
-  for (let i = 0; i < copy.length; i++) {
-    let copyUri = copy[i];
-    for (let j = 0; j < scripts.length; j++) {
-      if (copy[i].match(scripts[j].domain)) {
-        copyUri = await applyScript(copyUri, scripts[j].code);
-      }
-    }
-    copy[i] = copyUri;
-  }
-  return copy;
 }

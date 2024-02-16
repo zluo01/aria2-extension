@@ -55,19 +55,3 @@ export const DEFAULT_CONFIG: IConfig = {
   token: '',
   theme: Theme.FOLLOWING_SYSTEM,
 };
-
-export interface IScript {
-  name: string;
-  domain: string;
-  code: string;
-}
-
-export const DEFAULT_SCRIPT: IScript = {
-  name: '',
-  domain: '',
-  code: `(function(url) {
-  'use strict';
-  
-  // Your code here...
-})();`,
-};

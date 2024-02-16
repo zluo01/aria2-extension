@@ -1,68 +1,19 @@
-import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import Fade from '@mui/material/Fade';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import IconButton from '@mui/material/IconButton';
-import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import NativeSelect from '@mui/material/NativeSelect';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
-import { setConfiguration, updateScripts } from '@src/browser';
-import { useGetConfigurationQuery, useGetScriptsQuery } from '@src/lib/queries';
+import { setConfiguration } from '@src/browser';
+import { useGetConfigurationQuery } from '@src/lib/queries';
 import manifest from '@src/manifest';
 import { IConfig, Theme } from '@src/types';
-import React, { Fragment, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-const EditSection = styled('div')({
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-});
-
-const ScriptList = styled('div')(({ theme }) => ({
-  height: 382,
-  border: '1px solid',
-  borderColor: theme.palette.text.secondary,
-  overflow: 'auto',
-}));
-
-const HiddenMenuInput = styled(Input)({
-  display: 'none',
-});
-
-const HiddenMenuInputLabel = styled(InputLabel)({
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  paddingTop: 6,
-  paddingBottom: 6,
-  color: 'inherit',
-  cursor: 'inherit',
-});
-
-const ScriptTitle = styled(Typography)(({ theme }) => ({
-  color: theme.palette.text.secondary,
-  marginTop: 6,
-  marginBottom: 6,
-}));
+import React from 'react';
 
 function Setting(): JSX.Element {
-  const navigate = useNavigate();
-
   const protocol = {
     ws: 'WebSocket',
     wss: 'WebSocket (Security)',
@@ -71,23 +22,6 @@ function Setting(): JSX.Element {
   };
 
   const { data: config, mutate: mutateConfig } = useGetConfigurationQuery();
-  const { data: scripts, mutate: mutateScripts } = useGetScriptsQuery();
-
-  // dropdown button
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  async function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
-    setAnchorEl(event.currentTarget);
-  }
-
-  async function handleClose() {
-    setAnchorEl(null);
-  }
-
-  async function handleAddScript() {
-    navigate('/script');
-    await handleClose();
-  }
 
   async function updateTheme(
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -144,45 +78,6 @@ function Setting(): JSX.Element {
     } catch (e) {
       console.error(e);
     }
-  }
-
-  async function handleEdit(index: number) {
-    navigate(`/script?id=${index}`);
-  }
-
-  async function handleDelete(index: number) {
-    if (scripts) {
-      const result = [...scripts];
-      result.splice(index, 1);
-      await updateScripts(result);
-      await mutateScripts();
-    }
-  }
-
-  async function handleImport(e: any) {
-    const fileReader = new FileReader();
-
-    fileReader.readAsText(e.target.files[0]);
-    fileReader.onload = async e => {
-      const res = JSON.parse(e.target?.result as string);
-      await updateScripts(res);
-      await mutateScripts();
-      await handleClose();
-    };
-  }
-
-  async function handleExport() {
-    const fileName = 'scripts';
-    const json = JSON.stringify(scripts);
-    const blob = new Blob([json], { type: 'application/json' });
-    const href = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = href;
-    link.download = fileName + '.json';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    await handleClose();
   }
 
   return (
@@ -270,71 +165,6 @@ function Setting(): JSX.Element {
         margin="normal"
         fullWidth
       />
-      <EditSection>
-        <ScriptTitle variant="body1">Scripts</ScriptTitle>
-        <Fragment>
-          <IconButton
-            color="inherit"
-            aria-label="menu"
-            aria-controls="option-menu"
-            aria-haspopup="true"
-            onClick={handleClick}
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-            TransitionComponent={Fade}
-          >
-            <MenuItem onClick={handleAddScript}>New Script</MenuItem>
-            <MenuItem>
-              <HiddenMenuInput
-                type={'file'}
-                id={'file'}
-                inputProps={{
-                  accept: 'application/json',
-                }}
-                onChange={handleImport}
-              />
-              <HiddenMenuInputLabel htmlFor={'file'}>
-                Import
-              </HiddenMenuInputLabel>
-            </MenuItem>
-            <MenuItem onClick={handleExport} disabled={!scripts?.length}>
-              Export
-            </MenuItem>
-          </Menu>
-        </Fragment>
-      </EditSection>
-      <ScriptList>
-        <List>
-          {scripts?.map((value, index) => (
-            <ListItem
-              key={index}
-              secondaryAction={
-                <IconButton
-                  edge="end"
-                  aria-label="delete"
-                  onClick={() => handleDelete(index)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              }
-              disablePadding
-            >
-              <ListItemButton onDoubleClick={() => handleEdit(index)} dense>
-                <ListItemText
-                  primary={value.name}
-                  secondary={value.domain}
-                ></ListItemText>
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </ScriptList>
       <Divider sx={{ pt: 2 }} />
       <Typography sx={{ py: 1 }} align="right">
         v{manifest.version}

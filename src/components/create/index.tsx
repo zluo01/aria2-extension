@@ -3,7 +3,6 @@ import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { styled } from '@mui/material/styles';
 import { notify } from '@src/browser';
 import { useSubmitTasksTrigger } from '@src/lib/queries';
-import { applyScripts } from '@src/utils';
 import { useState } from 'react';
 
 const CreationSection = styled('div')(({ theme }) => ({
@@ -24,8 +23,7 @@ function CreationArea({ close }: ICreationArea): JSX.Element {
 
   async function handleSubmit() {
     try {
-      const uris = await applyScripts(...text.split('\n'));
-      await trigger(uris);
+      await trigger(text.split('\n'));
     } catch (e) {
       if (e instanceof Error) {
         await notify(`fail to download files, msg: ${e.message}.`);

@@ -18,11 +18,22 @@ export default function makeManifest(): PluginOption {
           throw Error('Build directory not exists.');
         }
 
-        const manifestPath = resolve(outDir, 'manifest.json');
+        let manifestContent = manifest;
 
+        if (process.env.TARGET === 'CHROME') {
+          manifestContent = {
+            ...manifestContent,
+            background: {
+              service_worker: (manifestContent.background as any).scripts[0],
+              type: (manifestContent.background as any).type,
+            },
+          };
+        }
+
+        const manifestPath = resolve(outDir, 'manifest.json');
         await fs.promises.writeFile(
           manifestPath,
-          JSON.stringify(manifest, null, 2),
+          JSON.stringify(manifestContent, null, 2),
         );
 
         console.info(`Manifest file copy complete: ${manifestPath}`);

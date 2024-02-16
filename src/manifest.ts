@@ -3,8 +3,8 @@ import type { Manifest } from 'webextension-polyfill';
 import pkg from '../package.json';
 
 const manifest: Manifest.WebExtensionManifest = {
-  manifest_version: 2,
-  name: 'Aria2 Integration Extension',
+  manifest_version: 3,
+  name: pkg.displayName,
   version: pkg.version,
   icons: {
     '48': 'logo48.png',
@@ -18,10 +18,11 @@ const manifest: Manifest.WebExtensionManifest = {
     'downloads',
     'webRequest',
     'webRequestBlocking',
-    '<all_urls>',
   ],
-  content_security_policy:
-    "script-src 'self' 'unsafe-eval'; object-src 'self';",
+  host_permissions: ['<all_urls>'],
+  content_security_policy: {
+    extension_pages: "script-src 'self'; object-src 'self';",
+  },
   background: {
     scripts: ['background/index.js'],
     type: 'module',
@@ -31,13 +32,18 @@ const manifest: Manifest.WebExtensionManifest = {
       description: 'Open AriaNg',
     },
   },
-  browser_action: {
+  action: {
     default_popup: 'index.html',
     default_title: 'Aria2Ex',
   },
   options_ui: {
     page: 'index.html#/setting',
     open_in_tab: true,
+  },
+  browser_specific_settings: {
+    gecko: {
+      id: '{9e3f5f09-a4c6-43c2-8715-cac81530a5ce}',
+    },
   },
 };
 

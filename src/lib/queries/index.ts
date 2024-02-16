@@ -1,13 +1,12 @@
 import { AddUris, GetJobs } from '@src/aria2';
-import { download, getConfiguration, getScripts } from '@src/browser';
-import { IConfig, IJob, IScript } from '@src/types';
+import { download, getConfiguration } from '@src/browser';
+import { IConfig, IJob } from '@src/types';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 enum FetchKey {
   TASKS = 'tasks',
   SETTING = 'setting',
-  SCRIPTS = 'scripts',
 }
 
 export function useGetTasksQuery() {
@@ -18,10 +17,6 @@ export function useGetTasksQuery() {
 
 export function useGetConfigurationQuery() {
   return useSWR<IConfig>(FetchKey.SETTING, getConfiguration);
-}
-
-export function useGetScriptsQuery() {
-  return useSWR<IScript[]>(FetchKey.SCRIPTS, getScripts);
 }
 
 export function useSubmitTasksTrigger() {

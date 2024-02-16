@@ -1,13 +1,7 @@
 import browser, { Action, Windows } from 'webextension-polyfill';
 
 import { AddUri } from '../aria2';
-import {
-  DEFAULT_CONFIG,
-  IConfig,
-  IDownload,
-  IFileDetail,
-  IScript,
-} from '../types';
+import { DEFAULT_CONFIG, IConfig, IDownload, IFileDetail } from '../types';
 
 export async function getConfiguration(): Promise<IConfig> {
   const config = await browser.storage.local.get('config');
@@ -16,30 +10,6 @@ export async function getConfiguration(): Promise<IConfig> {
 
 export async function setConfiguration(config: IConfig): Promise<void> {
   return browser.storage.local.set({ config });
-}
-
-export async function getScripts(): Promise<IScript[]> {
-  const config = await browser.storage.local.get('scripts');
-  return config.scripts || [];
-}
-
-export async function updateScripts(scripts: IScript[]): Promise<void> {
-  return browser.storage.local.set({ scripts });
-}
-
-export async function addScript(script: IScript, index: number): Promise<void> {
-  try {
-    const config = await browser.storage.local.get('scripts');
-    const scripts = (config.scripts as IScript[]) || [];
-    if (index >= 0) {
-      scripts[index] = script;
-    } else {
-      scripts.push(script);
-    }
-    return browser.storage.local.set({ scripts });
-  } catch (e) {
-    console.error('Add Script', e);
-  }
 }
 
 export function openDetail(fromExtension: boolean): void {
