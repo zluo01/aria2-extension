@@ -18,7 +18,7 @@ Web extension for Aria2
 
 ## Scripts
 
-> This feature is **removed** after 0.5.0 due to manifest 3 does not allow arbitrary code execution.
+> This feature is **removed** after 0.5.0 due to manifest 3 does not allow arbitrary code execution per [guideline](https://developer.chrome.com/docs/extensions/develop/migrate/improve-security).
 
 The new script extension allows user to download certain resources on websites without going into page source manually.
 
