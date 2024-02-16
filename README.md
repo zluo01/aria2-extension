@@ -14,7 +14,7 @@ Web extension for Aria2
 - Trigger download with right click context menu
 - Allow more operations with integrated AriaNg
 - Custom configuration allows instance other than default aria2 domains & ports
-- Third party scripts support, allow user to add scripts using integrated editor.
+- Third party scripts support, allow user to add scripts using integrated editor. (Removed after **0.5.0**, seen below.)
 
 ## Scripts
 
