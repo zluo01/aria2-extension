@@ -1,7 +1,7 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { ListItemButton } from '@mui/material';
 import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
 import Fade from '@mui/material/Fade';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -10,6 +10,7 @@ import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -19,6 +20,7 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { setConfiguration, updateScripts } from '@src/browser';
 import { useGetConfigurationQuery, useGetScriptsQuery } from '@src/lib/queries';
+import manifest from '@src/manifest';
 import { IConfig, Theme } from '@src/types';
 import React, { Fragment, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -333,6 +335,10 @@ function Setting(): JSX.Element {
           ))}
         </List>
       </ScriptList>
+      <Divider sx={{ pt: 2 }} />
+      <Typography sx={{ py: 1 }} align="right">
+        v{manifest.version}
+      </Typography>
     </Container>
   );
 }
