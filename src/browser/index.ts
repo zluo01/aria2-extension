@@ -166,12 +166,8 @@ async function getCurrentWindow(): Promise<Windows.Window> {
 }
 
 export async function updateBadge(num: number): Promise<void> {
-  try {
-    const value = num > 0 ? num.toString() : null;
-    const color = num > 0 ? '#303030' : ([217, 0, 0, 255] as Action.ColorArray);
-    await browser.browserAction.setBadgeText({ text: value });
-    await browser.browserAction.setBadgeBackgroundColor({ color });
-  } catch (err) {
-    console.error('Update Badge', err);
-  }
+  const value = num > 0 ? num.toString() : null;
+  const color = num > 0 ? '#303030' : ([217, 0, 0, 255] as Action.ColorArray);
+  await browser.action.setBadgeText({ text: value });
+  await browser.action.setBadgeBackgroundColor({ color });
 }
