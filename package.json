@@ -33,7 +33,7 @@
     "husky": "9.0.11",
     "lint-staged": "15.2.2",
     "prettier": "3.2.5",
-    "vite": "5.2.4",
+    "vite": "5.2.6",
     "typescript": "5.4.3",
     "web-ext": "7.11.0",
     "webextension-polyfill": "0.10.0"
