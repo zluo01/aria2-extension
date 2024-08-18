@@ -2,8 +2,6 @@
 
 Web extension for Aria2
 
-## Unknown Issues
-- [#165 - The right click context menu can't be downloaded](https://github.com/zluo01/aria2-extension/issues/165)
 ## Known Issues
 - [pop up menu and auto downloading not working in chrome](https://github.com/zluo01/aria2-extension/issues/910)
   
