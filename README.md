@@ -3,8 +3,9 @@
 Web extension for Aria2
 
 ## Known Issues
+
 - [pop up menu and auto downloading not working in chrome](https://github.com/zluo01/aria2-extension/issues/910)
-  
+
 ## Installation
 
 - [Firefox](https://addons.mozilla.org/en-US/firefox/addon/aria2-integration-extension/?utm_content=addons-manager-reviews-link&utm_medium=firefox-browser&utm_source=firefox-browser)

@@ -22,11 +22,21 @@ export default function makeManifest(): PluginOption {
 
         if (process.env.TARGET === 'CHROME') {
           manifestContent = {
-            ...manifestContent,
+            manifest_version: 2,
+            name: manifestContent.name,
+            version: manifestContent.version,
+            icons: manifestContent.icons,
+            permissions: [
+              ...(manifestContent.permissions as string[]),
+              '<all_urls>',
+            ],
+            content_security_policy: "script-src 'self'; object-src 'self';",
             background: {
-              service_worker: (manifestContent.background as any).scripts[0],
-              type: (manifestContent.background as any).type,
+              page: 'background-page.html',
             },
+            commands: manifestContent.commands,
+            options_ui: manifestContent.options_ui,
+            browser_action: manifestContent.action,
           };
         }
 
