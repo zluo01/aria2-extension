@@ -5,7 +5,7 @@ import { DEFAULT_CONFIG, IConfig, IDownload, IFileDetail } from '../types';
 
 export async function getConfiguration(): Promise<IConfig> {
   const config = await browser.storage.local.get('config');
-  return config.config || DEFAULT_CONFIG;
+  return (config.config as IConfig) || DEFAULT_CONFIG;
 }
 
 export async function setConfiguration(config: IConfig): Promise<void> {

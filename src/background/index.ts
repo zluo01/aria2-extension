@@ -79,9 +79,7 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
   let fileName = decodeURIComponent(getFileName(d));
 
   // issue #8
-  try {
-    fileName = decodeURI(escape(fileName));
-  } catch (e) {}
+  fileName = decodeURI(encodeURIComponent(fileName));
 
   // file name cannot have ""
   fileName = fileName.replace('UTF-8', '');
@@ -90,29 +88,25 @@ async function prepareDownload(d: OnHeadersReceivedDetailsType) {
   fileName = fileName.replaceAll("'", '');
 
   // correct File Name
-  try {
-    detail.fileName = await correctFileName(fileName);
-    // get file size
-    if (d.responseHeaders) {
-      const fid = d.responseHeaders.findIndex(
-        x => x.name.toLowerCase() === 'content-length',
-      );
-      detail.fileSize =
-        fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
-    }
-
-    // create download panel
-    processQueue.push(detail);
-    await removeBlankTab();
-    await createDownloadPanel();
-  } catch (e) {
-    console.error(e);
+  detail.fileName = await correctFileName(fileName);
+  // get file size
+  if (d.responseHeaders) {
+    const fid = d.responseHeaders.findIndex(
+      x => x.name.toLowerCase() === 'content-length',
+    );
+    detail.fileSize =
+      fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
   }
+
+  // create download panel
+  processQueue.push(detail);
+  await removeBlankTab();
+  await createDownloadPanel();
 }
 
 function observeResponse(
   d: OnHeadersReceivedDetailsType,
-): BlockingResponseOrPromise | void {
+): BlockingResponseOrPromise | undefined {
   // bug0001: goo.gl
   if (d.statusCode === 200) {
     if (
@@ -190,7 +184,7 @@ browser.webRequest.onErrorOccurred.addListener(requestError, {
   types,
 });
 
-browser.runtime.onMessage.addListener((data, _sender) => {
+browser.runtime.onMessage.addListener((data: any, _sender) => {
   if (data.type === 'all') {
     return Promise.resolve(processQueue.pop());
   }
@@ -202,5 +196,4 @@ function updateActiveJobNumber() {
     .catch(err => console.error(err));
 }
 
-updateActiveJobNumber();
 setInterval(updateActiveJobNumber, 1000);

@@ -20,8 +20,8 @@
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "@types/webextension-polyfill": "0.12.0",
-    "@typescript-eslint/eslint-plugin": "7.18.0",
-    "@typescript-eslint/parser": "7.18.0",
+    "@typescript-eslint/eslint-plugin": "8.1.0",
+    "@typescript-eslint/parser": "8.1.0",
     "@vitejs/plugin-react-swc": "3.7.0",
     "eslint": "8.57.0",
     "eslint-config-prettier": "9.1.0",
@@ -29,7 +29,6 @@
     "eslint-plugin-import": "2.29.1",
     "eslint-plugin-promise": "6.6.0",
     "eslint-plugin-react": "7.35.0",
-    "eslint-plugin-standard": "5.0.0",
     "husky": "9.1.4",
     "lint-staged": "15.2.9",
     "prettier": "3.3.3",
@@ -41,7 +40,7 @@
   "scripts": {
     "dev": "npm run build && web-ext run --source-dir ./build/",
     "build": "vite build",
-    "package": "web-ext build --config=webext.config.js",
+    "package": "web-ext build --config=webext.config.cjs",
     "complete": "npm run build && npm run package",
     "type-check": "tsc --pretty --noEmit",
     "format": "prettier --write .",
@@ -62,6 +61,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js}": [
+      "eslint --cache --fix",
       "npm run lint",
       "npm run format"
     ],
