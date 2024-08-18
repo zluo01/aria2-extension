@@ -2,6 +2,11 @@
 
 Web extension for Aria2
 
+## Unknown Issues
+
+- [#165 - The right click context menu can't be downloaded](https://github.com/zluo01/aria2-extension/issues/165)
+- https://github.com/zluo01/aria2-extension/issues/910
+- 
 ## Installation
 
 - [Firefox](https://addons.mozilla.org/en-US/firefox/addon/aria2-integration-extension/?utm_content=addons-manager-reviews-link&utm_medium=firefox-browser&utm_source=firefox-browser)
@@ -44,10 +49,6 @@ The new script extension allows user to download certain resources on websites w
 With the input url as a parameter, user should be able to implement scripts utilize xPath or query selector to find out media sources or batch images on define domains 
 and download all automatically in batch.
 </p>
-
-## Unknown Issues
-
-- [#165 - The right click context menu can't be downloaded](https://github.com/zluo01/aria2-extension/issues/165)
 
 ## Todo
 
