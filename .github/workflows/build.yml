@@ -12,14 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Node.js, NPM
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-      - run: npm install
-
-      - name: build extension
-        run: npm run build
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present
 
   deployment:
     runs-on: ubuntu-latest
