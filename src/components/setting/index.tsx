@@ -101,9 +101,6 @@ function Setting(): JSX.Element {
       <TextField
         label="Default Download Path"
         helperText="Download path of Aria2(only), optional"
-        InputLabelProps={{
-          shrink: true,
-        }}
         value={config?.path}
         onChange={updateDownloadPath}
         variant="standard"
@@ -130,9 +127,6 @@ function Setting(): JSX.Element {
       <TextField
         label="Host"
         helperText="RPC host of Aria2. You can use ip or domain name."
-        InputLabelProps={{
-          shrink: true,
-        }}
         value={config?.host}
         onChange={updateHost}
         variant="standard"
@@ -143,9 +137,6 @@ function Setting(): JSX.Element {
       <TextField
         label="Port"
         helperText="Aria2 RPC port"
-        InputLabelProps={{
-          shrink: true,
-        }}
         value={config?.port}
         onChange={updatePort}
         variant="standard"
@@ -156,9 +147,6 @@ function Setting(): JSX.Element {
       <TextField
         label="Token"
         helperText="Aria2 RPC secret, optional."
-        InputLabelProps={{
-          shrink: true,
-        }}
         value={config?.token}
         onChange={updateToken}
         variant="standard"

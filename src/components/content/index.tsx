@@ -5,7 +5,6 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
@@ -83,7 +82,21 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
       {jobs.map(o => {
         const labelId = `checkbox-list-label-${o.gid}`;
         return (
-          <Job key={o.gid} dense onClick={toggle(o.gid)}>
+          <Job
+            key={o.gid}
+            dense
+            onClick={toggle(o.gid)}
+            secondaryAction={
+              <IconButton
+                edge={'end'}
+                aria-label={'comments'}
+                size={'small'}
+                onClick={() => jobAction(o)}
+              >
+                {o.status === ACTIVE_JOB ? <PauseIcon /> : <PlayArrowIcon />}
+              </IconButton>
+            }
+          >
             <ListItemIcon>
               <Checkbox
                 edge="start"
@@ -131,16 +144,6 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
                 </React.Fragment>
               }
             />
-            <ListItemSecondaryAction>
-              <IconButton
-                edge={'end'}
-                aria-label={'comments'}
-                size={'small'}
-                onClick={() => jobAction(o)}
-              >
-                {o.status === ACTIVE_JOB ? <PauseIcon /> : <PlayArrowIcon />}
-              </IconButton>
-            </ListItemSecondaryAction>
           </Job>
         );
       })}
