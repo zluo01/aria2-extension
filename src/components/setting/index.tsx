@@ -1,3 +1,7 @@
+import { setConfiguration } from '@/browser';
+import { useGetConfigurationQuery } from '@/lib/queries';
+import manifest from '@/manifest';
+import { IConfig, Theme } from '@/types';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
@@ -7,10 +11,6 @@ import MenuItem from '@mui/material/MenuItem';
 import NativeSelect from '@mui/material/NativeSelect';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { setConfiguration } from '@src/browser';
-import { useGetConfigurationQuery } from '@src/lib/queries';
-import manifest from '@src/manifest';
-import { IConfig, Theme } from '@src/types';
 import React from 'react';
 
 function Setting(): JSX.Element {

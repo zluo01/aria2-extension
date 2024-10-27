@@ -1,9 +1,9 @@
+import { notify } from '@/browser';
+import { augmentDownloadLink } from '@/lib/magnet';
+import { useSubmitTasksTrigger } from '@/lib/queries';
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { styled } from '@mui/material/styles';
-import { notify } from '@src/browser';
-import { augmentDownloadLink } from '@src/lib/magnet';
-import { useSubmitTasksTrigger } from '@src/lib/queries';
 import { useState } from 'react';
 
 const CreationSection = styled('div')(({ theme }) => ({

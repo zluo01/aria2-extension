@@ -1,9 +1,9 @@
+import { useGetConfigurationQuery } from '@/lib/queries';
 import { Theme } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useEffect, useState } from 'react';
 
-import { useGetConfigurationQuery } from '../lib/queries';
 import { Theme as ThemeOptions } from '../types';
 
 const lightTheme = createTheme({

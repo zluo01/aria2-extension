@@ -1,6 +1,6 @@
-import { AddUris, GetJobs } from '@src/aria2';
-import { download, getConfiguration } from '@src/browser';
-import { IConfig, IJob } from '@src/types';
+import { AddUris, GetJobs } from '@/aria2';
+import { download, getConfiguration } from '@/browser';
+import { IConfig, IJob } from '@/types';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 

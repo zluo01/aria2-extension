@@ -1,7 +1,6 @@
+import { AddUri } from '@/aria2';
+import { DEFAULT_CONFIG, IConfig, IDownload, IFileDetail } from '@/types';
 import browser, { Action, Windows } from 'webextension-polyfill';
-
-import { AddUri } from '../aria2';
-import { DEFAULT_CONFIG, IConfig, IDownload, IFileDetail } from '../types';
 
 export async function getConfiguration(): Promise<IConfig> {
   const config = await browser.storage.local.get('config');

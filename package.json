@@ -1,7 +1,7 @@
 {
   "name": "aria2-extension",
   "displayName": "Aria2 Integration Extension",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "dependencies": {
     "@emotion/react": "11.13.3",
@@ -15,25 +15,28 @@
     "swr": "2.2.5"
   },
   "devDependencies": {
+    "@eslint/js": "9.13.0",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
     "@types/node": "20.17.1",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "@types/webextension-polyfill": "0.12.1",
-    "@typescript-eslint/eslint-plugin": "8.11.0",
-    "@typescript-eslint/parser": "8.11.0",
     "@vitejs/plugin-react-swc": "3.7.1",
-    "eslint": "8.57.1",
+    "eslint": "9.13.0",
     "eslint-config-prettier": "9.1.0",
-    "eslint-config-standard": "17.1.0",
     "eslint-plugin-import": "2.31.0",
-    "eslint-plugin-promise": "6.6.0",
+    "eslint-plugin-promise": "7.1.0",
     "eslint-plugin-react": "7.37.2",
+    "eslint-plugin-react-hooks": "5.0.0",
+    "globals": "15.11.0",
     "husky": "9.1.6",
     "lint-staged": "15.2.10",
     "prettier": "3.3.3",
-    "vite": "5.4.10",
     "typescript": "5.6.3",
+    "typescript-eslint": "8.11.0",
+    "vite": "5.4.10",
+    "vite-plugin-eslint": "1.8.1",
+    "vite-tsconfig-paths": "5.0.1",
     "web-ext": "8.3.0",
     "webextension-polyfill": "0.12.0"
   },
@@ -44,7 +47,7 @@
     "complete": "npm run build && npm run package",
     "type-check": "tsc --pretty --noEmit",
     "format": "prettier --write .",
-    "lint": "eslint . --ext ts --ext tsx --ext js",
+    "lint": "eslint .",
     "prepare": "husky"
   },
   "browserslist": {

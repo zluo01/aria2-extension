@@ -1,3 +1,6 @@
+import { PauseJobs, RemoveJobs, StartJobs } from '@/aria2';
+import { openDetail, openSetting } from '@/browser';
+import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -8,9 +11,6 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
-import { PauseJobs, RemoveJobs, StartJobs } from '@src/aria2';
-import { openDetail, openSetting } from '@src/browser';
-import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@src/types';
 import React from 'react';
 
 interface IHeader {

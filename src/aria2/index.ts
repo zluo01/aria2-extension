@@ -1,9 +1,8 @@
+import { getConfiguration, notify } from '@/browser';
+import { DEFAULT_CONFIG, IConfig, IDownload, IJob } from '@/types';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import Aria2 from 'aria2';
-
-import { getConfiguration, notify } from '../browser';
-import { DEFAULT_CONFIG, IConfig, IDownload, IJob } from '../types';
 
 type Aria2ClientType = string;
 

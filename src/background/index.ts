@@ -1,20 +1,19 @@
-import browser, { WebRequest } from 'webextension-polyfill';
-
-import { AddUri, GetNumJobs } from '../aria2';
+import { AddUri, GetNumJobs } from '@/aria2';
 import {
   createDownloadPanel,
   notify,
   openDetail,
   removeBlankTab,
   updateBadge,
-} from '../browser';
-import { IFileDetail } from '../types';
+} from '@/browser';
+import { IFileDetail } from '@/types';
 import {
   correctFileName,
   getFileName,
   getRequestHeaders,
   parseBytes,
-} from '../utils';
+} from '@/utils';
+import browser, { WebRequest } from 'webextension-polyfill';
 
 import ResourceType = WebRequest.ResourceType;
 import OnSendHeadersDetailsType = WebRequest.OnSendHeadersDetailsType;

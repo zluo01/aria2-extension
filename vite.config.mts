@@ -1,11 +1,13 @@
 import react from '@vitejs/plugin-react-swc';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
+import eslint from 'vite-plugin-eslint';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
-import bundleAria from './plugin/bundle-aria';
-import cleanBuildScript from './plugin/clean-build';
-import makeManifest from './plugin/make-manifest';
-import moveEntryScript from './plugin/move-entry';
+import bundleAria from './plugins/bundle-aria';
+import cleanBuildScript from './plugins/clean-build';
+import makeManifest from './plugins/make-manifest';
+import moveEntryScript from './plugins/move-entry';
 
 const root = resolve(__dirname, 'src');
 const outDir = resolve(__dirname, 'build');
@@ -14,7 +16,7 @@ const publicDir = resolve(__dirname, 'public');
 export default defineConfig({
   resolve: {
     alias: {
-      '@src': root,
+      '@': root,
     },
   },
   plugins: [
@@ -23,6 +25,8 @@ export default defineConfig({
     moveEntryScript(),
     makeManifest(),
     bundleAria(),
+    tsconfigPaths(),
+    eslint(),
   ],
   publicDir,
   build: {

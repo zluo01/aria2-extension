@@ -1,3 +1,4 @@
+import { useGetTasksQuery } from '@/lib/queries';
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
 import { styled, ThemeProvider } from '@mui/material/styles';
@@ -9,7 +10,6 @@ import CreationArea from '../components/create';
 import Header from '../components/header';
 import DownloadPanel from '../components/panel';
 import Setting from '../components/setting';
-import { useGetTasksQuery } from '../lib/queries';
 import usePreferTheme from '../theme';
 
 const DisplayHolder = styled(Container)(({ theme }) => ({

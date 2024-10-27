@@ -1,3 +1,6 @@
+import { PauseJobs, StartJobs } from '@/aria2';
+import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
+import { parseBytes } from '@/utils';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Checkbox from '@mui/material/Checkbox';
@@ -8,9 +11,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import { PauseJobs, StartJobs } from '@src/aria2';
-import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@src/types';
-import { parseBytes } from '@src/utils';
 import React from 'react';
 
 import Progress from '../progress';
