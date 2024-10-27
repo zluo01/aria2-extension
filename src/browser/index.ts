@@ -93,6 +93,7 @@ export async function createDownloadPanel(): Promise<Windows.Window> {
     width: w,
     height: h,
     incognito: windowInfo.incognito,
+    focused: true,
   });
 }
 
