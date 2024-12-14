@@ -17,9 +17,9 @@
   "devDependencies": {
     "@eslint/js": "9.16.0",
     "@trivago/prettier-plugin-sort-imports": "5.1.0",
-    "@types/node": "20.17.9",
-    "@types/react": "18.3.14",
-    "@types/react-dom": "18.3.2",
+    "@types/node": "20.17.10",
+    "@types/react": "18.3.16",
+    "@types/react-dom": "18.3.5",
     "@types/webextension-polyfill": "0.12.1",
     "@vitejs/plugin-react-swc": "3.7.2",
     "eslint": "9.16.0",
