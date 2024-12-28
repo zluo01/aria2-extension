@@ -12,7 +12,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "6.28.1",
-    "swr": "2.2.5"
+    "swr": "2.3.0"
   },
   "devDependencies": {
     "@eslint/js": "9.17.0",
