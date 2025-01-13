@@ -32,9 +32,7 @@ const ProgressHolder = styled('div')({
   width: '100%',
 });
 
-export default function LinearWithValueLabel({
-  value,
-}: IProgressWithLabel): JSX.Element {
+export default function LinearWithValueLabel({ value }: IProgressWithLabel) {
   return (
     <ProgressHolder>
       <LinearProgressWithLabel value={value} />

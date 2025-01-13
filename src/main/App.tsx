@@ -19,7 +19,7 @@ const DisplayHolder = styled(Container)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
 }));
 
-function Display(): JSX.Element {
+function Display() {
   const [checked, setChecked] = useState(['']);
   const [show, setShow] = useState(false);
 
@@ -60,7 +60,7 @@ function Display(): JSX.Element {
   );
 }
 
-function App(): JSX.Element {
+function App() {
   const preferTheme = usePreferTheme();
 
   return (

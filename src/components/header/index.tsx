@@ -32,13 +32,7 @@ const ActionGroup = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
 }));
 
-function Header({
-  jobs,
-  checked,
-  show,
-  setShow,
-  setCheck,
-}: IHeader): JSX.Element {
+function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
   const disabled = checked.length === 1;
 
   const [isChecked, setIsChecked] = React.useState(false);

@@ -17,7 +17,7 @@ interface ICreationArea {
   close: () => void;
 }
 
-function CreationArea({ close }: ICreationArea): JSX.Element {
+function CreationArea({ close }: ICreationArea) {
   const { trigger } = useSubmitTasksTrigger();
 
   const [text, setText] = useState('');

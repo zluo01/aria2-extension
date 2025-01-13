@@ -31,7 +31,7 @@ const initialDetail: IFileDetail = {
   url: '',
 };
 
-function DownloadPanel(): JSX.Element {
+function DownloadPanel() {
   const { trigger } = useDownloadTrigger();
 
   const [detail, setDetail] = useState<IFileDetail>(initialDetail);

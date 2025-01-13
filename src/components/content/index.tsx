@@ -45,7 +45,7 @@ interface IDownloadList {
   toggle: (value: string) => () => void;
 }
 
-function DownloadList({ jobs, checked, toggle }: IDownloadList): JSX.Element {
+function DownloadList({ jobs, checked, toggle }: IDownloadList) {
   function getFileName(job: IJob): string {
     if (job.bittorrent && job.bittorrent.info) {
       return job.bittorrent.info.name;

@@ -13,7 +13,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
-function Setting(): JSX.Element {
+function Setting() {
   const protocol = {
     ws: 'WebSocket',
     wss: 'WebSocket (Security)',
