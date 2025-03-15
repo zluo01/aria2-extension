@@ -34,7 +34,7 @@
     "prettier": "3.5.3",
     "typescript": "5.8.2",
     "typescript-eslint": "8.26.1",
-    "vite": "6.2.1",
+    "vite": "6.2.2",
     "vite-plugin-eslint": "1.8.1",
     "vite-tsconfig-paths": "5.1.4",
     "web-ext": "8.4.0",
