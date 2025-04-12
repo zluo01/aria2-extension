@@ -6,8 +6,8 @@
   "dependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.0",
-    "@mui/icons-material": "6.4.10",
-    "@mui/material": "6.4.10",
+    "@mui/icons-material": "6.4.11",
+    "@mui/material": "6.4.11",
     "aria2": "4.1.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
