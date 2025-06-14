@@ -21,7 +21,7 @@
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
     "@types/webextension-polyfill": "0.12.3",
-    "@vitejs/plugin-react-swc": "3.10.1",
+    "@vitejs/plugin-react-swc": "3.10.2",
     "eslint": "9.28.0",
     "eslint-config-prettier": "10.1.5",
     "eslint-plugin-import": "2.31.0",
