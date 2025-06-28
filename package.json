@@ -15,7 +15,7 @@
     "swr": "2.3.3"
   },
   "devDependencies": {
-    "@eslint/js": "9.29.0",
+    "@eslint/js": "9.30.0",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/node": "22.15.34",
     "@types/react": "19.1.8",
