@@ -129,7 +129,7 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList) {
                       display={'inline'}
                       color="textPrimary"
                     >
-                      {parseBytes(o.totalLength)}
+                      {parseBytes(parseFloat(o.totalLength))}
                     </Typography>
                     <Typography
                       component="span"
@@ -137,7 +137,7 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList) {
                       display={'inline'}
                       color="textPrimary"
                     >
-                      {parseBytes(o.downloadSpeed) + '\\s'}
+                      {parseBytes(parseFloat(o.downloadSpeed)) + '\\s'}
                     </Typography>
                   </JobSubInfoSection>
                   <Progress value={getProgress(o)} />

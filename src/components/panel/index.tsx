@@ -1,11 +1,12 @@
 import { getJobDetail, saveFile } from '@/browser';
 import { useDownloadTrigger } from '@/lib/queries';
 import { IFileDetail } from '@/types';
-import { verifyFileName } from '@/utils';
+import { verifyFileName, parseBytes } from '@/utils';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
+import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { ChangeEvent, useEffect, useState } from 'react';
 
@@ -25,7 +26,7 @@ const PanelButton = styled(Button)({
 
 const initialDetail: IFileDetail = {
   fileName: '',
-  filePath: '',
+  fileSize: 0,
   header: [],
   url: '',
 };
@@ -35,6 +36,7 @@ function DownloadPanel() {
 
   const [detail, setDetail] = useState<IFileDetail>(initialDetail);
   const [inValid, isInValid] = useState(false);
+  const [filePath, setFilePath] = useState('');
 
   useEffect(() => {
     getJobDetail()
@@ -54,13 +56,6 @@ function DownloadPanel() {
     verifyFileName(name)
       .then(b => isInValid(b))
       .catch(err => console.error(err));
-  }
-
-  function updateFilePath(
-    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
-  ): void {
-    const path = e.target.value;
-    setDetail({ ...detail, filePath: path });
   }
 
   async function downloadFile(
@@ -96,8 +91,8 @@ function DownloadPanel() {
       <TextField
         required
         label="File Path"
-        value={detail.filePath}
-        onChange={updateFilePath}
+        value={filePath}
+        onChange={e => setFilePath(e.target.value)}
         variant="standard"
         margin="dense"
         fullWidth
@@ -110,6 +105,18 @@ function DownloadPanel() {
         fullWidth
         disabled
       />
+      {detail.fileSize > 0 && (
+        <Typography
+          variant="body2"
+          component="span"
+          color="textSecondary"
+          display="inline"
+          align="right"
+          sx={{ width: 1 }}
+        >
+          {parseBytes(detail.fileSize)}
+        </Typography>
+      )}
       <TextareaAutosize
         minRows={6}
         maxRows={6}
@@ -130,7 +137,7 @@ function DownloadPanel() {
             downloadFile(
               detail.url,
               detail.fileName,
-              detail.filePath,
+              filePath,
               detail.header as string[],
             )
           }

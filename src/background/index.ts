@@ -7,7 +7,7 @@ import {
   updateBadge,
 } from '@/browser';
 import { IFileDetail } from '@/types';
-import { getPathComponents } from '@/utils';
+import { getFilename } from '@/utils';
 import { LRUCache } from 'lru-cache';
 import browser, { Downloads } from 'webextension-polyfill';
 
@@ -65,13 +65,14 @@ browser.commands.onCommand.addListener((command: string) => {
 });
 
 async function prepareDownload(d: DownloadItem) {
-  const pathComponents = getPathComponents(d.filename);
+  // findUrl only exists in chrome which currently not include in polyfill
+  const filename = getFilename(d.filename, (d as any).finalUrl || d.url);
 
   // create download panel
   processQueue.push({
     url: d.url,
-    fileName: pathComponents.basename,
-    filePath: pathComponents.dirname,
+    fileName: filename,
+    fileSize: d.fileSize,
   });
   await removeBlankTab();
   await createDownloadPanel();

@@ -60,40 +60,47 @@ export async function notify(msg: string): Promise<string> {
 export async function createDownloadPanel(): Promise<Windows.Window> {
   const w = 560;
   const h = 365;
-  // Fixes dual-screen position  Most browsers      Firefox
-  const dualScreenLeft =
-    window.screenLeft !== undefined ? window.screenLeft : window.screenX;
-  const dualScreenTop =
-    window.screenTop !== undefined ? window.screenTop : window.screenY;
-
-  const width = window.innerWidth
-    ? window.innerWidth
-    : document.documentElement.clientWidth
-      ? document.documentElement.clientWidth
-      : screen.width;
-  const height = window.innerHeight
-    ? window.innerHeight
-    : document.documentElement.clientHeight
-      ? document.documentElement.clientHeight
-      : screen.height;
-
-  const systemZoom = width / window.screen.availWidth;
-  const left = (width - w) / 2 / systemZoom + dualScreenLeft;
-  const top = (height - h) / 2 / systemZoom + dualScreenTop;
 
   const url = browser.runtime.getURL('index.html');
-
   const windowInfo = await getCurrentWindow();
-  return browser.windows.create({
-    top: Math.round(top),
-    left: Math.round(left),
+
+  const createOptions: Windows.CreateCreateDataType = {
     url: url.concat('#/download'),
     type: 'popup',
     width: w,
     height: h,
     incognito: windowInfo.incognito,
     focused: true,
-  });
+  };
+
+  // todo: find a way to support following in chrome
+  if (typeof window !== 'undefined') {
+    // Fixes dual-screen position  Most browsers      Firefox
+    const dualScreenLeft =
+      window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+    const dualScreenTop =
+      window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+    const width = window.innerWidth
+      ? window.innerWidth
+      : document.documentElement.clientWidth
+        ? document.documentElement.clientWidth
+        : screen.width;
+    const height = window.innerHeight
+      ? window.innerHeight
+      : document.documentElement.clientHeight
+        ? document.documentElement.clientHeight
+        : screen.height;
+
+    const systemZoom = width / window.screen.availWidth;
+    const top = Math.round((height - h) / 2 / systemZoom + dualScreenTop);
+    const left = Math.round((width - w) / 2 / systemZoom + dualScreenLeft);
+
+    createOptions.top = top;
+    createOptions.left = left;
+  }
+
+  return browser.windows.create(createOptions);
 }
 
 export async function getJobDetail(): Promise<IFileDetail> {
@@ -135,6 +142,12 @@ async function signalDefaultDownload(url: string): Promise<void> {
   });
 }
 
+// stupid way to handling chrome only behavior
+function isChrome() {
+  const globalChrome = (globalThis as any).chrome;
+  return !!(globalChrome && globalChrome.runtime && globalChrome.runtime.id);
+}
+
 export async function saveFile(
   url: string,
   fileName: string,
@@ -146,18 +159,18 @@ export async function saveFile(
     const downloadOptions: browser.Downloads.DownloadOptionsType =
       fileName !== ''
         ? {
-            // conflictAction: "prompt",  //not work
             filename: fileName,
-            incognito: window.incognito, // not work under 57
             saveAs: as,
             url,
           }
         : {
-            // conflictAction: "prompt",  //not work
-            incognito: window.incognito, // not work under 57
             saveAs: as,
             url,
           };
+    // incognito only support in firefox
+    if (!isChrome()) {
+      downloadOptions.incognito = window.incognito;
+    }
     await browser.downloads.download(downloadOptions);
     if (window.id && window.id !== 0) {
       await browser.windows.remove(window.id);

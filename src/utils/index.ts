@@ -17,17 +17,18 @@ export async function verifyFileName(name: string): Promise<boolean> {
   return tmp.length !== 0;
 }
 
-export function getPathComponents(fullPath: string) {
+export function getFilename(fullPath: string, url: string): string {
+  if (fullPath.trim() === '') {
+    // fallback to name from url in chrome
+    try {
+      const u = new URL(url);
+      return u.pathname.split('/').pop() || 'UNKNOWN';
+    } catch {
+      return 'UNKNOWN';
+    }
+  }
   const lastSlashIndex = fullPath.lastIndexOf('/');
-  const lastDotIndex = fullPath.lastIndexOf('.');
-
-  return {
-    dirname: fullPath.substring(0, lastSlashIndex),
-    basename: fullPath.substring(lastSlashIndex + 1),
-    basenameNoExt: fullPath.substring(lastSlashIndex + 1, lastDotIndex),
-    extension:
-      lastDotIndex > lastSlashIndex ? fullPath.substring(lastDotIndex) : '',
-  };
+  return fullPath.substring(lastSlashIndex + 1);
 }
 
 export function parseBytes(value: number): string {
