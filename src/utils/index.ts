@@ -1,20 +1,31 @@
 import browser from 'webextension-polyfill';
 
-// eslint-disable-next-line no-control-regex
-const regex = /[<>:"/\\|?*\x00-\x1F]/g;
+const INVALID_FILENAME_REGEX = /[\\/:"*?<>| ]/g;
+const WINDOWS_RESERVED_NAMES = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
 
 export async function verifyFileName(name: string): Promise<boolean> {
+  if (!name || name.trim() !== name) {
+    return false;
+  }
+
+  const invalidChars = name.match(INVALID_FILENAME_REGEX);
+  if (invalidChars) {
+    return false;
+  }
+
   const platformInfo = await browser.runtime.getPlatformInfo();
-  let tmp: any = name.match(regex) || [];
   if (platformInfo.os === 'win') {
-    if (name.search(/^(con|prn|aux|nul|com\d|lpt\d)$/i) !== -1) {
-      tmp = tmp.concat(name);
+    // Check for Windows reserved names
+    if (WINDOWS_RESERVED_NAMES.test(name)) {
+      return false;
     }
-    if (name[name.length - 1] === ' ' || name[name.length - 1] === '.') {
-      tmp = tmp.concat('Filenames cannot end in a space or dot.');
+
+    // Check for trailing spaces or dots
+    if (name.endsWith(' ') || name.endsWith('.')) {
+      return false;
     }
   }
-  return tmp.length !== 0;
+  return true;
 }
 
 export function getFilename(fullPath: string, url: string): string {
