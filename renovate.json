@@ -9,8 +9,7 @@
     },
     {
       "matchDepTypes": ["devDependencies"],
-      "matchPackagePatterns": ["lint", "prettier", "husky", "@trivago/"],
-      "automerge": true
+      "matchPackagePatterns": ["lint", "prettier", "husky", "@trivago/"]
     },
     {
       "groupName": "definitelyTyped",
@@ -18,11 +17,29 @@
     },
     {
       "groupName": "eslint",
-      "matchPackagePrefixes": ["eslint", "@typescript-eslint/"]
+      "matchPackagePrefixes": [
+        "@eslint",
+        "eslint",
+        "typescript-eslint",
+        "globals"
+      ]
     },
     {
       "groupName": "styling",
       "matchPackagePrefixes": ["@emotion/", "@mui/"]
+    },
+    {
+      "groupName": "tools",
+      "matchPackagePrefixes": [
+        "@tanstack",
+        "lru-cache",
+        "web-ext",
+        "webextension-polyfill"
+      ]
+    },
+    {
+      "groupName": "framework",
+      "matchPackagePrefixes": ["react"]
     },
     {
       "groupName": "build-tools",
