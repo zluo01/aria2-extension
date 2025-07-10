@@ -1,5 +1,5 @@
 import {
-  useGetConfigurationQuery,
+  getConfigurationQueryOptions,
   useUpdateConfigMutation,
 } from '@/lib/queries';
 import manifest from '@/manifest';
@@ -13,17 +13,25 @@ import MenuItem from '@mui/material/MenuItem';
 import NativeSelect from '@mui/material/NativeSelect';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 
-function Setting() {
-  const protocol = {
-    ws: 'WebSocket',
-    wss: 'WebSocket (Security)',
-    http: 'Http',
-    https: 'Https',
-  };
+export const Route = createFileRoute('/setting')({
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(getConfigurationQueryOptions),
+  component: Setting,
+});
 
-  const { data: config } = useGetConfigurationQuery();
+const protocol = {
+  ws: 'WebSocket',
+  wss: 'WebSocket (Security)',
+  http: 'Http',
+  https: 'Https',
+};
+
+function Setting() {
+  const { data: config } = useSuspenseQuery(getConfigurationQueryOptions);
   const updateConfigMutation = useUpdateConfigMutation();
 
   async function updateTheme(
@@ -162,5 +170,3 @@ function Setting() {
     </Container>
   );
 }
-
-export default Setting;

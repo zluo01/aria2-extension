@@ -1,7 +1,7 @@
 import { AddUris, GetJobs } from '@/aria2';
 import { download, getConfiguration, setConfiguration } from '@/browser';
 import { IConfig } from '@/types';
-import { QueryClient, useMutation, useQuery } from '@tanstack/react-query';
+import { QueryClient, queryOptions, useMutation } from '@tanstack/react-query';
 
 enum FetchKey {
   TASKS = 'tasks',
@@ -10,20 +10,16 @@ enum FetchKey {
 
 export const queryClient = new QueryClient();
 
-export function useGetTasksQuery() {
-  return useQuery({
-    queryKey: [FetchKey.TASKS],
-    queryFn: GetJobs,
-    refetchInterval: 1000,
-  });
-}
+export const getTasksQueryOptions = queryOptions({
+  queryKey: [FetchKey.TASKS],
+  queryFn: GetJobs,
+  refetchInterval: 1000,
+});
 
-export function useGetConfigurationQuery() {
-  return useQuery({
-    queryKey: [FetchKey.SETTING],
-    queryFn: getConfiguration,
-  });
-}
+export const getConfigurationQueryOptions = queryOptions({
+  queryKey: [FetchKey.SETTING],
+  queryFn: getConfiguration,
+});
 
 export function useUpdateConfigMutation() {
   return useMutation({

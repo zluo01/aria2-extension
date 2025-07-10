@@ -1,10 +1,18 @@
 import DownloadList from '@/components/content';
 import CreationArea from '@/components/create';
 import Header from '@/components/header';
-import { useGetTasksQuery } from '@/lib/queries';
+import { getTasksQueryOptions } from '@/lib/queries';
 import Container from '@mui/material/Container';
 import { styled } from '@mui/material/styles';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
+
+export const Route = createFileRoute('/')({
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(getTasksQueryOptions),
+  component: Display,
+});
 
 const DisplayHolder = styled(Container)(({ theme }) => ({
   width: '100%',
@@ -14,10 +22,10 @@ const DisplayHolder = styled(Container)(({ theme }) => ({
 }));
 
 function Display() {
+  const { data: jobs } = useSuspenseQuery(getTasksQueryOptions);
+
   const [checked, setChecked] = useState(['']);
   const [show, setShow] = useState(false);
-
-  const { data: jobs } = useGetTasksQuery();
 
   const handleToggle = (value: string) => () => {
     const currentIndex = checked.indexOf(value);
@@ -53,5 +61,3 @@ function Display() {
     </DisplayHolder>
   );
 }
-
-export default Display;

@@ -1,14 +1,20 @@
 import { getJobDetail, saveFile } from '@/browser';
 import { useDownloadMutation } from '@/lib/queries';
 import { IFileDetail } from '@/types';
-import { verifyFileName, parseBytes } from '@/utils';
+import { parseBytes, verifyFileName } from '@/utils';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import { createFileRoute } from '@tanstack/react-router';
 import { ChangeEvent, useEffect, useState } from 'react';
+
+export const Route = createFileRoute('/download')({
+  loader: async () => getJobDetail(),
+  component: DownloadPanel,
+});
 
 const Panel = styled(Stack)(({ theme }) => ({
   width: '98%',
@@ -24,29 +30,20 @@ const PanelButton = styled(Button)({
   width: 130,
 });
 
-const initialDetail: IFileDetail = {
-  fileName: '',
-  fileSize: 0,
-  header: [],
-  url: '',
-};
-
 function DownloadPanel() {
+  const data = Route.useLoaderData();
+
   const mutation = useDownloadMutation();
 
-  const [detail, setDetail] = useState<IFileDetail>(initialDetail);
+  const [detail, setDetail] = useState<IFileDetail>(data);
   const [inValid, isInValid] = useState(false);
   const [filePath, setFilePath] = useState('');
 
   useEffect(() => {
-    getJobDetail()
-      .then(detail => {
-        setDetail(detail);
-        return verifyFileName(detail.fileName as string);
-      })
+    verifyFileName(detail.fileName)
       .then(b => isInValid(b))
       .catch(err => console.error(err));
-  }, []);
+  }, [detail.fileName]);
 
   function updateFileName(
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -157,5 +154,3 @@ function DownloadPanel() {
     </Panel>
   );
 }
-
-export default DownloadPanel;

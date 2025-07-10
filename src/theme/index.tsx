@@ -1,7 +1,8 @@
-import { useGetConfigurationQuery } from '@/lib/queries';
+import { getConfigurationQueryOptions } from '@/lib/queries';
 import { Theme } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import { Theme as ThemeOptions } from '../types';
@@ -19,7 +20,7 @@ const darkTheme = createTheme({
 });
 
 function usePreferTheme() {
-  const { data: config } = useGetConfigurationQuery();
+  const { data: config } = useQuery(getConfigurationQueryOptions);
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [theme, setTheme] = useState<Theme>(lightTheme);

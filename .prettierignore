@@ -108,3 +108,4 @@ jspm_packages/
 build
 artifacts
 AriaNg
+**/routeTree.gen.ts
