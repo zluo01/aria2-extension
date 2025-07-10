@@ -16,8 +16,6 @@ const manifest: Manifest.WebExtensionManifest = {
     'notifications',
     'storage',
     'downloads',
-    'webRequest',
-    'webRequestBlocking',
   ],
   host_permissions: ['<all_urls>'],
   content_security_policy: {

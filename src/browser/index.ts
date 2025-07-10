@@ -128,14 +128,22 @@ export async function download(
   }
 }
 
+async function signalDefaultDownload(url: string): Promise<void> {
+  return browser.runtime.sendMessage({
+    type: 'signal',
+    message: url,
+  });
+}
+
 export async function saveFile(
   url: string,
   fileName: string,
   as: boolean,
 ): Promise<void> {
   try {
+    await signalDefaultDownload(url);
     const window = await getCurrentWindow();
-    const downloadOptions =
+    const downloadOptions: browser.Downloads.DownloadOptionsType =
       fileName !== ''
         ? {
             // conflictAction: "prompt",  //not work

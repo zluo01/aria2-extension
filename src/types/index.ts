@@ -24,8 +24,8 @@ export interface IDownload {
 
 export interface IFileDetail {
   url: string;
-  fileName?: string;
-  fileSize?: string;
+  fileName: string;
+  filePath: string;
   header?: string[];
 }
 

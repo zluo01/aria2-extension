@@ -1,7 +1,7 @@
 {
   "name": "aria2-extension",
   "displayName": "Aria2 Integration Extension",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": true,
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -9,6 +9,7 @@
     "@mui/icons-material": "6.4.12",
     "@mui/material": "6.4.12",
     "aria2": "4.1.2",
+    "lru-cache": "11.1.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-router-dom": "7.6.3",

@@ -6,7 +6,6 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { ChangeEvent, useEffect, useState } from 'react';
 
@@ -26,7 +25,7 @@ const PanelButton = styled(Button)({
 
 const initialDetail: IFileDetail = {
   fileName: '',
-  fileSize: '',
+  filePath: '',
   header: [],
   url: '',
 };
@@ -36,7 +35,6 @@ function DownloadPanel() {
 
   const [detail, setDetail] = useState<IFileDetail>(initialDetail);
   const [inValid, isInValid] = useState(false);
-  const [filePath, setFilePath] = useState('');
 
   useEffect(() => {
     getJobDetail()
@@ -56,6 +54,13 @@ function DownloadPanel() {
     verifyFileName(name)
       .then(b => isInValid(b))
       .catch(err => console.error(err));
+  }
+
+  function updateFilePath(
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ): void {
+    const path = e.target.value;
+    setDetail({ ...detail, filePath: path });
   }
 
   async function downloadFile(
@@ -91,8 +96,8 @@ function DownloadPanel() {
       <TextField
         required
         label="File Path"
-        value={filePath}
-        onChange={e => setFilePath(e.target.value)}
+        value={detail.filePath}
+        onChange={updateFilePath}
         variant="standard"
         margin="dense"
         fullWidth
@@ -105,16 +110,6 @@ function DownloadPanel() {
         fullWidth
         disabled
       />
-      <Typography
-        variant="body2"
-        component="span"
-        color="textSecondary"
-        display="inline"
-        align="right"
-        sx={{ width: 1 }}
-      >
-        {detail.fileSize}
-      </Typography>
       <TextareaAutosize
         minRows={6}
         maxRows={6}
@@ -134,8 +129,8 @@ function DownloadPanel() {
           onClick={() =>
             downloadFile(
               detail.url,
-              detail.fileName as string,
-              filePath,
+              detail.fileName,
+              detail.filePath,
               detail.header as string[],
             )
           }
@@ -145,14 +140,14 @@ function DownloadPanel() {
         <PanelButton
           variant="contained"
           color="primary"
-          onClick={() => saveFile(detail.url, detail.fileName as string, false)}
+          onClick={() => saveFile(detail.url, detail.fileName, false)}
         >
           Save
         </PanelButton>
         <PanelButton
           variant="contained"
           color="primary"
-          onClick={() => saveFile(detail.url, detail.fileName as string, true)}
+          onClick={() => saveFile(detail.url, detail.fileName, true)}
         >
           Save As
         </PanelButton>

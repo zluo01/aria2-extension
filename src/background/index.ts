@@ -7,21 +7,23 @@ import {
   updateBadge,
 } from '@/browser';
 import { IFileDetail } from '@/types';
-import {
-  correctFileName,
-  getFileName,
-  getRequestHeaders,
-  parseBytes,
-} from '@/utils';
-import browser, { WebRequest } from 'webextension-polyfill';
+import { getPathComponents } from '@/utils';
+import { LRUCache } from 'lru-cache';
+import browser, { Downloads } from 'webextension-polyfill';
 
-import ResourceType = WebRequest.ResourceType;
-import OnSendHeadersDetailsType = WebRequest.OnSendHeadersDetailsType;
-import OnHeadersReceivedDetailsType = WebRequest.OnHeadersReceivedDetailsType;
-import OnErrorOccurredDetailsType = WebRequest.OnErrorOccurredDetailsType;
-import BlockingResponseOrPromise = WebRequest.BlockingResponseOrPromise;
+import DownloadItem = Downloads.DownloadItem;
 
-const request: OnSendHeadersDetailsType[] = [];
+// only for synchronize built-in download action
+const cache = new LRUCache({
+  max: 100, // Maximum 100 items
+  ttl: 6000, // 6 seconds timeout
+  allowStale: false, // Don't return stale items
+  updateAgeOnGet: false, // Don't reset TTL on get
+  updateAgeOnHas: false, // Don't reset TTL on has
+  ttlResolution: 1000, // Check TTL every second
+  ttlAutopurge: true, // Automatically purge expired items
+});
+
 const processQueue: IFileDetail[] = [];
 const CONTEXT_ID = 'download-with-aria';
 
@@ -62,130 +64,45 @@ browser.commands.onCommand.addListener((command: string) => {
   }
 });
 
-async function prepareDownload(d: OnHeadersReceivedDetailsType) {
-  const detail: IFileDetail = { url: d.url };
-  // get request item
-  const id = request.findIndex(x => x.requestId === d.requestId);
-  const reqFound = { ...request[id] };
-  if (id >= 0) {
-    // create header
-    detail.header = getRequestHeaders(reqFound);
-    // delete request item
-    request.splice(id, 1);
-  }
-
-  // process file name
-  let fileName = decodeURIComponent(getFileName(d));
-
-  // issue #8
-  fileName = decodeURI(encodeURIComponent(fileName));
-
-  // file name cannot have ""
-  fileName = fileName.replace('UTF-8', '');
-  fileName = fileName.replaceAll(';', '');
-  fileName = fileName.replaceAll('"', '');
-  fileName = fileName.replaceAll("'", '');
-
-  // correct File Name
-  detail.fileName = await correctFileName(fileName);
-  // get file size
-  if (d.responseHeaders) {
-    const fid = d.responseHeaders.findIndex(
-      x => x.name.toLowerCase() === 'content-length',
-    );
-    detail.fileSize =
-      fid >= 0 ? parseBytes(d.responseHeaders[fid].value as string) : '';
-  }
+async function prepareDownload(d: DownloadItem) {
+  const pathComponents = getPathComponents(d.filename);
 
   // create download panel
-  processQueue.push(detail);
+  processQueue.push({
+    url: d.url,
+    fileName: pathComponents.basename,
+    filePath: pathComponents.dirname,
+  });
   await removeBlankTab();
   await createDownloadPanel();
 }
 
-function observeResponse(
-  d: OnHeadersReceivedDetailsType,
-): BlockingResponseOrPromise | undefined {
-  // bug0001: goo.gl
-  if (d.statusCode === 200) {
-    if (
-      d.responseHeaders?.find(
-        x => x.name.toLowerCase() === 'content-disposition',
-      )
-    ) {
-      const contentDisposition = d.responseHeaders
-        ?.find(x => x.name.toLowerCase() === 'content-disposition')
-        ?.value?.toLowerCase();
-      if (contentDisposition?.slice(0, 10) === 'attachment') {
-        prepareDownload(d).catch(err => console.error(err));
-        return { cancel: true };
-      }
-    }
-    if (d.responseHeaders?.find(x => x.name.toLowerCase() === 'content-type')) {
-      const contentType = d.responseHeaders
-        ?.find(x => x.name.toLowerCase() === 'content-type')
-        ?.value?.toLowerCase();
-      if (
-        contentType?.slice(0, 11) === 'application' &&
-        contentType?.slice(12, 15) !== 'pdf' &&
-        contentType?.slice(12, 17) !== 'xhtml' &&
-        contentType?.slice(12, 23) !== 'x-xpinstall' &&
-        contentType?.slice(12, 29) !== 'x-shockwave-flash' &&
-        contentType?.slice(12, 15) !== 'rss' &&
-        contentType?.slice(12, 16) !== 'json'
-      ) {
-        prepareDownload(d).catch(err => console.error(err));
-        return { cancel: true };
-      }
-    }
+browser.downloads.onCreated.addListener(async (downloadItem: DownloadItem) => {
+  const id = downloadItem.id;
+
+  // do nothing when user choose to download with built-in downloader
+  if (cache.delete(downloadItem.url)) {
+    return;
   }
 
-  // get request item and delete
-  const id = request.findIndex(x => x.requestId === d.requestId);
-  if (id >= 0) {
-    request.splice(id, 1);
+  // cleanup any built-in downloading
+  try {
+    await browser.downloads.cancel(id);
+  } catch {
+    await browser.downloads.removeFile(id);
+  } finally {
+    await browser.downloads.erase({ id });
   }
-}
-
-const types: ResourceType[] = ['main_frame', 'sub_frame'];
-
-function observeRequest(d: OnSendHeadersDetailsType) {
-  request.push(d);
-}
-
-browser.webRequest.onSendHeaders.addListener(
-  observeRequest,
-  {
-    urls: ['<all_urls>'],
-    types,
-  },
-  ['requestHeaders'],
-);
-
-browser.webRequest.onHeadersReceived.addListener(
-  observeResponse,
-  {
-    urls: ['<all_urls>'],
-    types,
-  },
-  ['blocking', 'responseHeaders'],
-);
-
-function requestError(d: OnErrorOccurredDetailsType): void {
-  const id = request.findIndex(x => x.requestId === d.requestId);
-  if (id >= 0) {
-    request.splice(id, 1);
-  }
-}
-
-browser.webRequest.onErrorOccurred.addListener(requestError, {
-  urls: ['<all_urls>'],
-  types,
+  await prepareDownload(downloadItem);
 });
 
-browser.runtime.onMessage.addListener((data: any, _sender) => {
+browser.runtime.onMessage.addListener((data: any) => {
   if (data.type === 'all') {
     return Promise.resolve(processQueue.pop());
+  } else if (data.type === 'signal') {
+    if (data.message) {
+      cache.set(data.message, true);
+    }
   }
 });
 
