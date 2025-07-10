@@ -1,46 +1,69 @@
 import { AddUris, GetJobs } from '@/aria2';
-import { download, getConfiguration } from '@/browser';
-import { IConfig, IJob } from '@/types';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
+import { download, getConfiguration, setConfiguration } from '@/browser';
+import { IConfig } from '@/types';
+import { QueryClient, useMutation, useQuery } from '@tanstack/react-query';
 
 enum FetchKey {
   TASKS = 'tasks',
   SETTING = 'setting',
 }
 
+export const queryClient = new QueryClient();
+
 export function useGetTasksQuery() {
-  return useSWR<IJob[]>(FetchKey.TASKS, GetJobs, {
-    refreshInterval: 1000,
+  return useQuery({
+    queryKey: [FetchKey.TASKS],
+    queryFn: GetJobs,
+    refetchInterval: 1000,
   });
 }
 
 export function useGetConfigurationQuery() {
-  return useSWR<IConfig>(FetchKey.SETTING, getConfiguration);
+  return useQuery({
+    queryKey: [FetchKey.SETTING],
+    queryFn: getConfiguration,
+  });
 }
 
-export function useSubmitTasksTrigger() {
-  return useSWRMutation(FetchKey.TASKS, (_url, opts: { arg: string[] }) =>
-    AddUris(...opts.arg),
-  );
-}
-
-export function useDownloadTrigger() {
-  return useSWRMutation(
-    FetchKey.TASKS,
-    async (
-      _url,
-      opts: {
-        arg: {
-          url: string;
-          fileName: string;
-          filePath: string;
-          headers: string[];
-        };
-      },
-    ) => {
-      const { url, fileName, filePath, headers } = opts.arg;
-      await download(url, fileName, filePath, headers);
+export function useUpdateConfigMutation() {
+  return useMutation({
+    mutationFn: async (config: IConfig) => {
+      return await setConfiguration(config);
     },
-  );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [FetchKey.SETTING] });
+    },
+  });
+}
+
+export function useSubmitTasksMutation() {
+  return useMutation({
+    mutationFn: async (uris: string[]) => {
+      return AddUris(...uris);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [FetchKey.TASKS] });
+    },
+  });
+}
+
+export function useDownloadMutation() {
+  return useMutation({
+    mutationFn: async ({
+      url,
+      fileName,
+      filePath,
+      headers,
+    }: {
+      url: string;
+      fileName: string;
+      filePath: string;
+      headers: string[];
+    }) => {
+      return await download(url, fileName, filePath, headers);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [FetchKey.TASKS] });
+    },
+  });
 }

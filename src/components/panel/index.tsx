@@ -1,5 +1,5 @@
 import { getJobDetail, saveFile } from '@/browser';
-import { useDownloadTrigger } from '@/lib/queries';
+import { useDownloadMutation } from '@/lib/queries';
 import { IFileDetail } from '@/types';
 import { verifyFileName, parseBytes } from '@/utils';
 import Button from '@mui/material/Button';
@@ -32,7 +32,7 @@ const initialDetail: IFileDetail = {
 };
 
 function DownloadPanel() {
-  const { trigger } = useDownloadTrigger();
+  const mutation = useDownloadMutation();
 
   const [detail, setDetail] = useState<IFileDetail>(initialDetail);
   const [inValid, isInValid] = useState(false);
@@ -64,12 +64,7 @@ function DownloadPanel() {
     filePath: string,
     headers: string[],
   ) {
-    await trigger({
-      url,
-      fileName,
-      filePath,
-      headers,
-    });
+    mutation.mutate({ url, fileName, filePath, headers });
   }
 
   return (

@@ -1,5 +1,7 @@
-import { setConfiguration } from '@/browser';
-import { useGetConfigurationQuery } from '@/lib/queries';
+import {
+  useGetConfigurationQuery,
+  useUpdateConfigMutation,
+} from '@/lib/queries';
 import manifest from '@/manifest';
 import { IConfig, Theme } from '@/types';
 import Container from '@mui/material/Container';
@@ -21,7 +23,8 @@ function Setting() {
     https: 'Https',
   };
 
-  const { data: config, mutate: mutateConfig } = useGetConfigurationQuery();
+  const { data: config } = useGetConfigurationQuery();
+  const updateConfigMutation = useUpdateConfigMutation();
 
   async function updateTheme(
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -73,8 +76,7 @@ function Setting() {
 
   async function updateConfig(config: IConfig) {
     try {
-      await setConfiguration(config);
-      await mutateConfig();
+      updateConfigMutation.mutate(config);
     } catch (e) {
       console.error(e);
     }

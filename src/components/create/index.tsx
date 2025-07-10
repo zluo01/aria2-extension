@@ -1,6 +1,6 @@
 import { notify } from '@/browser';
 import { augmentDownloadLink } from '@/lib/magnet';
-import { useSubmitTasksTrigger } from '@/lib/queries';
+import { useSubmitTasksMutation } from '@/lib/queries';
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { styled } from '@mui/material/styles';
@@ -18,13 +18,13 @@ interface ICreationArea {
 }
 
 function CreationArea({ close }: ICreationArea) {
-  const { trigger } = useSubmitTasksTrigger();
+  const mutation = useSubmitTasksMutation();
 
   const [text, setText] = useState('');
 
   async function handleSubmit() {
     try {
-      await trigger(text.split('\n').map(o => augmentDownloadLink(o)));
+      mutation.mutate(text.split('\n').map(o => augmentDownloadLink(o)));
     } catch (e) {
       if (e instanceof Error) {
         await notify(`fail to download files, msg: ${e.message}.`);

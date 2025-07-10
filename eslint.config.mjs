@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import pluginQuery from '@tanstack/eslint-plugin-query';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import pluginPromise from 'eslint-plugin-promise';
 import pluginReact from 'eslint-plugin-react';
@@ -13,6 +14,7 @@ export default [
   ...ts.configs.recommended,
   pluginReact.configs.flat.recommended,
   pluginPromise.configs['flat/recommended'],
+  ...pluginQuery.configs['flat/recommended'],
   eslintConfigPrettier,
   {
     plugins: {
