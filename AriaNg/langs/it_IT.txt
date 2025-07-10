@@ -340,11 +340,15 @@ rpc.request.parse.failed=Errore durante l'analisi della richiesta RPC.
 checksum.failed=Errore di verifica del checksum del file.
 
 [languages]
+Czech=Ceco
 English=Inglese
+Spanish=Spagnolo
+French=Francese
+Italian=Italiano
+Polish=Polacco
+Russian=Russo
 Simplified Chinese=Cinese Semplificato
 Traditional Chinese=Cinese Tradizionale
-Italian=Italiano
-French=Francese
 
 [format]
 longdate=DD/MM/YYYY HH:mm:ss
