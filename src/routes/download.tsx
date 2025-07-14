@@ -1,4 +1,4 @@
-import { getJobDetail, saveFile } from '@/browser';
+import { getJobDetail, getPlatformInfo, saveFile } from '@/browser';
 import { useDownloadMutation } from '@/lib/queries';
 import { parseBytes, verifyFileName } from '@/utils';
 import Button from '@mui/material/Button';
@@ -94,7 +94,8 @@ function DownloadPanel() {
           name="fileName"
           validators={{
             onChangeAsync: async ({ value }) => {
-              return (await verifyFileName(value))
+              const platformOs = await getPlatformInfo();
+              return verifyFileName(value, platformOs.os)
                 ? undefined
                 : 'Invalid file name.';
             },

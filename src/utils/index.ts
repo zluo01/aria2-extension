@@ -1,9 +1,7 @@
-import browser from 'webextension-polyfill';
-
 const INVALID_FILENAME_REGEX = /[\\/:"*?<>| ]/g;
 const WINDOWS_RESERVED_NAMES = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
 
-export async function verifyFileName(name: string): Promise<boolean> {
+export function verifyFileName(name: string, os: string): boolean {
   if (!name || name.trim() !== name) {
     return false;
   }
@@ -13,8 +11,7 @@ export async function verifyFileName(name: string): Promise<boolean> {
     return false;
   }
 
-  const platformInfo = await browser.runtime.getPlatformInfo();
-  if (platformInfo.os === 'win') {
+  if (os === 'win') {
     // Check for Windows reserved names
     if (WINDOWS_RESERVED_NAMES.test(name)) {
       return false;
@@ -38,8 +35,7 @@ export function getFilename(fullPath: string, url: string): string {
       return 'UNKNOWN';
     }
   }
-  const lastSlashIndex = fullPath.lastIndexOf('/');
-  return fullPath.substring(lastSlashIndex + 1);
+  return fullPath.split(/[/\\]/).pop() || 'UNKNOWN';
 }
 
 export function parseBytes(value: number): string {

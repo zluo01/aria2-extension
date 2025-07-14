@@ -2,6 +2,10 @@ import { AddUri } from '@/aria2';
 import { DEFAULT_CONFIG, IConfig, IDownload, IFileDetail } from '@/types';
 import browser, { Action, Windows } from 'webextension-polyfill';
 
+export async function getPlatformInfo() {
+  return await browser.runtime.getPlatformInfo();
+}
+
 export async function getConfiguration(): Promise<IConfig> {
   const config = await browser.storage.local.get('config');
   return (config.config as IConfig) || DEFAULT_CONFIG;
