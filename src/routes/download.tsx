@@ -106,7 +106,7 @@ function DownloadPanel() {
               label="File Name"
               error={!field.state.meta.isValid}
               value={field.state.value}
-              onChange={e => field.handleChange(e.target.value)}
+              onChange={e => field.handleChange(e.target.value.trim())}
               onBlur={field.handleBlur}
               variant="standard"
               margin="dense"

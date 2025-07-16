@@ -1,7 +1,11 @@
-const INVALID_FILENAME_REGEX = /[\\/:"*?<>| ]/g;
-const WINDOWS_RESERVED_NAMES = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
+import { Runtime } from 'webextension-polyfill';
 
-export function verifyFileName(name: string, os: string): boolean {
+import PlatformOs = Runtime.PlatformOs;
+
+const INVALID_FILENAME_REGEX = /[<>:"/\\|?*\p{C}]/u;
+const WINDOWS_RESERVED_NAMES = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\.|$)/i;
+
+export function verifyFileName(name: string, os: PlatformOs): boolean {
   if (!name || name.trim() !== name) {
     return false;
   }
