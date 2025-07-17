@@ -81,6 +81,11 @@ async function prepareDownload(d: DownloadItem) {
 browser.downloads.onCreated.addListener(async (downloadItem: DownloadItem) => {
   const id = downloadItem.id;
 
+  // skip blob url.
+  if (downloadItem.url.toLowerCase().startsWith('blob:')) {
+    return;
+  }
+
   // do nothing when user choose to download with built-in downloader
   if (cache.delete(downloadItem.url)) {
     return;
