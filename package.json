@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.31.0",
-    "@jest/globals": "30.0.4",
+    "@jest/globals": "30.0.5",
     "@tanstack/eslint-plugin-query": "5.81.2",
     "@tanstack/router-plugin": "1.128.8",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
@@ -35,7 +35,7 @@
     "eslint-plugin-react-hooks": "5.2.0",
     "globals": "16.3.0",
     "husky": "9.1.7",
-    "jest": "30.0.4",
+    "jest": "30.0.5",
     "lint-staged": "16.1.2",
     "prettier": "3.6.2",
     "ts-jest": "29.4.0",
