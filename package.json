@@ -13,8 +13,8 @@
     "@tanstack/react-router": "1.130.1",
     "aria2": "4.1.2",
     "lru-cache": "11.1.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
   "devDependencies": {
     "@eslint/js": "9.32.0",
