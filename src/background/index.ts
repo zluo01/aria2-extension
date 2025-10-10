@@ -13,6 +13,19 @@ import browser, { Downloads } from 'webextension-polyfill';
 
 import DownloadItem = Downloads.DownloadItem;
 
+const SKIP_DOWNLOAD_SCHEMA = [
+  'blob:',
+  'data:',
+  'file:',
+  'filesystem:',
+  'content:',
+  'about:',
+  'chrome-extension:',
+  'moz-extension:',
+  'edge-extension:',
+  'intent:',
+];
+
 // only for synchronize built-in download action
 const cache = new LRUCache({
   max: 100, // Maximum 100 items
@@ -81,8 +94,11 @@ async function prepareDownload(d: DownloadItem) {
 browser.downloads.onCreated.addListener(async (downloadItem: DownloadItem) => {
   const id = downloadItem.id;
 
-  // skip blob url.
-  if (downloadItem.url.toLowerCase().startsWith('blob:')) {
+  if (
+    SKIP_DOWNLOAD_SCHEMA.some(scheme =>
+      downloadItem.url.toLowerCase().startsWith(scheme),
+    )
+  ) {
     return;
   }
 
