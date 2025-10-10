@@ -33,9 +33,14 @@ export async function ConstructAria2Instance(): Promise<Aria2ClientType> {
 }
 
 export async function GetJobs(): Promise<IJob[]> {
-  const multiCallItems = [['tellActive'], ['tellWaiting', 0, 25]];
-  const data = await multiCall(multiCallItems);
-  return flatten(data);
+  try {
+    const multiCallItems = [['tellActive'], ['tellWaiting', 0, 25]];
+    const data = await multiCall(multiCallItems);
+    return flatten(data);
+  } catch (e) {
+    console.error('Fail to get jobs', e);
+  }
+  return [];
 }
 
 export async function StartJobs(...gid: string[]): Promise<void> {
@@ -75,8 +80,13 @@ export async function RemoveJobs(...gid: string[]): Promise<void> {
 }
 
 export async function GetNumJobs(): Promise<number> {
-  const data = await singleCall(() => aria2.call('tellActive'));
-  return data.length;
+  try {
+    const data = await singleCall(() => aria2.call('tellActive'));
+    return data.length;
+  } catch (e) {
+    console.error('Fail to get numJobs', e);
+  }
+  return 0;
 }
 
 export async function AddUris(...uris: string[]): Promise<void> {
