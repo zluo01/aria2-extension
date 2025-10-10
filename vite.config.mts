@@ -14,11 +14,14 @@ const root = resolve(__dirname, 'src');
 const outDir = resolve(__dirname, 'build');
 const publicDir = resolve(__dirname, 'public');
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': root,
     },
+  },
+  define: {
+    'process.env.__DEV__': JSON.stringify(mode === 'dev'),
   },
   plugins: [
     tanstackRouter({
@@ -37,6 +40,7 @@ export default defineConfig({
   build: {
     outDir,
     sourcemap: process.env.__DEV__ === 'true',
+    minify: process.env.__DEV__ === 'false',
     emptyOutDir: false,
     rollupOptions: {
       input: {
@@ -48,4 +52,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

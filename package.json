@@ -48,7 +48,7 @@
     "webextension-polyfill": "0.12.0"
   },
   "scripts": {
-    "dev": "pnpm run build && web-ext run --source-dir ./build/",
+    "dev": "vite build --mode dev && web-ext run --source-dir ./build/",
     "build": "vite build",
     "package": "web-ext build --config=webext.config.cjs",
     "complete": "pnpm run build && pnpm run package",
