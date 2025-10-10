@@ -1,7 +1,7 @@
 {
   "name": "aria2-extension",
   "displayName": "Aria2 Integration Extension",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "private": true,
   "dependencies": {
     "@emotion/react": "11.14.0",
