@@ -26,8 +26,8 @@ export function useUpdateConfigMutation() {
     mutationFn: async (config: IConfig) => {
       return await setConfiguration(config);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [FetchKey.SETTING] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [FetchKey.SETTING] });
     },
   });
 }
@@ -37,8 +37,8 @@ export function useSubmitTasksMutation() {
     mutationFn: async (uris: string[]) => {
       return AddUris(...uris);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [FetchKey.TASKS] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [FetchKey.TASKS] });
     },
   });
 }
@@ -58,8 +58,8 @@ export function useDownloadMutation() {
     }) => {
       return await download(url, fileName, filePath, headers);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [FetchKey.TASKS] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [FetchKey.TASKS] });
     },
   });
 }
