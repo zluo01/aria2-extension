@@ -12,13 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - uses: actions/setup-node@v5
         with:
           node-version: 'lts/*'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run test
-      - run: npm run build --if-present
+          cache: "pnpm"
+      - run: pnpm install
+      - run: pnpm run test
+      - run: pnpm run build --if-present
 
   deployment:
     runs-on: ubuntu-latest
@@ -30,14 +35,21 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Install Node.js, NPM
         uses: actions/setup-node@v5
         with:
           node-version: 'lts/*'
-      - run: npm install
+          cache: "pnpm"
+
+      - run: pnpm install
 
       - name: build extension
-        run: TARGET=${{ matrix.target }} npm run complete
+        run: TARGET=${{ matrix.target }} pnpm run complete
 
       - name: Get VERSION
         run: |
