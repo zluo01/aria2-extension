@@ -44,7 +44,7 @@
     "vite": "7.2.6",
     "vite-plugin-eslint": "1.8.1",
     "vite-tsconfig-paths": "5.1.4",
-    "web-ext": "8.10.0",
+    "web-ext": "8.8.0",
     "webextension-polyfill": "0.12.0"
   },
   "scripts": {
