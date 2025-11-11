@@ -17,7 +17,7 @@ jobs:
         with:
           version: 10
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: "pnpm"
@@ -41,7 +41,7 @@ jobs:
           version: 10
 
       - name: Install Node.js, NPM
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: "pnpm"
