@@ -70,8 +70,8 @@ importers:
         specifier: 0.12.4
         version: 0.12.4
       '@vitejs/plugin-react-swc':
-        specifier: 4.2.1
-        version: 4.2.1(vite@7.2.2(@types/node@22.19.1)(tsx@4.20.6)(yaml@2.8.1))
+        specifier: 4.2.2
+        version: 4.2.2(vite@7.2.2(@types/node@22.19.1)(tsx@4.20.6)(yaml@2.8.1))
       eslint:
         specifier: 9.39.1
         version: 9.39.1
@@ -900,8 +900,8 @@ packages:
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
 
-  '@rolldown/pluginutils@1.0.0-beta.46':
-    resolution: {integrity: sha512-xMNwJo/pHkEP/mhNVnW+zUiJDle6/hxrwO0mfSJuEVRbBfgrJFuUSRoZx/nYUw5pCjrysl9OkNXCkAdih8GCnA==}
+  '@rolldown/pluginutils@1.0.0-beta.47':
+    resolution: {integrity: sha512-8QagwMH3kNCuzD8EWL8R2YPW5e4OrHNSAHRFDdmFqEwEaD/KcNKjVoumo+gP2vW5eKB2UPbM6vTYiGZX0ixLnw==}
 
   '@rollup/pluginutils@4.2.1':
     resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}
@@ -1499,8 +1499,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@vitejs/plugin-react-swc@4.2.1':
-    resolution: {integrity: sha512-SIZ/XxeS2naLw4L2vVvpTyujM2OY+Rf+y6nWETqfoBrZpI3SFdyNJof3nQ8HbLhXJ1Eh9e9c0JGYC8GYPhLkCw==}
+  '@vitejs/plugin-react-swc@4.2.2':
+    resolution: {integrity: sha512-x+rE6tsxq/gxrEJN3Nv3dIV60lFflPj94c90b+NNo6n1QV1QQUTLoL0MpaOVasUZ0zqVBn7ead1B5ecx1JAGfA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: ^4 || ^5 || ^6 || ^7
@@ -5145,7 +5145,7 @@ snapshots:
 
   '@popperjs/core@2.11.8': {}
 
-  '@rolldown/pluginutils@1.0.0-beta.46': {}
+  '@rolldown/pluginutils@1.0.0-beta.47': {}
 
   '@rollup/pluginutils@4.2.1':
     dependencies:
@@ -5718,9 +5718,9 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vitejs/plugin-react-swc@4.2.1(vite@7.2.2(@types/node@22.19.1)(tsx@4.20.6)(yaml@2.8.1))':
+  '@vitejs/plugin-react-swc@4.2.2(vite@7.2.2(@types/node@22.19.1)(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
-      '@rolldown/pluginutils': 1.0.0-beta.46
+      '@rolldown/pluginutils': 1.0.0-beta.47
       '@swc/core': 1.13.5
       vite: 7.2.2(@types/node@22.19.1)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
