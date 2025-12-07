@@ -21,7 +21,7 @@
     "@jest/globals": "30.2.0",
     "@tanstack/eslint-plugin-query": "5.91.2",
     "@tanstack/router-plugin": "1.140.0",
-    "@trivago/prettier-plugin-sort-imports": "5.2.2",
+    "@trivago/prettier-plugin-sort-imports": "6.0.0",
     "@types/node": "22.19.1",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
