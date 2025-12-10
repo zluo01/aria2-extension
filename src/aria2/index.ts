@@ -1,15 +1,13 @@
 import { getConfiguration, notify } from '@/browser';
+import Aria2 from '@/lib/aria2c';
 import { DEFAULT_CONFIG, IConfig, IDownload, IJob } from '@/types';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Aria2 from 'aria2';
 
 type Aria2ClientType = string;
 
 const Aria2WsClient: Aria2ClientType = 'ws';
 const Aria2HttpClient: Aria2ClientType = 'http';
 
-let aria2: any;
+let aria2: Aria2;
 let prevConfig: IConfig = DEFAULT_CONFIG;
 
 export async function ConstructAria2Instance(): Promise<Aria2ClientType> {
@@ -157,7 +155,7 @@ async function multiCall(
   if (useWebSocket) {
     await aria2.open();
   }
-  const data = await aria2.multicall(callItems);
+  const data = await aria2.multiCall(callItems);
   if (useWebSocket) {
     await aria2.close();
   }

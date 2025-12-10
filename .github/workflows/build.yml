@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 'lts/*'
-          cache: "pnpm"
+          cache: 'pnpm'
       - run: pnpm install
       - run: pnpm run test
       - run: pnpm run build
@@ -44,7 +44,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 'lts/*'
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - run: pnpm install
 
