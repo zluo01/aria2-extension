@@ -31,7 +31,7 @@
     "@tanstack/eslint-plugin-router": "1.140.0",
     "@tanstack/router-plugin": "1.140.0",
     "@trivago/prettier-plugin-sort-imports": "6.0.0",
-    "@types/node": "22.19.1",
+    "@types/node": "24.10.3",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@types/webextension-polyfill": "0.12.4",
