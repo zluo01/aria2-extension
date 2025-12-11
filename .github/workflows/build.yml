@@ -10,14 +10,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'pnpm'
@@ -33,15 +33,14 @@ jobs:
       matrix:
         target: ['FIREFOX', 'CHROME']
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: Install Node.js, NPM
-        uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'pnpm'
@@ -56,7 +55,7 @@ jobs:
           echo "VERSION=$(awk -F'"' '/"version": ".+"/{ print $4; exit; }' package.json)" >> $GITHUB_ENV
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: aria2_integration_extension_${{ matrix.target }}_${{ env.VERSION }}
           path: artifacts/aria2_integration_extension-${{ env.VERSION }}.zip
