@@ -1,8 +1,8 @@
+import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
-import react from '@vitejs/plugin-react-swc';
+import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-import eslint from 'vite-plugin-eslint';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 import bundleAria from './plugins/bundle-aria';
@@ -28,13 +28,17 @@ export default defineConfig(({ mode }) => ({
       target: 'react',
       autoCodeSplitting: true,
     }),
-    react(),
+    react({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
+    tailwindcss(),
+    tsconfigPaths(),
     cleanBuildScript(),
     moveEntryScript(),
     makeManifest(),
     bundleAria(),
-    tsconfigPaths(),
-    eslint(),
   ],
   publicDir,
   build: {

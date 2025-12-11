@@ -1,17 +1,9 @@
 import { notify } from '@/browser';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { augmentDownloadLink } from '@/lib/magnet';
 import { useSubmitTasksMutation } from '@/lib/queries';
-import Button from '@mui/material/Button';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
-import { styled } from '@mui/material/styles';
 import { useState } from 'react';
-
-const CreationSection = styled('div')(({ theme }) => ({
-  width: 420,
-  backgroundColor: theme.palette.background.paper,
-  display: 'flex',
-  flexFlow: 'column nowrap',
-}));
 
 interface ICreationArea {
   close: () => void;
@@ -35,24 +27,22 @@ function CreationArea({ close }: ICreationArea) {
   }
 
   return (
-    <CreationSection>
-      <TextareaAutosize
-        aria-label="minimum height"
-        minRows={6}
+    <div className="w-full grid gap-1 py-1 px-2">
+      <Textarea
+        className="min-h-32"
         placeholder="Support multiple URLS, one URL per line"
         value={text}
         onChange={e => setText(e.target.value)}
         autoFocus
       />
       <Button
-        variant="contained"
-        color="primary"
+        variant="ghost"
         disabled={text.length === 0}
         onClick={handleSubmit}
       >
         Submit
       </Button>
-    </CreationSection>
+    </div>
   );
 }
 

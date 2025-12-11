@@ -1,32 +1,22 @@
 import { getJobDetail, getPlatformInfo, saveFile } from '@/browser';
+import { Button } from '@/components/ui/button';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useDownloadMutation } from '@/lib/queries';
 import { parseBytes, verifyFileName } from '@/utils';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
-import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/download')({
   loader: async () => getJobDetail(),
   component: DownloadPanel,
-});
-
-const Panel = styled(Stack)(({ theme }) => ({
-  width: '98%',
-  height: '100%',
-  minWidth: 480,
-  minHeight: 320,
-  marginLeft: 'auto',
-  marginRight: 'auto',
-  backgroundColor: theme.palette.background.paper,
-}));
-
-const PanelButton = styled(Button)({
-  width: 130,
 });
 
 type FormMeta = {
@@ -42,7 +32,7 @@ function DownloadPanel() {
 
   const mutation = useDownloadMutation();
 
-  const { Field, Subscribe, handleSubmit } = useForm({
+  const form = useForm({
     defaultValues: {
       fileName: data.fileName,
       filePath: '',
@@ -84,118 +74,137 @@ function DownloadPanel() {
         e.stopPropagation();
       }}
     >
-      <Panel
-        direction="column"
-        justifyContent="space-around"
-        alignItems="center"
-        spacing={1}
-      >
-        <Field
-          name="fileName"
-          validators={{
-            onChangeAsync: async ({ value }) => {
-              const platformOs = await getPlatformInfo();
-              return verifyFileName(value, platformOs.os)
-                ? undefined
-                : 'Invalid file name.';
-            },
-          }}
-        >
-          {field => (
-            <TextField
-              label="File Name"
-              error={!field.state.meta.isValid}
-              value={field.state.value}
-              onChange={e => field.handleChange(e.target.value.trim())}
-              onBlur={field.handleBlur}
-              variant="standard"
-              margin="dense"
-              fullWidth
-            />
-          )}
-        </Field>
-
-        <Field name="filePath">
-          {field => (
-            <TextField
-              required
-              label="File Path"
-              value={field.state.value}
-              onChange={e => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-              variant="standard"
-              margin="dense"
-              fullWidth
-            />
-          )}
-        </Field>
-        <TextField
-          label="From"
-          value={data.url}
-          variant="standard"
-          margin="dense"
-          fullWidth
-          disabled
-        />
-        {data.fileSize > 0 && (
-          <Typography
-            variant="body2"
-            component="span"
-            color="textSecondary"
-            display="inline"
-            align="right"
-            sx={{ width: 1 }}
-          >
-            {parseBytes(data.fileSize)}
-          </Typography>
-        )}
-        <TextareaAutosize
-          minRows={6}
-          maxRows={6}
-          value={data.header}
-          style={{ width: '100%' }}
-        />
-
-        <Subscribe selector={state => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, _isSubmitting]) => (
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              spacing={1}
-              sx={{ pt: 1, width: 1 }}
-            >
-              <PanelButton
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={!canSubmit}
-                onClick={() => handleSubmit({ submitAction: 'download' })}
+      <div className="size-full p-4">
+        <FieldGroup>
+          <FieldSet>
+            <FieldGroup className="gap-y-1.5">
+              <form.Field
+                name="fileName"
+                validators={{
+                  onChangeAsync: async ({ value }) => {
+                    const platformOs = await getPlatformInfo();
+                    return verifyFileName(value, platformOs.os)
+                      ? undefined
+                      : { message: 'Invalid file name.' };
+                  },
+                }}
               >
-                Download
-              </PanelButton>
-              <PanelButton
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={!canSubmit}
-                onClick={() => handleSubmit({ submitAction: 'save' })}
+                {field => {
+                  const isInvalid = !field.state.meta.isValid;
+                  return (
+                    <Field
+                      className="gap-0"
+                      data-invalid={!field.state.meta.isValid}
+                    >
+                      <FieldLabel
+                        className="text-sm text-muted-foreground"
+                        htmlFor={field.name}
+                      >
+                        File Name
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={e => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        autoComplete="off"
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="filePath">
+                {field => (
+                  <Field
+                    className="gap-0"
+                    data-invalid={!field.state.meta.isValid}
+                  >
+                    <FieldLabel
+                      className="text-sm text-muted-foreground"
+                      htmlFor={field.name}
+                    >
+                      File Path
+                    </FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={e => field.handleChange(e.target.value)}
+                      autoComplete="off"
+                      required
+                    />
+                  </Field>
+                )}
+              </form.Field>
+              <Field className="gap-0">
+                <FieldLabel className="text-sm text-muted-foreground">
+                  From
+                </FieldLabel>
+                <Input value={data.url} disabled />
+              </Field>
+              <div className="flex flex-row justify-end items-center">
+                <span className="text-xs text-muted-foreground">
+                  {data.fileSize > 0 ? parseBytes(data.fileSize) : 'UNKNOWN B'}
+                </span>
+              </div>
+              <Field>
+                <Textarea
+                  value={data.header}
+                  className="resize-none"
+                  disabled
+                />
+              </Field>
+              <form.Subscribe
+                selector={state => [state.canSubmit, state.isSubmitting]}
               >
-                Save
-              </PanelButton>
-              <PanelButton
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={!canSubmit}
-                onClick={() => handleSubmit({ submitAction: 'saveAs' })}
-              >
-                Save As
-              </PanelButton>
-            </Stack>
-          )}
-        </Subscribe>
-      </Panel>
+                {([canSubmit, _isSubmitting]) => (
+                  <Field
+                    orientation="horizontal"
+                    className="justify-between mt-1"
+                  >
+                    <Button
+                      className="w-32"
+                      type="submit"
+                      disabled={!canSubmit}
+                      onClick={() =>
+                        form.handleSubmit({ submitAction: 'download' })
+                      }
+                    >
+                      Download
+                    </Button>
+                    <Button
+                      className="w-32"
+                      type="submit"
+                      disabled={!canSubmit}
+                      onClick={() =>
+                        form.handleSubmit({ submitAction: 'save' })
+                      }
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      className="w-32"
+                      type="submit"
+                      disabled={!canSubmit}
+                      onClick={() =>
+                        form.handleSubmit({ submitAction: 'saveAs' })
+                      }
+                    >
+                      Save As
+                    </Button>
+                  </Field>
+                )}
+              </form.Subscribe>
+            </FieldGroup>
+          </FieldSet>
+        </FieldGroup>
+      </div>
     </form>
   );
 }

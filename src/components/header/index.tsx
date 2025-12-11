@@ -1,17 +1,18 @@
 import { PauseJobs, RemoveJobs, StartJobs } from '@/aria2';
 import { openDetail, openSetting } from '@/browser';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import PauseIcon from '@mui/icons-material/Pause';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import SettingsIcon from '@mui/icons-material/Settings';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
-import { styled } from '@mui/material/styles';
-import React from 'react';
+import { CheckedState } from '@radix-ui/react-checkbox';
+import {
+  EllipsisVerticalIcon,
+  PauseIcon,
+  PlayIcon,
+  PlusIcon,
+  SettingsIcon,
+  TrashIcon,
+} from 'lucide-react';
+import { useState } from 'react';
 
 interface IHeader {
   jobs: IJob[];
@@ -21,21 +22,10 @@ interface IHeader {
   setCheck: (value: string[]) => void;
 }
 
-const ActionGroup = styled('div')(({ theme }) => ({
-  paddingLeft: 3,
-  display: 'flex',
-  flexFlow: 'row nowrap',
-  justifyContent: 'space-between',
-  position: 'sticky',
-  top: 0,
-  zIndex: 10,
-  backgroundColor: theme.palette.background.default,
-}));
-
 function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
   const disabled = checked.length === 1;
 
-  const [isChecked, setIsChecked] = React.useState(false);
+  const [isChecked, setIsChecked] = useState<CheckedState>(false);
 
   function reset() {
     setCheck(['']);
@@ -66,9 +56,9 @@ function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
     reset();
   }
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setIsChecked(event.target.checked);
-    if (!event.target.checked) {
+  function handleChange(check: CheckedState) {
+    setIsChecked(check);
+    if (!check) {
       setCheck(['']);
     } else {
       setCheck([''].concat(jobs.map(o => o.gid)));
@@ -76,39 +66,67 @@ function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
   }
 
   return (
-    <ActionGroup>
+    <div className="flex sticky top-0 z-10 flex-nowrap flex-row justify-between items-center pb-1 px-2 pt-2">
       <Checkbox
-        size={'small'}
-        disabled={show}
+        className="ml-2"
         checked={isChecked}
-        onChange={handleChange}
+        disabled={show}
+        onCheckedChange={handleChange}
       />
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        alignItems="center"
-        spacing={1}
-      >
-        <IconButton size="small" onClick={() => setShow()}>
-          <AddIcon />
-        </IconButton>
-        <IconButton size="small" disabled={disabled} onClick={() => start()}>
-          <PlayArrowIcon />
-        </IconButton>
-        <IconButton size="small" disabled={disabled} onClick={() => pause()}>
+      <div className="flex flex-row flex-nowrap justify-end items-center space-x-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          onClick={() => setShow()}
+        >
+          <PlusIcon />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          disabled={disabled}
+          onClick={() => start()}
+        >
+          <PlayIcon />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          disabled={disabled}
+          onClick={() => pause()}
+        >
           <PauseIcon />
-        </IconButton>
-        <IconButton size="small" disabled={disabled} onClick={() => remove()}>
-          <DeleteIcon />
-        </IconButton>
-        <IconButton size="small" onClick={() => openSetting()}>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          disabled={disabled}
+          onClick={() => remove()}
+        >
+          <TrashIcon />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          onClick={() => openSetting()}
+        >
           <SettingsIcon />
-        </IconButton>
-        <IconButton size="small" onClick={() => openDetail(true)}>
-          <MoreVertIcon />
-        </IconButton>
-      </Stack>
-    </ActionGroup>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          onClick={() => openDetail(true)}
+        >
+          <EllipsisVerticalIcon />
+        </Button>
+      </div>
+    </div>
   );
 }
 

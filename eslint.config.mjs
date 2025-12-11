@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import pluginQuery from '@tanstack/eslint-plugin-query';
+import pluginRouter from '@tanstack/eslint-plugin-router';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import pluginPromise from 'eslint-plugin-promise';
 import pluginReact from 'eslint-plugin-react';
@@ -8,18 +9,17 @@ import globals from 'globals';
 import ts from 'typescript-eslint';
 
 export default [
-  { files: ['**/*.{js,ts,tsx}'] },
+  { files: ['**/*.{ts,tsx}'] },
   { languageOptions: { globals: globals.browser } },
   js.configs.recommended,
   ...ts.configs.recommended,
   pluginReact.configs.flat.recommended,
+  pluginReactHooks.configs.flat.recommended,
   pluginPromise.configs['flat/recommended'],
+  ...pluginRouter.configs['flat/recommended'],
   ...pluginQuery.configs['flat/recommended'],
   eslintConfigPrettier,
   {
-    plugins: {
-      'react-hooks': pluginReactHooks,
-    },
     rules: {
       'react/react-in-jsx-scope': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -37,7 +37,6 @@ export default [
           allow: ['warn', 'error'],
         },
       ],
-      ...pluginReactHooks.configs.recommended.rules,
     },
   },
   {

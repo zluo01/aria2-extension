@@ -1,43 +1,10 @@
 import { PauseJobs, StartJobs } from '@/aria2';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Progress } from '@/components/ui/progress';
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
 import { parseBytes } from '@/utils';
-import PauseIcon from '@mui/icons-material/Pause';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
-import React from 'react';
-
-import Progress from '../progress';
-
-const JobList = styled(List)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-}));
-
-const Job = styled(ListItem)(() => ({
-  height: 60,
-}));
-
-const JobTitleSection = styled(ListItem)(() => ({
-  width: '100%',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  padding: 0,
-}));
-
-const JobSubInfoSection = styled(ListItem)(() => ({
-  width: '100%',
-  display: 'flex',
-  flexFlow: 'row wrap',
-  justifyContent: 'space-between',
-  padding: 0,
-}));
+import { PauseIcon, PlayIcon } from 'lucide-react';
 
 interface IDownloadList {
   jobs: IJob[];
@@ -78,76 +45,45 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList) {
   }
 
   return (
-    <JobList dense={true}>
+    <div className="flex flex-col items-center justify-center w-full py-1 px-2 gap-y-1">
       {jobs.map(o => {
-        const labelId = `checkbox-list-label-${o.gid}`;
+        const progress = getProgress(o);
         return (
-          <Job
+          <div
             key={o.gid}
-            dense
+            className="flex flex-row items-center justify-between w-full h-16"
             onClick={toggle(o.gid)}
-            secondaryAction={
-              <IconButton
-                edge={'end'}
-                aria-label={'comments'}
-                size={'small'}
+          >
+            <Checkbox
+              className="ml-2"
+              checked={checked.indexOf(o.gid) !== -1}
+              tabIndex={-1}
+            />
+            <div className="flex flex-row flex-nowrap items-center justify-end gap-x-2 w-4/5">
+              <div className="flex flex-col w-full flex-nowrap justify-around py-1 truncate">
+                <span>{getFileName(o)}</span>
+                <div className="w-full flex flex-row flex-nowrap justify-between text-muted-foreground text-sm">
+                  <span>{parseBytes(parseFloat(o.totalLength))}</span>
+                  <span>{parseBytes(parseFloat(o.downloadSpeed)) + '\\s'}</span>
+                </div>
+                <div className="w-full flex flex-row flex-nowrap justify-end items-center">
+                  <Progress value={progress} className="mr-1 h-1 w-full" />
+                  <span className="min-w-9 text-muted-foreground text-sm">{`${progress.toFixed(1)}%`}</span>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full z-10"
                 onClick={() => jobAction(o)}
               >
-                {o.status === ACTIVE_JOB ? <PauseIcon /> : <PlayArrowIcon />}
-              </IconButton>
-            }
-          >
-            <ListItemIcon>
-              <Checkbox
-                edge="start"
-                size={'small'}
-                checked={checked.indexOf(o.gid) !== -1}
-                tabIndex={-1}
-                inputProps={{ 'aria-labelledby': labelId }}
-              />
-            </ListItemIcon>
-            <ListItemText
-              id={labelId}
-              primary={
-                <JobTitleSection>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    display={'inline'}
-                    color="textPrimary"
-                  >
-                    {getFileName(o)}
-                  </Typography>
-                </JobTitleSection>
-              }
-              secondary={
-                <React.Fragment>
-                  <JobSubInfoSection>
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      display={'inline'}
-                      color="textPrimary"
-                    >
-                      {parseBytes(parseFloat(o.totalLength))}
-                    </Typography>
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      display={'inline'}
-                      color="textPrimary"
-                    >
-                      {parseBytes(parseFloat(o.downloadSpeed)) + '\\s'}
-                    </Typography>
-                  </JobSubInfoSection>
-                  <Progress value={getProgress(o)} />
-                </React.Fragment>
-              }
-            />
-          </Job>
+                {o.status === ACTIVE_JOB ? <PauseIcon /> : <PlayIcon />}
+              </Button>
+            </div>
+          </div>
         );
       })}
-    </JobList>
+    </div>
   );
 }
 
