@@ -3,7 +3,7 @@
  * @param input url or hash string
  */
 export function augmentDownloadLink(input: string): string {
-  if (input.startsWith('http') || input.endsWith('https')) {
+  if (input.startsWith('http') || input.startsWith('https')) {
     return input;
   }
 
