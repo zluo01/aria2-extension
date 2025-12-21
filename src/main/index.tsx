@@ -1,5 +1,5 @@
 import { queryClient } from '@/lib/queries';
-import ThemeProvider from '@/lib/theme';
+import { ThemeProvider } from '@/lib/theme';
 import { routeTree } from '@/routeTree.gen';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
@@ -40,12 +40,7 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider defaultTheme="system">
           <RouterProvider router={router} />
         </ThemeProvider>
       </QueryClientProvider>

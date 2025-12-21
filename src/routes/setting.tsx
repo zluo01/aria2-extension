@@ -18,11 +18,11 @@ import {
   getConfigurationQueryOptions,
   useUpdateConfigMutation,
 } from '@/lib/queries';
+import { useTheme } from '@/lib/theme';
 import manifest from '@/manifest';
 import { IConfig } from '@/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useTheme } from 'next-themes';
 import { ChangeEvent } from 'react';
 
 export const Route = createFileRoute('/setting')({
