@@ -40,10 +40,12 @@ const cache = new LRUCache({
 const processQueue: IFileDetail[] = [];
 const CONTEXT_ID = 'download-with-aria';
 
-browser.contextMenus.create({
-  id: CONTEXT_ID,
-  title: 'Download with Aria2',
-  contexts: ['link', 'video', 'audio'],
+browser.runtime.onInstalled.addListener(() => {
+  browser.contextMenus.create({
+    id: CONTEXT_ID,
+    title: 'Download with Aria2',
+    contexts: ['link', 'video', 'audio'],
+  });
 });
 
 browser.contextMenus.onClicked.addListener(async (info, _tab) => {
