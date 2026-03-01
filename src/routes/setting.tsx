@@ -19,7 +19,7 @@ import {
   useUpdateConfigMutation,
 } from '@/lib/queries';
 import { useTheme } from '@/lib/theme';
-import manifest from '@/manifest';
+import { Chrome } from '@/manifest';
 import { IConfig } from '@/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -156,7 +156,7 @@ function Setting() {
         <Separator className="mt-2" />
         <div className="flex flex-row justify-end items-center">
           <span className="text-sm text-muted-foreground">
-            v{manifest.version}
+            v{Chrome.version}
           </span>
         </div>
       </div>

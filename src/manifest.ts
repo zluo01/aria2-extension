@@ -2,7 +2,7 @@ import type { Manifest } from 'webextension-polyfill';
 
 import pkg from '../package.json';
 
-const manifest: Manifest.WebExtensionManifest = {
+const base = {
   manifest_version: 3,
   name: pkg.displayName,
   version: pkg.version,
@@ -16,14 +16,11 @@ const manifest: Manifest.WebExtensionManifest = {
     'notifications',
     'storage',
     'downloads',
+    'alarms',
   ],
   host_permissions: ['<all_urls>'],
   content_security_policy: {
     extension_pages: "script-src 'self'; object-src 'self';",
-  },
-  background: {
-    scripts: ['background/index.js'],
-    type: 'module',
   },
   commands: {
     open_detail: {
@@ -38,11 +35,25 @@ const manifest: Manifest.WebExtensionManifest = {
     page: 'index.html#/setting',
     open_in_tab: true,
   },
+};
+
+export const Chrome = {
+  ...base,
+  background: {
+    service_worker: 'background/index.js',
+    type: 'module' as const,
+  },
+};
+
+export const Firefox: Manifest.WebExtensionManifest = {
+  ...base,
+  background: {
+    scripts: ['background/index.js'],
+    type: 'module',
+  },
   browser_specific_settings: {
     gecko: {
       id: '{9e3f5f09-a4c6-43c2-8715-cac81530a5ce}',
     },
   },
 };
-
-export default manifest;

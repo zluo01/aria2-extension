@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { PluginOption } from 'vite';
 
-import manifest from '../src/manifest';
+import { Chrome, Firefox } from '../src/manifest';
 
 const { resolve } = path;
 
@@ -18,22 +18,12 @@ export default function makeManifest(): PluginOption {
           throw Error('Build directory not exists.');
         }
 
-        let manifestContent = manifest;
-
-        if (process.env.TARGET === 'CHROME') {
-          manifestContent = {
-            ...manifestContent,
-            background: {
-              service_worker: (manifestContent.background as any).scripts[0],
-              type: (manifestContent.background as any).type,
-            },
-          };
-        }
+        const manifest = process.env.TARGET === 'CHROME' ? Chrome : Firefox;
 
         const manifestPath = resolve(outDir, 'manifest.json');
         await fs.promises.writeFile(
           manifestPath,
-          JSON.stringify(manifestContent, null, 2),
+          JSON.stringify(manifest, null, 2),
         );
 
         console.info(`Manifest file copy complete: ${manifestPath}`);
