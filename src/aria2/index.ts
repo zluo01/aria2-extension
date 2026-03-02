@@ -12,7 +12,7 @@ let prevConfig: IConfig = DEFAULT_CONFIG;
 
 export async function ConstructAria2Instance(): Promise<Aria2ClientType> {
   const config: IConfig = await getConfiguration();
-  if (!aria2 || JSON.stringify(prevConfig) === JSON.stringify(config)) {
+  if (!aria2 || JSON.stringify(prevConfig) !== JSON.stringify(config)) {
     const options = {
       path: '/jsonrpc',
       host: config.host,
