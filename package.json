@@ -59,9 +59,12 @@
   "scripts": {
     "analyze": "npx vite-bundle-visualizer",
     "dev": "vite build --mode dev && web-ext run --source-dir ./build/",
-    "build": "vite build",
+    "dev:chrome": "TARGET=CHROME vite build --mode dev && web-ext run --source-dir ./build/ -t chromium",
+    "build": "tsc && vite build",
+    "build:chrome": "tsc && TARGET=CHROME vite build",
     "package": "web-ext build --config=webext.config.cjs",
     "complete": "pnpm run build && pnpm run package",
+    "complete:chrome": "pnpm run build:chrome && pnpm run package",
     "type-check": "tsc --pretty --noEmit",
     "format": "prettier --write .",
     "lint": "eslint .",
