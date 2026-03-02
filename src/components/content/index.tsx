@@ -64,7 +64,7 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList) {
                 <span>{getFileName(o)}</span>
                 <div className="w-full flex flex-row flex-nowrap justify-between text-muted-foreground text-sm">
                   <span>{parseBytes(parseFloat(o.totalLength))}</span>
-                  <span>{parseBytes(parseFloat(o.downloadSpeed)) + '\\s'}</span>
+                  <span>{parseBytes(parseFloat(o.downloadSpeed)) + '/s'}</span>
                 </div>
                 <div className="w-full flex flex-row flex-nowrap justify-end items-center">
                   <Progress value={progress} className="mr-1 h-1 w-full" />
