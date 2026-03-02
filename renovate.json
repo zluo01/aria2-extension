@@ -32,7 +32,6 @@
       "groupName": "tools",
       "matchPackagePrefixes": [
         "@tanstack",
-        "lru-cache",
         "web-ext",
         "webextension-polyfill"
       ]

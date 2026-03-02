@@ -6,9 +6,9 @@ import {
   removeBlankTab,
   updateBadge,
 } from '@/browser';
+import { cacheRemove, cacheSet } from '@/lib/session-cache';
 import { IFileDetail } from '@/types';
 import { getFilename } from '@/utils';
-import { LRUCache } from 'lru-cache';
 import browser, { Downloads } from 'webextension-polyfill';
 
 import DownloadItem = Downloads.DownloadItem;
@@ -25,17 +25,6 @@ const SKIP_DOWNLOAD_SCHEMA = [
   'edge-extension:',
   'intent:',
 ];
-
-// only for synchronize built-in download action
-const cache = new LRUCache({
-  max: 100, // Maximum 100 items
-  ttl: 6000, // 6 seconds timeout
-  allowStale: false, // Don't return stale items
-  updateAgeOnGet: false, // Don't reset TTL on get
-  updateAgeOnHas: false, // Don't reset TTL on has
-  ttlResolution: 1000, // Check TTL every second
-  ttlAutopurge: true, // Automatically purge expired items
-});
 
 const processQueue: IFileDetail[] = [];
 const CONTEXT_ID = 'download-with-aria';
@@ -105,7 +94,7 @@ browser.downloads.onCreated.addListener(async (downloadItem: DownloadItem) => {
   }
 
   // do nothing when user choose to download with built-in downloader
-  if (cache.delete(downloadItem.url)) {
+  if (await cacheRemove(downloadItem.url)) {
     return;
   }
 
@@ -125,7 +114,7 @@ browser.runtime.onMessage.addListener((data: any) => {
     return Promise.resolve(processQueue.pop());
   } else if (data.type === 'signal') {
     if (data.message) {
-      cache.set(data.message, true);
+      return cacheSet(data.message);
     }
   }
 });
