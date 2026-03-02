@@ -1,4 +1,4 @@
-import { getJobDetail, getPlatformInfo, saveFile } from '@/browser';
+import { getPlatformInfo, saveFile } from '@/browser';
 import { Button } from '@/components/ui/button';
 import {
   Field,
@@ -8,14 +8,14 @@ import {
   FieldSet,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useDownloadMutation } from '@/lib/queries';
+import { downloadSearchSchema } from '@/types';
 import { parseBytes, verifyFileName } from '@/utils';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/download')({
-  loader: async () => getJobDetail(),
+  validateSearch: downloadSearchSchema,
   component: DownloadPanel,
 });
 
@@ -28,7 +28,7 @@ const defaultMeta: FormMeta = {
 };
 
 function DownloadPanel() {
-  const data = Route.useLoaderData();
+  const data = Route.useSearch();
 
   const mutation = useDownloadMutation();
 
@@ -41,12 +41,7 @@ function DownloadPanel() {
     onSubmit: async ({ value, meta }) => {
       switch (meta.submitAction) {
         case 'download':
-          await downloadFile(
-            data.url,
-            value.fileName,
-            value.filePath,
-            data.header as string[],
-          );
+          await downloadFile(data.url, value.fileName, value.filePath);
           break;
         case 'save':
           await saveFile(data.url, value.fileName, false);
@@ -58,13 +53,8 @@ function DownloadPanel() {
     },
   });
 
-  async function downloadFile(
-    url: string,
-    fileName: string,
-    filePath: string,
-    headers: string[],
-  ) {
-    mutation.mutate({ url, fileName, filePath, headers });
+  async function downloadFile(url: string, fileName: string, filePath: string) {
+    mutation.mutate({ url, fileName, filePath, headers: [] });
   }
 
   return (
@@ -153,13 +143,6 @@ function DownloadPanel() {
                   {data.fileSize > 0 ? parseBytes(data.fileSize) : 'UNKNOWN B'}
                 </span>
               </div>
-              <Field>
-                <Textarea
-                  value={data.header}
-                  className="resize-none"
-                  disabled
-                />
-              </Field>
               <form.Subscribe
                 selector={state => [state.canSubmit, state.isSubmitting]}
               >

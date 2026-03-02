@@ -1,6 +1,90 @@
-import { getFilename, verifyFileName } from '@/utils';
+import { downloadSearchSchema } from '@/types';
+import { downloadToQueryString, getFilename, verifyFileName } from '@/utils';
 import { describe, expect, test } from '@jest/globals';
 import { Runtime } from 'webextension-polyfill';
+
+describe('downloadSearchSchema', () => {
+  test('parses valid search params', () => {
+    const result = downloadSearchSchema.parse({
+      url: 'https://example.com/file.zip',
+      fileName: 'file.zip',
+      fileSize: '1234',
+    });
+    expect(result).toEqual({
+      url: 'https://example.com/file.zip',
+      fileName: 'file.zip',
+      fileSize: 1234,
+    });
+  });
+
+  test('coerces fileSize from string to number', () => {
+    const result = downloadSearchSchema.parse({
+      url: 'https://example.com/file.zip',
+      fileName: 'file.zip',
+      fileSize: '99999',
+    });
+    expect(result.fileSize).toBe(99999);
+  });
+
+  test('rejects an invalid URL', () => {
+    expect(() =>
+      downloadSearchSchema.parse({
+        url: 'not-a-url',
+        fileName: 'file.zip',
+        fileSize: '1234',
+      }),
+    ).toThrow();
+  });
+
+  test('rejects missing required fields', () => {
+    expect(() =>
+      downloadSearchSchema.parse({ url: 'https://example.com/file.zip' }),
+    ).toThrow();
+  });
+});
+
+describe('downloadToQueryString', () => {
+  test('encodes spaces in fileName as %20 not +', () => {
+    const search = downloadToQueryString({
+      url: 'https://example.com/file.zip',
+      fileName: 'my file name.zip',
+      fileSize: 1234,
+    });
+    expect(search).toContain('fileName=my%20file%20name.zip');
+    expect(search).not.toContain('+');
+  });
+
+  test('encodes special characters in URL', () => {
+    const search = downloadToQueryString({
+      url: 'https://example.com/file?a=1&b=2',
+      fileName: 'file.zip',
+      fileSize: 1234,
+    });
+    expect(search).toContain(
+      'url=https%3A%2F%2Fexample.com%2Ffile%3Fa%3D1%26b%3D2',
+    );
+  });
+
+  test('URLSearchParams.toString() encodes spaces as + not %20', () => {
+    const search = new URLSearchParams({ fileName: 'my file.zip' }).toString();
+    expect(search).toBe('fileName=my+file.zip');
+  });
+
+  test('decodeURIComponent does not decode + back to space', () => {
+    expect(decodeURIComponent('my+file.zip')).toBe('my+file.zip');
+  });
+
+  test('downloadToQueryString encodes spaces as %20 which decodeURIComponent correctly reverses', () => {
+    const search = downloadToQueryString({
+      url: 'https://example.com/file.zip',
+      fileName: 'my file.zip',
+      fileSize: 1234,
+    });
+    const value = search.split('fileName=')[1]!.split('&')[0]!;
+    expect(value).toBe('my%20file.zip');
+    expect(decodeURIComponent(value)).toBe('my file.zip');
+  });
+});
 
 import PlatformOs = Runtime.PlatformOs;
 

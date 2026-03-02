@@ -1,5 +1,6 @@
 import { AddUri } from '@/aria2';
 import { DEFAULT_CONFIG, IConfig, IDownload, IFileDetail } from '@/types';
+import { downloadToQueryString } from '@/utils';
 import browser, { Action, Windows } from 'webextension-polyfill';
 
 export async function getPlatformInfo() {
@@ -61,15 +62,17 @@ export async function notify(msg: string): Promise<string> {
 }
 
 // https://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
-export async function createDownloadPanel(): Promise<Windows.Window> {
+export async function createDownloadPanel(
+  detail: IFileDetail,
+): Promise<Windows.Window> {
   const w = 560;
   const h = 365;
 
-  const url = browser.runtime.getURL('index.html');
+  const baseUrl = browser.runtime.getURL('index.html');
   const windowInfo = await getCurrentWindow();
 
   const createOptions: Windows.CreateCreateDataType = {
-    url: url.concat('#/download'),
+    url: `${baseUrl}#/download?${downloadToQueryString(detail)}`,
     type: 'popup',
     width: w,
     height: h,
@@ -105,12 +108,6 @@ export async function createDownloadPanel(): Promise<Windows.Window> {
   }
 
   return browser.windows.create(createOptions);
-}
-
-export async function getJobDetail(): Promise<IFileDetail> {
-  return browser.runtime.sendMessage({
-    type: 'all',
-  });
 }
 
 export async function download(

@@ -59,6 +59,9 @@ importers:
       tailwindcss:
         specifier: 4.2.1
         version: 4.2.1
+      zod:
+        specifier: 4.3.6
+        version: 4.3.6
     devDependencies:
       '@eslint/js':
         specifier: 9.39.3
@@ -4636,8 +4639,8 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zod@4.1.12:
-    resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
 snapshots:
 
@@ -7095,8 +7098,8 @@ snapshots:
       '@babel/parser': 7.29.0
       eslint: 9.39.3(jiti@2.6.1)
       hermes-parser: 0.25.1
-      zod: 4.1.12
-      zod-validation-error: 4.0.2(zod@4.1.12)
+      zod: 4.3.6
+      zod-validation-error: 4.0.2(zod@4.3.6)
     transitivePeerDependencies:
       - supports-color
 
@@ -9539,10 +9542,10 @@ snapshots:
       async: 3.2.6
       jszip: 3.10.1
 
-  zod-validation-error@4.0.2(zod@4.1.12):
+  zod-validation-error@4.0.2(zod@4.3.6):
     dependencies:
-      zod: 4.1.12
+      zod: 4.3.6
 
   zod@3.25.76: {}
 
-  zod@4.1.12: {}
+  zod@4.3.6: {}

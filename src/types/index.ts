@@ -1,3 +1,11 @@
+import { z } from 'zod';
+
+export const downloadSearchSchema = z.object({
+  url: z.url(),
+  fileName: z.string(),
+  fileSize: z.coerce.number(),
+});
+
 export interface IJob {
   gid: string;
   downloadSpeed: string;
@@ -26,7 +34,6 @@ export interface IFileDetail {
   url: string;
   fileName: string;
   fileSize: number;
-  header?: string[];
 }
 
 export const ACTIVE_JOB = 'active';

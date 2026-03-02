@@ -7,7 +7,6 @@ import {
   updateBadge,
 } from '@/browser';
 import { cacheRemove, cacheSet } from '@/lib/session-cache';
-import { IFileDetail } from '@/types';
 import { getFilename } from '@/utils';
 import browser, { Downloads } from 'webextension-polyfill';
 
@@ -26,7 +25,6 @@ const SKIP_DOWNLOAD_SCHEMA = [
   'intent:',
 ];
 
-const processQueue: IFileDetail[] = [];
 const CONTEXT_ID = 'download-with-aria';
 
 browser.runtime.onInstalled.addListener(() => {
@@ -71,15 +69,12 @@ browser.commands.onCommand.addListener((command: string) => {
 async function prepareDownload(d: DownloadItem) {
   // findUrl only exists in chrome which currently not include in polyfill
   const filename = getFilename(d.filename, (d as any).finalUrl || d.url);
-
-  // create download panel
-  processQueue.push({
+  await removeBlankTab();
+  await createDownloadPanel({
     url: d.url,
     fileName: filename,
     fileSize: d.fileSize,
   });
-  await removeBlankTab();
-  await createDownloadPanel();
 }
 
 browser.downloads.onCreated.addListener(async (downloadItem: DownloadItem) => {
@@ -110,12 +105,8 @@ browser.downloads.onCreated.addListener(async (downloadItem: DownloadItem) => {
 });
 
 browser.runtime.onMessage.addListener((data: any) => {
-  if (data.type === 'all') {
-    return Promise.resolve(processQueue.pop());
-  } else if (data.type === 'signal') {
-    if (data.message) {
-      return cacheSet(data.message);
-    }
+  if (data.type === 'signal' && data.message) {
+    return cacheSet(data.message);
   }
 });
 

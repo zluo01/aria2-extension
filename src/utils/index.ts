@@ -1,3 +1,4 @@
+import type { IFileDetail } from '@/types';
 import { Runtime } from 'webextension-polyfill';
 
 import PlatformOs = Runtime.PlatformOs;
@@ -40,6 +41,14 @@ export function getFilename(fullPath: string, url: string): string {
     }
   }
   return fullPath.split(/[/\\]/).pop() || 'UNKNOWN';
+}
+
+export function downloadToQueryString(detail: IFileDetail): string {
+  return [
+    `url=${encodeURIComponent(detail.url)}`,
+    `fileName=${encodeURIComponent(detail.fileName)}`,
+    `fileSize=${detail.fileSize}`,
+  ].join('&');
 }
 
 export function parseBytes(value: number): string {
