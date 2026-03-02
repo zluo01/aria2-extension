@@ -197,3 +197,4 @@ build
 artifacts
 public/manifest.json
 **/.tanstack/
+.claude/
