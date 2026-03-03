@@ -23,7 +23,7 @@ interface IHeader {
 }
 
 function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
-  const disabled = checked.length === 1;
+  const disabled = checked.length <= 1;
 
   const [isChecked, setIsChecked] = useState<CheckedState>(false);
 
