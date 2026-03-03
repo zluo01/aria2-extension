@@ -18,9 +18,7 @@ function CreationArea({ close }: ICreationArea) {
     try {
       mutation.mutate(text.split('\n').map(o => augmentDownloadLink(o)));
     } catch (e) {
-      if (e instanceof Error) {
-        await client.notify(`fail to download files, msg: ${e.message}.`);
-      }
+      await client.notify(`fail to download files, msg: ${e}.`);
     }
     setText('');
     close();
