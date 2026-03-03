@@ -84,7 +84,7 @@ function Setting() {
 
   async function updateConfig(config: IConfig) {
     try {
-      updateConfigMutation.mutate(config);
+      await updateConfigMutation.mutateAsync(config);
     } catch (e) {
       console.error(e);
     }
