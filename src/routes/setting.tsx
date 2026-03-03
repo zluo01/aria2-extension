@@ -131,7 +131,9 @@ function Setting() {
                     ))}
                   </SelectContent>
                 </Select>
-                <FieldDescription>Please select prefer theme</FieldDescription>
+                <FieldDescription>
+                  Select the RPC protocol for Aria2
+                </FieldDescription>
               </Field>
               <Field>
                 <FieldLabel>Host</FieldLabel>
