@@ -16,7 +16,6 @@ export class FirefoxClient extends IBaseBrowserClient<Downloads.DownloadItem> {
       const h = 365;
 
       const baseUrl = browser.runtime.getURL('index.html');
-      const windowInfo = await this.getCurrentWindow();
 
       // Fixes dual-screen position
       const dualScreenLeft = window.screenLeft ?? window.screenX;
@@ -44,7 +43,7 @@ export class FirefoxClient extends IBaseBrowserClient<Downloads.DownloadItem> {
         left,
         width: w,
         height: h,
-        incognito: windowInfo.incognito,
+        incognito: detail.incognito,
         focused: true,
       };
 
@@ -83,6 +82,7 @@ export class FirefoxClient extends IBaseBrowserClient<Downloads.DownloadItem> {
       filename: item.filename.split(/[/\\]/).pop() || 'UNKNOWN',
       fileSize: await this.getContentLength(item.url),
       url: item.url,
+      incognito: item.incognito,
     };
   }
 

@@ -12,15 +12,12 @@ export class ChromeClient extends IBaseBrowserClient<chrome.downloads.DownloadIt
 
       const baseUrl = chrome.runtime.getURL('index.html');
 
-      const windowInfo = await chrome.windows.getLastFocused();
-      console.error(JSON.stringify(windowInfo));
-
       const createOptions: chrome.windows.CreateData = {
         url: `${baseUrl}#/download?${downloadToQueryString(detail)}`,
         type: 'popup',
         width: w,
         height: h,
-        incognito: windowInfo.incognito,
+        incognito: detail.incognito,
         focused: true,
       };
 
@@ -57,6 +54,7 @@ export class ChromeClient extends IBaseBrowserClient<chrome.downloads.DownloadIt
       filename: item.filename,
       fileSize: item.fileSize,
       url: item.finalUrl ?? item.url,
+      incognito: item.incognito,
     };
   }
 

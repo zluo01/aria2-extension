@@ -26,6 +26,7 @@ export interface IFileDetail {
   url: string;
   filename: string;
   fileSize: number;
+  incognito: boolean;
 }
 
 export const ACTIVE_JOB = 'active';
