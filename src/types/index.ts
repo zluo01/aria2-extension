@@ -9,11 +9,7 @@ export interface IJob {
       name: string;
     };
   };
-  files: [
-    {
-      path: string;
-    },
-  ];
+  files: { path: string }[];
 }
 
 export interface IDownload {

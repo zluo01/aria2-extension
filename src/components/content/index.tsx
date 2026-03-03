@@ -17,8 +17,8 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList) {
     if (job.bittorrent && job.bittorrent.info) {
       return job.bittorrent.info.name;
     }
-    const path = job.files[0].path;
-    return path.split('/').slice(-1)[0];
+    const path = job.files[0]?.path ?? '';
+    return path.split('/').slice(-1)[0] || 'UNKNOWN';
   }
 
   function getProgress(job: IJob): number {
