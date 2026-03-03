@@ -2,6 +2,11 @@ import { AddUri, GetNumJobs } from '@/aria2';
 import { client } from '@/lib/browser';
 import { cacheSet } from '@/lib/session-cache';
 import browser from 'webextension-polyfill';
+import { z } from 'zod';
+
+const MessageSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('signal'), message: z.string() }),
+]);
 
 const CONTEXT_ID = 'download-with-aria';
 
@@ -44,9 +49,13 @@ browser.commands.onCommand.addListener((command: string) => {
   }
 });
 
-browser.runtime.onMessage.addListener((data: any) => {
-  if (data.type === 'signal' && data.message) {
-    return cacheSet(data.message);
+browser.runtime.onMessage.addListener((data: unknown) => {
+  const result = MessageSchema.safeParse(data);
+  if (!result.success) return;
+
+  switch (result.data.type) {
+    case 'signal':
+      return cacheSet(result.data.message);
   }
 });
 
