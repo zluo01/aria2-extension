@@ -17,6 +17,15 @@ describe('augmentDownloadLink', () => {
       const input = 'https://example.com/file.zip';
       expect(augmentDownloadLink(input)).toBe(input);
     });
+
+    test('should trim whitespace from URLs before returning', () => {
+      expect(augmentDownloadLink('  https://example.com/file.zip  ')).toBe(
+        'https://example.com/file.zip',
+      );
+      expect(augmentDownloadLink('\thttp://example.com/file.zip\n')).toBe(
+        'http://example.com/file.zip',
+      );
+    });
   });
 
   describe('SHA-1 hashes (40 hex characters)', () => {

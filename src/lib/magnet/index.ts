@@ -3,12 +3,12 @@
  * @param input url or hash string
  */
 export function augmentDownloadLink(input: string): string {
+  // Remove any leading or trailing whitespace before any check
+  input = input.trim();
+
   if (input.startsWith('http') || input.startsWith('https')) {
     return input;
   }
-
-  // Remove any leading or trailing whitespace
-  input = input.trim();
 
   // Determine hash type and validate
   let hashType: string | null = null;
