@@ -160,6 +160,8 @@ export abstract class IBaseBrowserClient<T> implements BrowserClient {
     await browser.downloads.removeFile(id).catch(() => {
       /* empty */
     });
-    await browser.downloads.erase({ id });
+    await browser.downloads.erase({ id }).catch(() => {
+      /* empty */
+    });
   }
 }
