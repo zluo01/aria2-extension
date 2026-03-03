@@ -13,10 +13,10 @@ export function augmentDownloadLink(input: string): string {
   // Determine hash type and validate
   let hashType: string | null = null;
 
-  if (/^[0-9a-f]{40}$/.test(input)) {
+  if (/^[0-9a-f]{40}$/i.test(input)) {
     // SHA-1
     hashType = 'btih';
-  } else if (/^[0-9a-f]{64}$/.test(input)) {
+  } else if (/^[0-9a-f]{64}$/i.test(input)) {
     // SHA-256
     hashType = 'btmh';
   } else if (/^[a-f0-9]{32}$/i.test(input)) {

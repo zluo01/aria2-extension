@@ -43,10 +43,18 @@ describe('augmentDownloadLink', () => {
       expect(augmentDownloadLink(sha1)).toBe(expected);
     });
 
-    test('should handle uppercase SHA-1 hash as invalid (returns as-is)', () => {
+    test('should convert uppercase SHA-1 hash to magnet link', () => {
       const sha1 = 'AAF4C61DDCC5E8A2DABEDE0F3B482CD9AEA9434D';
-      // Regex only matches lowercase, so this should return as-is
-      expect(augmentDownloadLink(sha1)).toBe(sha1);
+      const expected =
+        'magnet:?xt=urn:btih:AAF4C61DDCC5E8A2DABEDE0F3B482CD9AEA9434D';
+      expect(augmentDownloadLink(sha1)).toBe(expected);
+    });
+
+    test('should convert mixed-case SHA-1 hash to magnet link', () => {
+      const sha1 = 'Aaf4C61dDCC5e8A2DABede0f3B482cd9AEA9434d';
+      const expected =
+        'magnet:?xt=urn:btih:Aaf4C61dDCC5e8A2DABede0f3B482cd9AEA9434d';
+      expect(augmentDownloadLink(sha1)).toBe(expected);
     });
   });
 
@@ -56,6 +64,14 @@ describe('augmentDownloadLink', () => {
         '2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae';
       const expected =
         'magnet:?xt=urn:btmh:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae';
+      expect(augmentDownloadLink(sha256)).toBe(expected);
+    });
+
+    test('should convert uppercase SHA-256 hash to magnet link', () => {
+      const sha256 =
+        '2C26B46B68FFC68FF99B453C1D30413413422D706483BFA0F98A5E886266E7AE';
+      const expected =
+        'magnet:?xt=urn:btmh:2C26B46B68FFC68FF99B453C1D30413413422D706483BFA0F98A5E886266E7AE';
       expect(augmentDownloadLink(sha256)).toBe(expected);
     });
 
