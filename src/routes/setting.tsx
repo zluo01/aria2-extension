@@ -14,10 +14,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import {
-  getConfigurationQueryOptions,
-  useUpdateConfigMutation,
-} from '@/lib/queries';
+import { client } from '@/lib/browser';
+import { getConfigurationQueryOptions, queryClient } from '@/lib/queries';
 import { useTheme } from '@/lib/theme';
 import { Chrome } from '@/manifest';
 import { IConfig } from '@/types';
@@ -42,7 +40,6 @@ function Setting() {
   const { theme, setTheme } = useTheme();
 
   const { data: config } = useSuspenseQuery(getConfigurationQueryOptions);
-  const updateConfigMutation = useUpdateConfigMutation();
 
   async function updateDownloadPath(
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -84,7 +81,10 @@ function Setting() {
 
   async function updateConfig(config: IConfig) {
     try {
-      await updateConfigMutation.mutateAsync(config);
+      await client.setConfiguration(config);
+      await queryClient.invalidateQueries({
+        queryKey: getConfigurationQueryOptions.queryKey,
+      });
     } catch (e) {
       console.error(e);
     }

@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { client } from '@/lib/browser';
-import { useDownloadMutation } from '@/lib/queries';
 import { parseBytes, verifyFileName } from '@/utils';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute } from '@tanstack/react-router';
@@ -36,8 +35,6 @@ const defaultMeta: FormMeta = {
 function DownloadPanel() {
   const data = Route.useSearch();
 
-  const mutation = useDownloadMutation();
-
   const form = useForm({
     defaultValues: {
       fileName: data.filename,
@@ -60,7 +57,7 @@ function DownloadPanel() {
   });
 
   async function downloadFile(url: string, fileName: string, filePath: string) {
-    mutation.mutate({ url, fileName, filePath, headers: [] });
+    await client.download(url, fileName, filePath, []);
   }
 
   return (

@@ -1,8 +1,7 @@
+import { AddUris } from '@/aria2';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { client } from '@/lib/browser';
 import { augmentDownloadLink } from '@/lib/magnet';
-import { useSubmitTasksMutation } from '@/lib/queries';
 import { useState } from 'react';
 
 interface ICreationArea {
@@ -10,16 +9,14 @@ interface ICreationArea {
 }
 
 function CreationArea({ close }: ICreationArea) {
-  const mutation = useSubmitTasksMutation();
-
   const [text, setText] = useState('');
 
   async function handleSubmit() {
-    try {
-      mutation.mutate(text.split('\n').map(o => augmentDownloadLink(o)));
-    } catch (e) {
-      await client.notify(`fail to download files, msg: ${e}.`);
-    }
+    const uris = text
+      .split('\n')
+      .map(augmentDownloadLink)
+      .filter(o => o.length > 0);
+    await AddUris(...uris);
     setText('');
     close();
   }
