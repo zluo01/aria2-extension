@@ -1,5 +1,5 @@
 import { AddUris, GetJobs } from '@/aria2';
-import { download, getConfiguration, setConfiguration } from '@/browser';
+import { client } from '@/lib/browser';
 import { IConfig } from '@/types';
 import { QueryClient, queryOptions, useMutation } from '@tanstack/react-query';
 
@@ -18,13 +18,13 @@ export const getTasksQueryOptions = queryOptions({
 
 export const getConfigurationQueryOptions = queryOptions({
   queryKey: [FetchKey.SETTING],
-  queryFn: getConfiguration,
+  queryFn: client.getConfiguration,
 });
 
 export function useUpdateConfigMutation() {
   return useMutation({
     mutationFn: async (config: IConfig) => {
-      return await setConfiguration(config);
+      return await client.setConfiguration(config);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [FetchKey.SETTING] });
@@ -56,7 +56,7 @@ export function useDownloadMutation() {
       filePath: string;
       headers: string[];
     }) => {
-      return await download(url, fileName, filePath, headers);
+      return await client.download(url, fileName, filePath, headers);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [FetchKey.TASKS] });

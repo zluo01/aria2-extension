@@ -1,11 +1,3 @@
-import { z } from 'zod';
-
-export const downloadSearchSchema = z.object({
-  url: z.url(),
-  fileName: z.string(),
-  fileSize: z.coerce.number(),
-});
-
 export interface IJob {
   gid: string;
   downloadSpeed: string;
@@ -32,7 +24,7 @@ export interface IDownload {
 
 export interface IFileDetail {
   url: string;
-  fileName: string;
+  filename: string;
   fileSize: number;
 }
 
@@ -54,3 +46,16 @@ export const DEFAULT_CONFIG: IConfig = {
   port: 6800,
   token: '',
 };
+
+export const SKIP_DOWNLOAD_SCHEMA = [
+  'blob:',
+  'data:',
+  'file:',
+  'filesystem:',
+  'content:',
+  'about:',
+  'chrome-extension:',
+  'moz-extension:',
+  'edge-extension:',
+  'intent:',
+];

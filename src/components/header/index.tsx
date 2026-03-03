@@ -1,7 +1,7 @@
 import { PauseJobs, RemoveJobs, StartJobs } from '@/aria2';
-import { openDetail, openSetting } from '@/browser';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { client } from '@/lib/browser';
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import {
@@ -113,7 +113,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
           variant="ghost"
           size="icon"
           className="rounded-full"
-          onClick={() => openSetting()}
+          onClick={() => client.openSetting()}
         >
           <SettingsIcon />
         </Button>
@@ -121,7 +121,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
           variant="ghost"
           size="icon"
           className="rounded-full"
-          onClick={() => openDetail(true)}
+          onClick={() => client.openDetail(true)}
         >
           <EllipsisVerticalIcon />
         </Button>

@@ -30,25 +30,12 @@ export function verifyFileName(name: string, os: PlatformOs): boolean {
   return true;
 }
 
-export function getFilename(fullPath: string, url: string): string {
-  if (fullPath.trim() === '') {
-    // fallback to name from url in chrome
-    try {
-      const u = new URL(url);
-      return u.pathname.split('/').pop() || 'UNKNOWN';
-    } catch {
-      return 'UNKNOWN';
-    }
-  }
-  return fullPath.split(/[/\\]/).pop() || 'UNKNOWN';
-}
-
 export function downloadToQueryString(detail: IFileDetail): string {
-  return [
-    `url=${encodeURIComponent(detail.url)}`,
-    `fileName=${encodeURIComponent(detail.fileName)}`,
-    `fileSize=${detail.fileSize}`,
-  ].join('&');
+  return new URLSearchParams(
+    Object.entries(detail)
+      .filter(([, v]) => v !== undefined)
+      .map(([k, v]) => [k, String(v)]),
+  ).toString();
 }
 
 export function parseBytes(value: number): string {

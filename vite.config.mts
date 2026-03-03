@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     'process.env.__DEV__': JSON.stringify(mode === 'dev'),
+    __TARGET__: JSON.stringify(process.env.TARGET ?? 'FIREFOX'),
   },
   plugins: [
     tanstackRouter({

@@ -1,5 +1,5 @@
-import { getConfiguration, notify } from '@/browser';
 import Aria2 from '@/lib/aria2c';
+import { client } from '@/lib/browser';
 import { DEFAULT_CONFIG, IConfig, IDownload, IJob } from '@/types';
 
 type Aria2ClientType = string;
@@ -11,7 +11,7 @@ let aria2: Aria2;
 let prevConfig: IConfig = DEFAULT_CONFIG;
 
 export async function ConstructAria2Instance(): Promise<Aria2ClientType> {
-  const config: IConfig = await getConfiguration();
+  const config: IConfig = await client.getConfiguration();
   if (!aria2 || JSON.stringify(prevConfig) !== JSON.stringify(config)) {
     const options = {
       path: '/jsonrpc',
@@ -94,10 +94,10 @@ export async function AddUris(...uris: string[]): Promise<void> {
   try {
     const multiCallItems = uris.map(o => ['addUri', [o]]);
     await multiCall(multiCallItems);
-    await notify(`Start downloading ${uris.length} files using Aria2`);
+    await client.notify(`Start downloading ${uris.length} files using Aria2`);
   } catch (e) {
     if (e instanceof Error) {
-      await notify(e.message);
+      await client.notify(e.message);
     }
   }
 }
@@ -109,10 +109,10 @@ export async function AddUri(
 ): Promise<void> {
   try {
     await singleCall(() => aria2.call('addUri', [link], options || {}));
-    await notify(`Start downloading ${fileName || ''} using Aria2`);
+    await client.notify(`Start downloading ${fileName || ''} using Aria2`);
   } catch (e) {
     if (e instanceof Error) {
-      await notify(e.message);
+      await client.notify(e.message);
     }
   }
 }

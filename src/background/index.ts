@@ -1,29 +1,7 @@
 import { AddUri, GetNumJobs } from '@/aria2';
-import {
-  createDownloadPanel,
-  notify,
-  openDetail,
-  removeBlankTab,
-  updateBadge,
-} from '@/browser';
-import { cacheRemove, cacheSet } from '@/lib/session-cache';
-import { getFilename } from '@/utils';
-import browser, { Downloads } from 'webextension-polyfill';
-
-import DownloadItem = Downloads.DownloadItem;
-
-const SKIP_DOWNLOAD_SCHEMA = [
-  'blob:',
-  'data:',
-  'file:',
-  'filesystem:',
-  'content:',
-  'about:',
-  'chrome-extension:',
-  'moz-extension:',
-  'edge-extension:',
-  'intent:',
-];
+import { client } from '@/lib/browser';
+import { cacheSet } from '@/lib/session-cache';
+import browser from 'webextension-polyfill';
 
 const CONTEXT_ID = 'download-with-aria';
 
@@ -41,9 +19,7 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
       const uri = escapeHTML(info.linkUrl as string);
       await AddUri(uri);
     } catch (e) {
-      if (e instanceof Error) {
-        await notify(`fail to download url, msg: ${e.message}`);
-      }
+      await client.notify(`fail to download url, msg: ${e}`);
     }
   }
 });
@@ -60,48 +36,12 @@ function escapeHTML(str: string) {
     .replace(/>/g, '&gt;');
 }
 
+client.registerDownloadInterceptor();
+
 browser.commands.onCommand.addListener((command: string) => {
   if (command === 'open_detail') {
-    openDetail(false);
+    client.openDetail(false);
   }
-});
-
-async function prepareDownload(d: DownloadItem) {
-  // findUrl only exists in chrome which currently not include in polyfill
-  const filename = getFilename(d.filename, (d as any).finalUrl || d.url);
-  await removeBlankTab();
-  await createDownloadPanel({
-    url: d.url,
-    fileName: filename,
-    fileSize: d.fileSize,
-  });
-}
-
-browser.downloads.onCreated.addListener(async (downloadItem: DownloadItem) => {
-  const id = downloadItem.id;
-
-  if (
-    SKIP_DOWNLOAD_SCHEMA.some(scheme =>
-      downloadItem.url.toLowerCase().startsWith(scheme),
-    )
-  ) {
-    return;
-  }
-
-  // do nothing when user choose to download with built-in downloader
-  if (await cacheRemove(downloadItem.url)) {
-    return;
-  }
-
-  // cleanup any built-in downloading
-  try {
-    await browser.downloads.cancel(id);
-  } catch {
-    await browser.downloads.removeFile(id);
-  } finally {
-    await browser.downloads.erase({ id });
-  }
-  await prepareDownload(downloadItem);
 });
 
 browser.runtime.onMessage.addListener((data: any) => {
@@ -112,7 +52,7 @@ browser.runtime.onMessage.addListener((data: any) => {
 
 function updateActiveJobNumber() {
   GetNumJobs()
-    .then(num => updateBadge(num))
+    .then(num => client.updateBadge(num))
     .catch(err => console.error(err));
 }
 

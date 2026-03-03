@@ -1,0 +1,92 @@
+import { cacheRemove } from '@/lib/session-cache';
+import { IFileDetail } from '@/types';
+import { downloadToQueryString } from '@/utils';
+
+import { IBaseBrowserClient } from './base';
+
+export class ChromeClient extends IBaseBrowserClient<chrome.downloads.DownloadItem> {
+  async createDownloadPanel(detail: IFileDetail): Promise<void> {
+    try {
+      const w = 560;
+      const h = 365;
+
+      const baseUrl = chrome.runtime.getURL('index.html');
+
+      const windowInfo = await chrome.windows.getLastFocused();
+      console.error(JSON.stringify(windowInfo));
+
+      const createOptions: chrome.windows.CreateData = {
+        url: `${baseUrl}#/download?${downloadToQueryString(detail)}`,
+        type: 'popup',
+        width: w,
+        height: h,
+        incognito: windowInfo.incognito,
+        focused: true,
+      };
+
+      await chrome.windows.create(createOptions);
+    } catch (e) {
+      console.error(`Fail to create download panel. ${e}`);
+    }
+  }
+
+  /*
+  {
+     "bytesReceived":0,
+     "canResume":false,
+     "danger":"safe",
+     "exists":true,
+     "fileSize":6655619072,
+     "filename":"ubuntu-24.04.4-desktop-amd64.iso",
+     "finalUrl":"https://releases.ubuntu.com/24.04.4/ubuntu-24.04.4-desktop-amd64.iso",
+     "id":1,
+     "incognito":false,
+     "mime":"application/x-iso9660-image",
+     "paused":false,
+     "referrer":"https://ubuntu.com/",
+     "startTime":"2026-03-03T10:16:11.148Z",
+     "state":"in_progress",
+     "totalBytes":6655619072,
+     "url":"https://releases.ubuntu.com/24.04.4/ubuntu-24.04.4-desktop-amd64.iso"
+  }
+   */
+  protected async getDownloadDetail(
+    item: chrome.downloads.DownloadItem,
+  ): Promise<IFileDetail> {
+    return {
+      filename: item.filename,
+      fileSize: item.fileSize,
+      url: item.finalUrl ?? item.url,
+    };
+  }
+
+  protected async initializeBrowserDownload(
+    filename: string,
+    saveAs: boolean,
+    url: string,
+    _incognito: boolean,
+  ): Promise<void> {
+    const downloadOptions: chrome.downloads.DownloadOptions =
+      filename !== '' ? { filename, saveAs, url } : { saveAs, url };
+    await chrome.downloads.download(downloadOptions);
+  }
+
+  registerDownloadInterceptor(): void {
+    chrome.downloads.onDeterminingFilename.addListener(async downloadItem => {
+      const id = downloadItem.id;
+
+      const fileDetail = await this.getDownloadDetail(downloadItem);
+      if (this.shouldIgnoreDownloadURL(fileDetail.url)) {
+        return;
+      }
+
+      // do nothing when user choose to download with built-in downloader
+      if (await cacheRemove(fileDetail.url)) {
+        return;
+      }
+
+      await this.cancelDownload(id);
+      await this.prepareDownload(fileDetail);
+    });
+  }
+}

@@ -1,6 +1,6 @@
-import { notify } from '@/browser';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { client } from '@/lib/browser';
 import { augmentDownloadLink } from '@/lib/magnet';
 import { useSubmitTasksMutation } from '@/lib/queries';
 import { useState } from 'react';
@@ -19,7 +19,7 @@ function CreationArea({ close }: ICreationArea) {
       mutation.mutate(text.split('\n').map(o => augmentDownloadLink(o)));
     } catch (e) {
       if (e instanceof Error) {
-        await notify(`fail to download files, msg: ${e.message}.`);
+        await client.notify(`fail to download files, msg: ${e.message}.`);
       }
     }
     setText('');

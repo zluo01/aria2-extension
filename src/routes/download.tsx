@@ -1,4 +1,3 @@
-import { getPlatformInfo, saveFile } from '@/browser';
 import { Button } from '@/components/ui/button';
 import {
   Field,
@@ -8,11 +7,18 @@ import {
   FieldSet,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { client } from '@/lib/browser';
 import { useDownloadMutation } from '@/lib/queries';
-import { downloadSearchSchema } from '@/types';
 import { parseBytes, verifyFileName } from '@/utils';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
+
+const downloadSearchSchema = z.object({
+  url: z.url(),
+  filename: z.string(),
+  fileSize: z.coerce.number(),
+});
 
 export const Route = createFileRoute('/download')({
   validateSearch: downloadSearchSchema,
@@ -34,7 +40,7 @@ function DownloadPanel() {
 
   const form = useForm({
     defaultValues: {
-      fileName: data.fileName,
+      fileName: data.filename,
       filePath: '',
     },
     onSubmitMeta: defaultMeta,
@@ -44,10 +50,10 @@ function DownloadPanel() {
           await downloadFile(data.url, value.fileName, value.filePath);
           break;
         case 'save':
-          await saveFile(data.url, value.fileName, false);
+          await client.saveFile(data.url, value.fileName, false);
           break;
         case 'saveAs':
-          await saveFile(data.url, value.fileName, true);
+          await client.saveFile(data.url, value.fileName, true);
           break;
       }
     },
@@ -72,7 +78,7 @@ function DownloadPanel() {
                 name="fileName"
                 validators={{
                   onChangeAsync: async ({ value }) => {
-                    const platformOs = await getPlatformInfo();
+                    const platformOs = await client.getPlatformInfo();
                     return verifyFileName(value, platformOs.os)
                       ? undefined
                       : { message: 'Invalid file name.' };
