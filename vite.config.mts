@@ -21,7 +21,6 @@ export default defineConfig(({ mode }) => ({
     },
   },
   define: {
-    'process.env.__DEV__': JSON.stringify(mode === 'dev'),
     __TARGET__: JSON.stringify(process.env.TARGET ?? 'FIREFOX'),
   },
   plugins: [
@@ -44,8 +43,8 @@ export default defineConfig(({ mode }) => ({
   publicDir,
   build: {
     outDir,
-    sourcemap: process.env.__DEV__ === 'true',
-    minify: process.env.__DEV__ === 'false',
+    sourcemap: mode === 'dev',
+    minify: mode !== 'dev',
     emptyOutDir: false,
     rollupOptions: {
       input: {
