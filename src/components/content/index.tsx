@@ -22,12 +22,9 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList) {
   }
 
   function getProgress(job: IJob): number {
-    const progress =
-      parseFloat(job.completedLength) / parseFloat(job.totalLength);
-    if (isNaN(progress)) {
-      return 0;
-    }
-    return progress * 100;
+    const total = parseFloat(job.totalLength);
+    if (!(total > 0)) return 0;
+    return (parseFloat(job.completedLength) / total) * 100;
   }
 
   async function jobAction(job: IJob) {
