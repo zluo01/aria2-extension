@@ -1,56 +1,14 @@
 import {
   Aria2Options,
-  JSONRPCNotification,
   JSONRPCRequest,
   JSONRPCResponse,
   RPCCallback,
 } from '@/lib/aria2c/types';
 
-type EventListener = (...args: any[]) => void;
-
-class EventEmitter {
-  private events: Map<string, Set<EventListener>> = new Map();
-
-  on(event: string, listener: EventListener): this {
-    if (!this.events.has(event)) {
-      this.events.set(event, new Set());
-    }
-    this.events.get(event)!.add(listener);
-    return this;
-  }
-
-  off(event: string, listener: EventListener): this {
-    const listeners = this.events.get(event);
-    if (listeners) {
-      listeners.delete(listener);
-    }
-    return this;
-  }
-
-  emit(event: string, ...args: any[]): boolean {
-    const listeners = this.events.get(event);
-    if (!listeners || listeners.size === 0) {
-      return false;
-    }
-    listeners.forEach(listener => {
-      listener(...args);
-    });
-    return true;
-  }
-
-  once(event: string, listener: EventListener): this {
-    const onceWrapper = (...args: any[]) => {
-      listener(...args);
-      this.off(event, onceWrapper);
-    };
-    return this.on(event, onceWrapper);
-  }
-}
-
 /**
  * Aria2 client for browser and Node.js
  */
-export class Aria2 extends EventEmitter {
+export class Aria2 {
   private readonly host: string;
   private readonly port: number;
   private readonly secure: boolean;
@@ -61,7 +19,6 @@ export class Aria2 extends EventEmitter {
   private callbacks: Map<number, RPCCallback> = new Map();
 
   constructor(options: Aria2Options = {}) {
-    super();
     this.host = options.host || 'localhost';
     this.port = options.port || 6800;
     this.secure = options.secure || false;
@@ -92,7 +49,6 @@ export class Aria2 extends EventEmitter {
 
       this.ws.onopen = () => {
         clearTimeout(timeout);
-        this.emit('open');
         resolve();
       };
 
@@ -103,12 +59,10 @@ export class Aria2 extends EventEmitter {
 
       this.ws.onclose = () => {
         this.ws = null;
-        this.emit('close');
         this.rejectPendingCallbacks(new Error('WebSocket closed unexpectedly'));
       };
 
       this.ws.onmessage = event => {
-        this.emit('input', event.data);
         this.handleMessage(event.data);
       };
     });
@@ -133,9 +87,7 @@ export class Aria2 extends EventEmitter {
    */
   private handleMessage(data: string): void {
     try {
-      const message: JSONRPCResponse | JSONRPCNotification = JSON.parse(data);
-
-      // Handle response
+      const message: JSONRPCResponse = JSON.parse(data);
       if ('id' in message) {
         const callback = this.callbacks.get(message.id as number);
         if (callback) {
@@ -145,15 +97,6 @@ export class Aria2 extends EventEmitter {
           } else {
             callback.resolve(message.result);
           }
-        }
-      }
-      // Handle notification
-      else if ('method' in message) {
-        const method = message.method;
-        this.emit(method, message.params);
-        // Also emit without "aria2." prefix
-        if (method.startsWith('aria2.')) {
-          this.emit(method.slice(6), message.params);
         }
       }
     } catch (error) {
@@ -205,9 +148,7 @@ export class Aria2 extends EventEmitter {
       };
 
       this.callbacks.set(id, { resolve, reject });
-      const message = JSON.stringify(request);
-      this.emit('output', message);
-      this.ws!.send(message);
+      this.ws!.send(JSON.stringify(request));
     });
   }
 
@@ -226,15 +167,12 @@ export class Aria2 extends EventEmitter {
     const protocol = this.secure ? 'https' : 'http';
     const url = `${protocol}://${this.host}:${this.port}${this.path}`;
 
-    const message = JSON.stringify(request);
-    this.emit('output', message);
-
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: message,
+      body: JSON.stringify(request),
     });
 
     if (!response.ok) {
@@ -242,7 +180,6 @@ export class Aria2 extends EventEmitter {
     }
 
     const data: JSONRPCResponse = await response.json();
-    this.emit('input', JSON.stringify(data));
 
     if (data.error) {
       throw new Error(data.error.message);

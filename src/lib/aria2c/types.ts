@@ -33,15 +33,6 @@ export interface JSONRPCResponse {
 }
 
 /**
- * JSON-RPC notification structure
- */
-export interface JSONRPCNotification {
-  jsonrpc: '2.0';
-  method: string;
-  params: any[];
-}
-
-/**
  * Callback for pending RPC requests
  */
 export interface RPCCallback {

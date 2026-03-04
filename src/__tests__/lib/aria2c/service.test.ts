@@ -1,5 +1,5 @@
 /**
- * Tests for the low-level Aria2 JSON-RPC service (EventEmitter + Aria2 class).
+ * Tests for the low-level Aria2 JSON-RPC service.
  *
  * Protocol reference: https://aria2.github.io/manual/en/html/aria2c.html#rpc-interface
  *
@@ -100,67 +100,6 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-// ─── EventEmitter ─────────────────────────────────────────────────────────
-
-describe('EventEmitter', () => {
-  test('on/emit: listener receives all arguments', () => {
-    const aria2 = new Aria2();
-    const spy = jest.fn();
-    aria2.on('test', spy);
-    aria2.emit('test', 42, 'hello', { gid: 'aabbccddeeff0011' });
-    expect(spy).toHaveBeenCalledWith(42, 'hello', { gid: 'aabbccddeeff0011' });
-  });
-
-  test('emit returns false when no listeners are registered', () => {
-    const aria2 = new Aria2();
-    expect(aria2.emit('no-listeners')).toBe(false);
-  });
-
-  test('emit returns true when at least one listener is registered', () => {
-    const aria2 = new Aria2();
-    aria2.on('has-listener', jest.fn());
-    expect(aria2.emit('has-listener')).toBe(true);
-  });
-
-  test('off: removes the specific listener so it no longer fires', () => {
-    const aria2 = new Aria2();
-    const spy = jest.fn();
-    aria2.on('evt', spy);
-    aria2.off('evt', spy);
-    aria2.emit('evt');
-    expect(spy).not.toHaveBeenCalled();
-  });
-
-  test('off: removing an unregistered listener is a no-op', () => {
-    const aria2 = new Aria2();
-    expect(() => aria2.off('unknown', jest.fn())).not.toThrow();
-  });
-
-  test('off: removing one listener does not affect others on the same event', () => {
-    const aria2 = new Aria2();
-    const spyA = jest.fn();
-    const spyB = jest.fn();
-    aria2.on('evt', spyA);
-    aria2.on('evt', spyB);
-    aria2.off('evt', spyA);
-    aria2.emit('evt');
-    expect(spyA).not.toHaveBeenCalled();
-    expect(spyB).toHaveBeenCalled();
-  });
-
-  test('once: listener fires exactly once, then is automatically removed', () => {
-    const aria2 = new Aria2();
-    const spy = jest.fn();
-    aria2.once('evt', spy);
-    aria2.emit('evt', 'first');
-    aria2.emit('evt', 'second');
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('first');
-  });
-});
-
-// ─── Aria2 constructor ────────────────────────────────────────────────────
-
 // ─── Aria2.open — timeout ─────────────────────────────────────────────────
 
 describe('Aria2.open timeout', () => {
@@ -252,27 +191,6 @@ describe('Aria2.open', () => {
     const before = MockWebSocket.mock.calls.length;
     await aria2.open();
     expect(MockWebSocket.mock.calls.length).toBe(before);
-  });
-
-  test('emits "open" event on connection', async () => {
-    const aria2 = new Aria2();
-    const spy = jest.fn();
-    aria2.on('open', spy);
-    const p = aria2.open();
-    mockWsInstance.triggerOpen();
-    await p;
-    expect(spy).toHaveBeenCalled();
-  });
-
-  test('emits "close" when connection drops', async () => {
-    const aria2 = new Aria2();
-    const closeSpy = jest.fn();
-    aria2.on('close', closeSpy);
-    const p = aria2.open();
-    mockWsInstance.triggerOpen();
-    await p;
-    mockWsInstance.triggerClose();
-    expect(closeSpy).toHaveBeenCalled();
   });
 });
 
@@ -455,18 +373,6 @@ describe('Aria2.call via HTTP', () => {
       'Method not found',
     );
   });
-
-  test('emits "output" with the serialised request and "input" with the response', async () => {
-    mockFetch.mockImplementationOnce(() => makeHttpOk('v1.36.0'));
-    const aria2 = new Aria2();
-    const outputSpy = jest.fn();
-    const inputSpy = jest.fn();
-    aria2.on('output', outputSpy);
-    aria2.on('input', inputSpy);
-    await aria2.call('getVersion');
-    expect(outputSpy).toHaveBeenCalledTimes(1);
-    expect(inputSpy).toHaveBeenCalledTimes(1);
-  });
 });
 
 // ─── WebSocket message handling ───────────────────────────────────────────
@@ -521,41 +427,6 @@ describe('Aria2 WebSocket message handling', () => {
       result: 'aabbccddeeff0011', // 16-char hex GID
     });
     await expect(callPromise).resolves.toBe('aabbccddeeff0011');
-  });
-
-  test.each([
-    'aria2.onDownloadStart',
-    'aria2.onDownloadPause',
-    'aria2.onDownloadStop',
-    'aria2.onDownloadComplete',
-    'aria2.onDownloadError',
-    'aria2.onBtDownloadComplete',
-  ])(
-    'emits short event name for notification "%s"',
-    async (fullMethod: string) => {
-      const aria2 = await openAria2();
-      const shortName = fullMethod.slice('aria2.'.length);
-      const spy = jest.fn();
-      aria2.on(shortName, spy);
-      mockWsInstance.receive({
-        jsonrpc: '2.0',
-        method: fullMethod,
-        params: [{ gid: 'aabbccddeeff0011' }],
-      });
-      expect(spy).toHaveBeenCalledWith([{ gid: 'aabbccddeeff0011' }]);
-    },
-  );
-
-  test('also emits the full method name for notifications', async () => {
-    const aria2 = await openAria2();
-    const spy = jest.fn();
-    aria2.on('aria2.onDownloadComplete', spy);
-    mockWsInstance.receive({
-      jsonrpc: '2.0',
-      method: 'aria2.onDownloadComplete',
-      params: [{ gid: 'aabbccddeeff0011' }],
-    });
-    expect(spy).toHaveBeenCalled();
   });
 
   test('stale response with unknown id does not throw', async () => {
