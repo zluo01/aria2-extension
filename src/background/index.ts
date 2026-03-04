@@ -16,26 +16,15 @@ browser.runtime.onInstalled.addListener(() => {
 
 browser.contextMenus.onClicked.addListener(async (info, _tab) => {
   if (info.menuItemId === CONTEXT_ID) {
+    const url = info.srcUrl ?? info.linkUrl;
+    if (!url) return;
     try {
-      const uri = escapeHTML(info.linkUrl as string);
-      await (await getAria2Client()).addUri(uri);
+      await (await getAria2Client()).addUri(url);
     } catch (e) {
       await client.notify(`fail to download url, msg: ${e}`);
     }
   }
 });
-
-// https://gist.github.com/Rob--W/ec23b9d6db9e56b7e4563f1544e0d546
-function escapeHTML(str: string) {
-  // Note: string cast using String; may throw if `str` is non-serializable, e.g. a Symbol.
-  // Most often this is not the case though.
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
 
 client.registerDownloadInterceptor();
 
