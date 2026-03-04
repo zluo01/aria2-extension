@@ -118,20 +118,12 @@ export class Aria2 extends EventEmitter {
    * Close WebSocket connection
    */
   async close(): Promise<void> {
+    if (!this.ws) {
+      return;
+    }
     return new Promise(resolve => {
-      if (!this.ws) {
-        resolve();
-        return;
-      }
-
-      this.ws.onclose = () => {
-        this.ws = null;
-        this.emit('close');
-        this.rejectPendingCallbacks(new Error('WebSocket closed'));
-        resolve();
-      };
-
-      this.ws.close();
+      this.once('close', resolve);
+      this.ws!.close();
     });
   }
 
