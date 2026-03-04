@@ -32,7 +32,7 @@ function Display() {
   };
 
   return (
-    <div className="w-[420px] h-auto max-h-[768px] overflow-auto">
+    <div className="w-105 h-auto max-h-192 overflow-auto">
       <Header
         jobs={jobs || []}
         checked={checked}
