@@ -193,12 +193,11 @@ describe('FirefoxClient.getContentLength', () => {
     });
   });
 
-  test('handles non-numeric content-length by returning NaN cast from parseInt', async () => {
-    // parseInt('abc', 10) → NaN; we verify the function does not throw
+  test('returns -1 for non-numeric content-length header', async () => {
     mockFetch.mockImplementationOnce(() => makeHeadResponse('not-a-number'));
     const client = new FirefoxClient();
     const len = await (client as any).getContentLength('https://example.com/f');
-    expect(len).toBeNaN();
+    expect(len).toBe(-1);
   });
 
   test('returns -1 for content-length of zero', async () => {

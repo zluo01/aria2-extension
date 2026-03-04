@@ -95,7 +95,9 @@ export class FirefoxClient extends IBaseBrowserClient<Downloads.DownloadItem> {
 
       const length = response.headers.get('content-length');
 
-      return length ? parseInt(length, 10) : -1;
+      if (!length) return -1;
+      const parsed = parseInt(length, 10);
+      return Number.isNaN(parsed) ? -1 : parsed;
     } catch {
       return -1;
     }
