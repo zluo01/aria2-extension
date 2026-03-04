@@ -1,27 +1,22 @@
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-
-type Theme = 'dark' | 'light' | 'system';
+import { getThemeQueryOptions } from '@/lib/queries';
+import { Theme } from '@/types';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { createContext, ReactNode, useContext, useEffect } from 'react';
+import browser from 'webextension-polyfill';
 
 type ThemeProviderProps = {
   children: ReactNode;
   defaultTheme?: Theme;
-  storageKey?: string;
 };
 
 type ThemeProviderState = {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: Theme) => Promise<void>;
 };
 
 const initialState: ThemeProviderState = {
   theme: 'system',
-  setTheme: () => null,
+  setTheme: () => Promise.resolve(),
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
@@ -29,12 +24,10 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
-  storageKey = 'aria2-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
-  );
+  const queryClient = useQueryClient();
+  const { data: theme = defaultTheme } = useQuery(getThemeQueryOptions);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -54,12 +47,16 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
+  async function saveTheme(theme: Theme): Promise<void> {
+    queryClient.setQueryData(getThemeQueryOptions.queryKey, theme);
+    await browser.storage.local.set({
+      [getThemeQueryOptions.queryKey[0]]: theme,
+    });
+  }
+
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-    },
+    setTheme: saveTheme,
   };
 
   return (

@@ -70,6 +70,8 @@ export interface IFileDetail {
 export const ACTIVE_JOB = 'active';
 export const PAUSED_JOB = 'paused';
 
+export type Theme = 'dark' | 'light' | 'system';
+
 export interface IConfig {
   path: string;
   protocol: string;
