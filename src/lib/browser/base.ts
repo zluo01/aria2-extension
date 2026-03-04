@@ -1,9 +1,11 @@
-import { getAria2Client } from '@/lib/aria2c';
+import { addUri } from '@/lib/queries';
 import {
   DEFAULT_CONFIG,
   IConfig,
   IDownload,
   IFileDetail,
+  Message,
+  MessageType,
   SKIP_DOWNLOAD_SCHEMA,
 } from '@/types';
 import browser, { Action, Windows } from 'webextension-polyfill';
@@ -95,7 +97,7 @@ export abstract class IBaseBrowserClient<T> implements BrowserClient {
       if (header) {
         options.header = header as string[];
       }
-      await (await getAria2Client()).addUri(url, filename, options);
+      await addUri(url, filename, options);
       const windowInfo = await this.getCurrentWindow();
       if (windowInfo.id) {
         await browser.windows.remove(windowInfo.id);
@@ -134,12 +136,16 @@ export abstract class IBaseBrowserClient<T> implements BrowserClient {
     await browser.action.setBadgeBackgroundColor({ color });
   }
 
+  sendMessage<T = void>(message: Message): Promise<T> {
+    return browser.runtime.sendMessage(message);
+  }
+
   protected getCurrentWindow(): Promise<Windows.Window> {
     return browser.windows.getCurrent();
   }
 
   protected signalDefaultDownload(url: string): Promise<void> {
-    return browser.runtime.sendMessage({ type: 'signal', message: url });
+    return this.sendMessage({ type: MessageType.Signal, message: url });
   }
 
   protected shouldIgnoreDownloadURL(url: string) {

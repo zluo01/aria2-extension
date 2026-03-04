@@ -1,4 +1,4 @@
-import { IConfig } from '@/types';
+import { IConfig, Message } from '@/types';
 import { Runtime } from 'webextension-polyfill';
 
 export interface BrowserClient {
@@ -17,4 +17,5 @@ export interface BrowserClient {
   saveFile(url: string, filename: string, saveAs: boolean): Promise<void>;
   updateBadge(num: number): Promise<void>;
   registerDownloadInterceptor(): void;
+  sendMessage<T = void>(message: Message): Promise<T>;
 }

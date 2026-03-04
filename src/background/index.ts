@@ -1,12 +1,8 @@
 import { getAria2Client } from '@/lib/aria2c';
 import { client } from '@/lib/browser';
 import { cacheSet } from '@/lib/session-cache';
+import { MessageSchema, MessageType } from '@/types';
 import browser from 'webextension-polyfill';
-import { z } from 'zod';
-
-const MessageSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('signal'), message: z.string() }),
-]);
 
 const CONTEXT_ID = 'download-with-aria';
 
@@ -49,13 +45,34 @@ browser.commands.onCommand.addListener((command: string) => {
   }
 });
 
-browser.runtime.onMessage.addListener((data: unknown) => {
+browser.runtime.onMessage.addListener(async (data: unknown) => {
   const result = MessageSchema.safeParse(data);
-  if (!result.success) return;
-
+  if (!result.success) {
+    console.error('Invalid message', result.error);
+    return;
+  }
+  const c = await getAria2Client();
   switch (result.data.type) {
-    case 'signal':
+    case MessageType.Signal:
       return cacheSet(result.data.message);
+    case MessageType.GetJobs:
+      return c.getJobs();
+    case MessageType.GetNumJobs:
+      return c.getNumJobs();
+    case MessageType.AddUri:
+      return c.addUri(
+        result.data.link,
+        result.data.filename,
+        result.data.options,
+      );
+    case MessageType.AddUris:
+      return c.addUris(...result.data.uris);
+    case MessageType.StartJobs:
+      return c.startJobs(...result.data.gids);
+    case MessageType.PauseJobs:
+      return c.pauseJobs(...result.data.gids);
+    case MessageType.RemoveJobs:
+      return c.removeJobs(...result.data.gids);
   }
 });
 

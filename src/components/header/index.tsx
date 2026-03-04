@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { getAria2Client } from '@/lib/aria2c';
 import { client } from '@/lib/browser';
+import { pauseJobs, removeJobs, startJobs } from '@/lib/queries';
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import {
@@ -37,7 +37,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
     const context = jobs
       .filter(o => gid.includes(o.gid) && o.status === PAUSED_JOB)
       .map(o => o.gid);
-    await (await getAria2Client()).startJobs(...context);
+    await startJobs(...context);
     reset();
   }
 
@@ -46,13 +46,13 @@ function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
     const context = jobs
       .filter(o => gid.includes(o.gid) && o.status === ACTIVE_JOB)
       .map(o => o.gid);
-    await (await getAria2Client()).pauseJobs(...context);
+    await pauseJobs(...context);
     reset();
   }
 
   async function remove(): Promise<void> {
     const gid = checked.filter(o => o);
-    await (await getAria2Client()).removeJobs(...gid);
+    await removeJobs(...gid);
     reset();
   }
 

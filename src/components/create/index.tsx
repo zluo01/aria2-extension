@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { getAria2Client } from '@/lib/aria2c';
 import { augmentDownloadLink } from '@/lib/magnet';
+import { addUris } from '@/lib/queries';
 import { useState } from 'react';
 
 interface ICreationArea {
@@ -16,7 +16,7 @@ function CreationArea({ close }: ICreationArea) {
       .split('\n')
       .map(augmentDownloadLink)
       .filter(o => o.length > 0);
-    await (await getAria2Client()).addUris(...uris);
+    await addUris(...uris);
     setText('');
     close();
   }
