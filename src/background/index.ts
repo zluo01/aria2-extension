@@ -66,11 +66,16 @@ browser.runtime.onMessage.addListener(async (data: unknown) => {
   }
 });
 
-function updateActiveJobNumber() {
-  getAria2Client()
-    .then(c => c.getNumJobs())
-    .then(num => client.updateBadge(num))
-    .catch(err => console.error(err));
+async function updateActiveJobNumber(): Promise<void> {
+  try {
+    const c = await getAria2Client();
+    const num = await c.getNumJobs();
+    await client.updateBadge(num);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setTimeout(updateActiveJobNumber, 1000);
+  }
 }
 
-setInterval(updateActiveJobNumber, 1000);
+updateActiveJobNumber();
