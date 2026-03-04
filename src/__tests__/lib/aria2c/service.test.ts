@@ -523,6 +523,22 @@ describe('Aria2 WebSocket message handling', () => {
     ).not.toThrow();
   });
 
+  test('pending call rejects when connection drops before response arrives', async () => {
+    const aria2 = await openAria2();
+    const callPromise = aria2.call('getVersion');
+    mockWsInstance.triggerClose(); // drop connection with no response
+    await expect(callPromise).rejects.toThrow('WebSocket closed');
+  });
+
+  test('all pending calls are rejected and the map is cleared on unexpected close', async () => {
+    const aria2 = await openAria2();
+    const p1 = aria2.call('getVersion');
+    const p2 = aria2.call('tellActive');
+    mockWsInstance.triggerClose();
+    await expect(p1).rejects.toThrow();
+    await expect(p2).rejects.toThrow();
+  });
+
   test('invalid JSON is handled gracefully without throwing', async () => {
     const consoleSpy = jest
       .spyOn(console, 'error')

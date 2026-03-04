@@ -96,6 +96,7 @@ export class Aria2 extends EventEmitter {
       this.ws.onclose = () => {
         this.ws = null;
         this.emit('close');
+        this.rejectPendingCallbacks(new Error('WebSocket closed unexpectedly'));
       };
 
       this.ws.onmessage = event => {
@@ -118,11 +119,19 @@ export class Aria2 extends EventEmitter {
       this.ws.onclose = () => {
         this.ws = null;
         this.emit('close');
+        this.rejectPendingCallbacks(new Error('WebSocket closed'));
         resolve();
       };
 
       this.ws.close();
     });
+  }
+
+  private rejectPendingCallbacks(reason: Error): void {
+    for (const cb of this.callbacks.values()) {
+      cb.reject(reason);
+    }
+    this.callbacks.clear();
   }
 
   /**
