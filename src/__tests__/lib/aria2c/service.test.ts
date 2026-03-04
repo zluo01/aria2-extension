@@ -202,6 +202,20 @@ describe('Aria2.open', () => {
     await expect(p).rejects.toBe(err);
   });
 
+  test('creates a new WebSocket when existing socket is CLOSING (readyState=2)', async () => {
+    const aria2 = new Aria2();
+    const p1 = aria2.open();
+    mockWsInstance.triggerOpen();
+    await p1;
+    // Simulate the socket entering CLOSING state without our close() call
+    mockWsInstance.readyState = 2; // WebSocket.CLOSING
+    const before = MockWebSocket.mock.calls.length;
+    const p2 = aria2.open();
+    mockWsInstance.triggerOpen();
+    await p2;
+    expect(MockWebSocket.mock.calls.length).toBeGreaterThan(before);
+  });
+
   test('does not create a second WebSocket when already connected', async () => {
     const aria2 = new Aria2();
     const p1 = aria2.open();

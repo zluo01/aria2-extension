@@ -74,7 +74,7 @@ export class Aria2 extends EventEmitter {
    */
   async open(): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (this.ws) {
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         resolve();
         return;
       }
