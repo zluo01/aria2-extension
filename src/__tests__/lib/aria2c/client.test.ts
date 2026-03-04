@@ -103,6 +103,63 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
+// ─── shouldReset ──────────────────────────────────────────────────────────
+
+describe('Aria2Client.shouldReset', () => {
+  const base = {
+    host: '127.0.0.1',
+    port: 6800,
+    protocol: 'ws',
+    token: '',
+    path: '',
+  };
+
+  test('returns false when config is identical', () => {
+    expect(makeWsClient().shouldReset(base)).toBe(false);
+  });
+
+  test('returns true when host changes', () => {
+    expect(makeWsClient().shouldReset({ ...base, host: '192.168.1.1' })).toBe(
+      true,
+    );
+  });
+
+  test('returns true when port changes', () => {
+    expect(makeWsClient().shouldReset({ ...base, port: 6801 })).toBe(true);
+  });
+
+  test('returns true when token changes', () => {
+    expect(makeWsClient().shouldReset({ ...base, token: 'secret' })).toBe(true);
+  });
+
+  test('returns true when switching ws → http (different transport)', () => {
+    expect(makeWsClient().shouldReset({ ...base, protocol: 'http' })).toBe(
+      true,
+    );
+  });
+
+  test('returns true when switching ws → wss (secure flag changes)', () => {
+    expect(makeWsClient().shouldReset({ ...base, protocol: 'wss' })).toBe(true);
+  });
+
+  test('returns true when switching http → https (secure flag changes)', () => {
+    expect(makeHttpClient().shouldReset({ ...base, protocol: 'https' })).toBe(
+      true,
+    );
+  });
+
+  test('returns false when only download path changes (not a connection param)', () => {
+    expect(
+      makeWsClient().shouldReset({ ...base, path: '/new/download/dir' }),
+    ).toBe(false);
+  });
+
+  test('wss and https both map to secure=true but different transports', () => {
+    const wssClient = new Aria2Client({ ...base, protocol: 'wss' });
+    expect(wssClient.shouldReset({ ...base, protocol: 'https' })).toBe(true);
+  });
+});
+
 // ─── getJobs ─────────────────────────────────────────────────────────────
 
 describe('Aria2Client.getJobs', () => {

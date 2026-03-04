@@ -8,19 +8,32 @@ type Aria2ClientType = 'ws' | 'http';
 
 export class Aria2Client {
   private readonly protocol: Aria2ClientType;
+  private readonly options: Aria2Options;
   private aria2: Aria2;
 
   constructor(config: IConfig) {
-    const options: Aria2Options = {
+    this.options = {
       path: '/jsonrpc',
       host: config.host,
       port: config.port,
       secure: config.protocol === 'https' || config.protocol === 'wss',
       secret: config.token,
     };
-    this.aria2 = new Aria2(options);
+    this.aria2 = new Aria2(this.options);
     this.protocol =
       config.protocol === 'ws' || config.protocol === 'wss' ? 'ws' : 'http';
+  }
+
+  shouldReset(config: IConfig): boolean {
+    const isSecure = config.protocol === 'https' || config.protocol === 'wss';
+    const isWs = config.protocol === 'ws' || config.protocol === 'wss';
+    return (
+      this.options.host !== config.host ||
+      this.options.port !== config.port ||
+      this.options.secure !== isSecure ||
+      this.options.secret !== config.token ||
+      (this.protocol === 'ws') !== isWs
+    );
   }
 
   async getJobs(): Promise<IJob[]> {
