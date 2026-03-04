@@ -23,45 +23,42 @@ interface IHeader {
 }
 
 function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
-  const disabled = checked.length <= 1;
+  const disabled = checked.length === 0;
 
   const [isChecked, setIsChecked] = useState<CheckedState>(false);
 
   function reset() {
-    setCheck(['']);
+    setCheck([]);
     setIsChecked(false);
   }
 
   async function start(): Promise<void> {
-    const gid = checked.filter(o => o);
     const context = jobs
-      .filter(o => gid.includes(o.gid) && o.status === PAUSED_JOB)
+      .filter(o => checked.includes(o.gid) && o.status === PAUSED_JOB)
       .map(o => o.gid);
     await startJobs(...context);
     reset();
   }
 
   async function pause(): Promise<void> {
-    const gid = checked.filter(o => o);
     const context = jobs
-      .filter(o => gid.includes(o.gid) && o.status === ACTIVE_JOB)
+      .filter(o => checked.includes(o.gid) && o.status === ACTIVE_JOB)
       .map(o => o.gid);
     await pauseJobs(...context);
     reset();
   }
 
   async function remove(): Promise<void> {
-    const gid = checked.filter(o => o);
-    await removeJobs(...gid);
+    await removeJobs(...checked);
     reset();
   }
 
   function handleChange(check: CheckedState) {
     setIsChecked(check);
     if (!check) {
-      setCheck(['']);
+      setCheck([]);
     } else {
-      setCheck([''].concat(jobs.map(o => o.gid)));
+      setCheck(jobs.map(o => o.gid));
     }
   }
 

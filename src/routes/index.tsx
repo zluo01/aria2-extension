@@ -15,7 +15,7 @@ export const Route = createFileRoute('/')({
 function Display() {
   const { data: jobs } = useSuspenseQuery(getTasksQueryOptions);
 
-  const [checked, setChecked] = useState(['']);
+  const [checked, setChecked] = useState<string[]>([]);
   const [show, setShow] = useState(false);
 
   const handleToggle = (value: string) => () => {
