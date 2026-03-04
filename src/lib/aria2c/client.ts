@@ -127,7 +127,7 @@ export class Aria2Client {
         await this.aria2.open();
         return await func();
       } finally {
-        await this.aria2.close();
+        this.aria2.close();
       }
     }
     return await func();
@@ -141,7 +141,7 @@ export class Aria2Client {
         await this.aria2.open();
         return await this.aria2.multiCall(callItems);
       } finally {
-        await this.aria2.close();
+        this.aria2.close();
       }
     }
     return await this.aria2.multiCall(callItems);

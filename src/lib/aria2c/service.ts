@@ -117,14 +117,8 @@ export class Aria2 extends EventEmitter {
   /**
    * Close WebSocket connection
    */
-  async close(): Promise<void> {
-    if (!this.ws) {
-      return;
-    }
-    return new Promise(resolve => {
-      this.once('close', resolve);
-      this.ws!.close();
-    });
+  close(): void {
+    this.ws?.close();
   }
 
   private rejectPendingCallbacks(reason: Error): void {

@@ -279,17 +279,17 @@ describe('Aria2.open', () => {
 // ─── Aria2.close ─────────────────────────────────────────────────────────
 
 describe('Aria2.close', () => {
-  test('resolves immediately when no WebSocket is open', async () => {
+  test('is a no-op when no WebSocket is open', () => {
     const aria2 = new Aria2();
-    await expect(aria2.close()).resolves.toBeUndefined();
+    expect(() => aria2.close()).not.toThrow();
   });
 
-  test('calls WebSocket.close() and resolves after the close event', async () => {
+  test('calls WebSocket.close()', async () => {
     const aria2 = new Aria2();
     const p = aria2.open();
     mockWsInstance.triggerOpen();
     await p;
-    await aria2.close();
+    aria2.close();
     expect(mockWsInstance.close).toHaveBeenCalled();
   });
 });

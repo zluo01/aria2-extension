@@ -35,7 +35,7 @@ jest.mock('@/lib/browser', () => ({
 jest.mock('webextension-polyfill', () => ({}));
 
 const mockOpen = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
-const mockClose = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
+const mockClose = jest.fn<() => void>();
 const mockCall = jest.fn<(...args: any[]) => Promise<any>>();
 const mockMultiCall = jest.fn<(...args: any[]) => Promise<any>>();
 
