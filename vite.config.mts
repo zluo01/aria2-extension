@@ -15,11 +15,6 @@ const outDir = resolve(__dirname, 'build');
 const publicDir = resolve(__dirname, 'public');
 
 export default defineConfig(({ mode }) => ({
-  resolve: {
-    alias: {
-      '@': root,
-    },
-  },
   define: {
     __TARGET__: JSON.stringify(process.env.TARGET ?? 'FIREFOX'),
   },

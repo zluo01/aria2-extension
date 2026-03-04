@@ -85,11 +85,7 @@
     ]
   },
   "lint-staged": {
-    "*.{ts,tsx,js}": [
-      "eslint --cache --fix",
-      "pnpm run lint",
-      "pnpm run format"
-    ],
-    "*.{js,css,md}": "prettier --write"
+    "*.{ts,tsx,js}": ["eslint --cache --fix", "prettier --write"],
+    "*.{css,md}": "prettier --write"
   }
 }
