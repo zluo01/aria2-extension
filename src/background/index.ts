@@ -1,4 +1,4 @@
-import { AddUri, GetNumJobs } from '@/aria2';
+import { getAria2Client } from '@/lib/aria2c';
 import { client } from '@/lib/browser';
 import { cacheSet } from '@/lib/session-cache';
 import browser from 'webextension-polyfill';
@@ -22,7 +22,7 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
   if (info.menuItemId === CONTEXT_ID) {
     try {
       const uri = escapeHTML(info.linkUrl as string);
-      await AddUri(uri);
+      await (await getAria2Client()).addUri(uri);
     } catch (e) {
       await client.notify(`fail to download url, msg: ${e}`);
     }
@@ -60,7 +60,8 @@ browser.runtime.onMessage.addListener((data: unknown) => {
 });
 
 function updateActiveJobNumber() {
-  GetNumJobs()
+  getAria2Client()
+    .then(c => c.getNumJobs())
     .then(num => client.updateBadge(num))
     .catch(err => console.error(err));
 }

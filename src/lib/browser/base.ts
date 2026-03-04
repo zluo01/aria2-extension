@@ -1,4 +1,4 @@
-import { AddUri } from '@/aria2';
+import { getAria2Client } from '@/lib/aria2c';
 import {
   DEFAULT_CONFIG,
   IConfig,
@@ -95,7 +95,7 @@ export abstract class IBaseBrowserClient<T> implements BrowserClient {
       if (header) {
         options.header = header as string[];
       }
-      await AddUri(url, filename, options);
+      await (await getAria2Client()).addUri(url, filename, options);
       const windowInfo = await this.getCurrentWindow();
       if (windowInfo.id) {
         await browser.windows.remove(windowInfo.id);

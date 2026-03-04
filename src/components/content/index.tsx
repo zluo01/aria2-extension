@@ -1,7 +1,7 @@
-import { PauseJobs, StartJobs } from '@/aria2';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
+import { getAria2Client } from '@/lib/aria2c';
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
 import { parseBytes } from '@/utils';
 import { PauseIcon, PlayIcon } from 'lucide-react';
@@ -30,10 +30,10 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList) {
   async function jobAction(job: IJob) {
     switch (job.status) {
       case ACTIVE_JOB:
-        await PauseJobs(job.gid);
+        await (await getAria2Client()).pauseJobs(job.gid);
         break;
       case PAUSED_JOB:
-        await StartJobs(job.gid);
+        await (await getAria2Client()).startJobs(job.gid);
         break;
       default:
         console.error(`Invalid job status ${job.status}`);

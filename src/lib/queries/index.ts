@@ -1,4 +1,4 @@
-import { GetJobs } from '@/aria2';
+import { getAria2Client } from '@/lib/aria2c';
 import { client } from '@/lib/browser';
 import { QueryClient, queryOptions } from '@tanstack/react-query';
 
@@ -11,7 +11,7 @@ export const queryClient = new QueryClient();
 
 export const getTasksQueryOptions = queryOptions({
   queryKey: [FetchKey.TASKS],
-  queryFn: GetJobs,
+  queryFn: async () => (await getAria2Client()).getJobs(),
   refetchInterval: 1000,
 });
 
