@@ -13,8 +13,6 @@
  *   - startJobs/pauseJobs/removeJobs: guard against empty gid list
  *   - Error paths return safe defaults and/or notify the user
  */
-import { Aria2Client } from '@/lib/aria2c/client';
-import { client as browserClient } from '@/lib/browser';
 import {
   afterEach,
   beforeEach,
@@ -23,6 +21,9 @@ import {
   jest,
   test,
 } from '@jest/globals';
+
+import { Aria2Client } from '@/lib/aria2c/client';
+import { client as browserClient } from '@/lib/browser';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 

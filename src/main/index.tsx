@@ -1,6 +1,3 @@
-import { queryClient } from '@/lib/queries';
-import { ThemeProvider } from '@/lib/theme';
-import { routeTree } from '@/routeTree.gen';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   RouterProvider,
@@ -9,6 +6,10 @@ import {
 } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
+
+import { queryClient } from '@/lib/queries';
+import { ThemeProvider } from '@/lib/theme';
+import { routeTree } from '@/routeTree.gen';
 
 import './index.css';
 

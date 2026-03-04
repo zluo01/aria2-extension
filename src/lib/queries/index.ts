@@ -1,7 +1,8 @@
-import { client } from '@/lib/browser';
-import { IDownload, IJob, MessageType, Theme } from '@/types';
 import { QueryClient, queryOptions } from '@tanstack/react-query';
 import browser from 'webextension-polyfill';
+
+import { client } from '@/lib/browser';
+import { IDownload, IJob, MessageType, Theme } from '@/types';
 
 enum FetchKey {
   TASKS = 'tasks',

@@ -1,5 +1,6 @@
-import { IConfig, Message } from '@/types';
 import { Runtime } from 'webextension-polyfill';
+
+import { IConfig, Message } from '@/types';
 
 export interface BrowserClient {
   getPlatformInfo(): Promise<Runtime.PlatformInfo>;

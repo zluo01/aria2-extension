@@ -11,7 +11,6 @@
  *   - GIDs are 16-char hex strings
  *   - Error responses: {error: {code, message}} – code 1 = wrong secret
  */
-import { Aria2 } from '@/lib/aria2c/service';
 import {
   afterEach,
   beforeEach,
@@ -20,6 +19,8 @@ import {
   jest,
   test,
 } from '@jest/globals';
+
+import { Aria2 } from '@/lib/aria2c/service';
 
 // ─── WebSocket mock ────────────────────────────────────────────────────────
 

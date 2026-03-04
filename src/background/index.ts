@@ -1,8 +1,9 @@
+import browser from 'webextension-polyfill';
+
 import { getAria2Client } from '@/lib/aria2c';
 import { client } from '@/lib/browser';
 import { cacheSet } from '@/lib/session-cache';
 import { MessageSchema, MessageType } from '@/types';
-import browser from 'webextension-polyfill';
 
 const CONTEXT_ID = 'download-with-aria';
 

@@ -1,3 +1,7 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import { ChangeEvent } from 'react';
+
 import {
   Field,
   FieldDescription,
@@ -19,9 +23,6 @@ import { getConfigurationQueryOptions, queryClient } from '@/lib/queries';
 import { useTheme } from '@/lib/theme';
 import { Chrome } from '@/manifest';
 import { IConfig } from '@/types';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
-import { ChangeEvent } from 'react';
 
 export const Route = createFileRoute('/setting')({
   loader: ({ context: { queryClient } }) =>

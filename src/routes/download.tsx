@@ -1,3 +1,7 @@
+import { useForm } from '@tanstack/react-form';
+import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
 import {
   Field,
@@ -9,9 +13,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { client } from '@/lib/browser';
 import { parseBytes, verifyFileName } from '@/lib/utils';
-import { useForm } from '@tanstack/react-form';
-import { createFileRoute } from '@tanstack/react-router';
-import { z } from 'zod';
 
 const downloadSearchSchema = z.object({
   url: z.url(),

@@ -1,3 +1,5 @@
+import browser, { Action, Windows } from 'webextension-polyfill';
+
 import { addUri } from '@/lib/queries';
 import {
   DEFAULT_CONFIG,
@@ -8,7 +10,6 @@ import {
   MessageType,
   SKIP_DOWNLOAD_SCHEMA,
 } from '@/types';
-import browser, { Action, Windows } from 'webextension-polyfill';
 
 import { BrowserClient } from './types';
 

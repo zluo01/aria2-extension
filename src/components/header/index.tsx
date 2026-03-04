@@ -1,8 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { client } from '@/lib/browser';
-import { pauseJobs, removeJobs, startJobs } from '@/lib/queries';
-import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import {
   EllipsisVerticalIcon,
@@ -13,6 +8,12 @@ import {
   TrashIcon,
 } from 'lucide-react';
 import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { client } from '@/lib/browser';
+import { pauseJobs, removeJobs, startJobs } from '@/lib/queries';
+import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
 
 interface IHeader {
   jobs: IJob[];

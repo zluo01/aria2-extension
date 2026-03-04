@@ -1,7 +1,8 @@
-import type { IFileDetail } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Runtime } from 'webextension-polyfill';
+
+import type { IFileDetail } from '@/types';
 
 import PlatformOs = Runtime.PlatformOs;
 

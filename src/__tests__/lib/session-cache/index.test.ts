@@ -1,6 +1,7 @@
-import { cacheRemove, cacheSet } from '@/lib/session-cache';
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 import browser from 'webextension-polyfill';
+
+import { cacheRemove, cacheSet } from '@/lib/session-cache';
 
 jest.mock('webextension-polyfill', () => ({
   storage: {

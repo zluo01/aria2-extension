@@ -1,6 +1,7 @@
-import { downloadToQueryString, parseBytes, verifyFileName } from '@/lib/utils';
 import { describe, expect, test } from '@jest/globals';
 import { Runtime } from 'webextension-polyfill';
+
+import { downloadToQueryString, parseBytes, verifyFileName } from '@/lib/utils';
 
 import PlatformOs = Runtime.PlatformOs;
 

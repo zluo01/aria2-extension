@@ -1,5 +1,6 @@
-import { augmentDownloadLink } from '@/lib/magnet';
 import { describe, expect, test } from '@jest/globals';
+
+import { augmentDownloadLink } from '@/lib/magnet';
 
 describe('augmentDownloadLink', () => {
   describe('HTTP/HTTPS URLs', () => {

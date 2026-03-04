@@ -1,8 +1,9 @@
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { augmentDownloadLink } from '@/lib/magnet';
 import { addUris } from '@/lib/queries';
-import { useState } from 'react';
 
 interface ICreationArea {
   close: () => void;

@@ -7,8 +7,9 @@
  *   - fileSize comes directly from item.fileSize (no HEAD request)
  *   - incognito is not supported in initializeBrowserDownload options
  */
-import { ChromeClient } from '@/lib/browser/chrome';
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+
+import { ChromeClient } from '@/lib/browser/chrome';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 

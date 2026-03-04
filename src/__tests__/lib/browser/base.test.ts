@@ -2,9 +2,10 @@
  * Tests for IBaseBrowserClient shared logic.
  * Uses a minimal concrete subclass to exercise protected methods.
  */
+import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+
 import { IBaseBrowserClient } from '@/lib/browser/base';
 import { IFileDetail } from '@/types';
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 

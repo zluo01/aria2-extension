@@ -1,8 +1,9 @@
-import { getThemeQueryOptions } from '@/lib/queries';
-import { Theme } from '@/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, ReactNode, useContext, useEffect } from 'react';
 import browser from 'webextension-polyfill';
+
+import { getThemeQueryOptions } from '@/lib/queries';
+import { Theme } from '@/types';
 
 type ThemeProviderProps = {
   children: ReactNode;

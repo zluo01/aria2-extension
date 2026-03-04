@@ -1,10 +1,11 @@
+import { PauseIcon, PlayIcon } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { pauseJobs, startJobs } from '@/lib/queries';
 import { parseBytes } from '@/lib/utils';
 import { ACTIVE_JOB, IJob, PAUSED_JOB } from '@/types';
-import { PauseIcon, PlayIcon } from 'lucide-react';
 
 interface IDownloadList {
   jobs: IJob[];

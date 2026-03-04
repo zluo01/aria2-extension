@@ -2,8 +2,9 @@
  * Tests for FirefoxClient browser-specific logic.
  * Focus: getDownloadDetail filename extraction and getContentLength HEAD request.
  */
-import { FirefoxClient } from '@/lib/browser/firefox';
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+
+import { FirefoxClient } from '@/lib/browser/firefox';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 
