@@ -73,8 +73,6 @@ browser.runtime.onMessage.addListener(async (data: unknown) => {
       return c.pauseJobs(...result.data.gids);
     case MessageType.RemoveJobs:
       return c.removeJobs(...result.data.gids);
-    default:
-      console.error('Unhandled message type', result.data);
   }
 });
 
