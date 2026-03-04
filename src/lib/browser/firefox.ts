@@ -1,6 +1,6 @@
 import { cacheRemove } from '@/lib/session-cache';
+import { downloadToQueryString } from '@/lib/utils';
 import { IFileDetail } from '@/types';
-import { downloadToQueryString } from '@/utils';
 import browser, { Downloads, Windows } from 'webextension-polyfill';
 
 import { IBaseBrowserClient } from './base';

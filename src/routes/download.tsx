@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { client } from '@/lib/browser';
-import { parseBytes, verifyFileName } from '@/utils';
+import { parseBytes, verifyFileName } from '@/lib/utils';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';

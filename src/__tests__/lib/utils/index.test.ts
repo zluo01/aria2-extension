@@ -1,4 +1,4 @@
-import { verifyFileName } from '@/utils';
+import { downloadToQueryString, parseBytes, verifyFileName } from '@/lib/utils';
 import { describe, expect, test } from '@jest/globals';
 import { Runtime } from 'webextension-polyfill';
 
@@ -56,7 +56,6 @@ describe('verifyFileName', () => {
     });
 
     test('should return false for filenames with control characters', () => {
-      // Test some control characters using \p{C}
       const controlChars = ['\x00', '\x01', '\x02', '\x1f', '\x7f'];
 
       controlChars.forEach(char => {
@@ -322,9 +321,9 @@ describe('verifyFileName', () => {
 
     test('should handle filenames with only dots', () => {
       expect(verifyFileName('.', 'linux')).toBe(true);
-      expect(verifyFileName('.', 'win')).toBe(false); // Ends with dot
+      expect(verifyFileName('.', 'win')).toBe(false);
       expect(verifyFileName('..', 'linux')).toBe(true);
-      expect(verifyFileName('..', 'win')).toBe(false); // Ends with dot
+      expect(verifyFileName('..', 'win')).toBe(false);
     });
 
     test('should handle filenames with multiple extensions', () => {
@@ -333,5 +332,108 @@ describe('verifyFileName', () => {
       expect(verifyFileName('backup.sql.bak', 'linux')).toBe(true);
       expect(verifyFileName('backup.sql.bak', 'win')).toBe(true);
     });
+  });
+});
+
+describe('parseBytes', () => {
+  test('formats zero as bytes', () => {
+    expect(parseBytes(0)).toBe('0.00 B');
+  });
+
+  test('formats values below 1000 as bytes', () => {
+    expect(parseBytes(1)).toBe('1.00 B');
+    expect(parseBytes(999)).toBe('999.00 B');
+  });
+
+  test('promotes to KB at exactly 1000', () => {
+    expect(parseBytes(1000)).toBe('1.00 KB');
+  });
+
+  test('formats KB range', () => {
+    expect(parseBytes(1500)).toBe('1.50 KB');
+    expect(parseBytes(999999)).toBe('1000.00 KB');
+  });
+
+  test('promotes to MB at 1_000_000', () => {
+    expect(parseBytes(1_000_000)).toBe('1.00 MB');
+  });
+
+  test('promotes to GB at 1_000_000_000', () => {
+    expect(parseBytes(1_000_000_000)).toBe('1.00 GB');
+  });
+
+  test('promotes to TB at 1e12', () => {
+    expect(parseBytes(1e12)).toBe('1.00 TB');
+  });
+
+  test('stops at YB (highest unit)', () => {
+    // 1 YB = 1e24, value stays >= 1000 but order is capped
+    expect(parseBytes(1e27)).toBe('1000.00 YB');
+  });
+
+  test('always returns two decimal places', () => {
+    expect(parseBytes(1024)).toBe('1.02 KB');
+    expect(parseBytes(1100)).toBe('1.10 KB');
+  });
+});
+
+describe('downloadToQueryString', () => {
+  test('serialises all IFileDetail fields to query string', () => {
+    const detail = {
+      url: 'https://example.com/file.zip',
+      filename: 'file.zip',
+      fileSize: 1024,
+      incognito: false,
+    };
+    const qs = downloadToQueryString(detail);
+    const params = new URLSearchParams(qs);
+    expect(params.get('url')).toBe('https://example.com/file.zip');
+    expect(params.get('filename')).toBe('file.zip');
+    expect(params.get('fileSize')).toBe('1024');
+    expect(params.get('incognito')).toBe('false');
+  });
+
+  test('converts incognito=true to string "true"', () => {
+    const detail = {
+      url: 'https://example.com/f',
+      filename: 'f',
+      fileSize: 0,
+      incognito: true,
+    };
+    const params = new URLSearchParams(downloadToQueryString(detail));
+    expect(params.get('incognito')).toBe('true');
+  });
+
+  test('filters out undefined values', () => {
+    const detail = {
+      url: 'https://example.com/f',
+      filename: 'f',
+      fileSize: undefined as any,
+      incognito: false,
+    };
+    const params = new URLSearchParams(downloadToQueryString(detail));
+    expect(params.has('fileSize')).toBe(false);
+  });
+
+  test('URL-encodes special characters in filename', () => {
+    const detail = {
+      url: 'https://example.com/f',
+      filename: 'my file & more.zip',
+      fileSize: 0,
+      incognito: false,
+    };
+    const params = new URLSearchParams(downloadToQueryString(detail));
+    expect(params.get('filename')).toBe('my file & more.zip');
+  });
+
+  test('handles fileSize of zero', () => {
+    const detail = {
+      url: 'https://x.com/f',
+      filename: 'f',
+      fileSize: 0,
+      incognito: false,
+    };
+    const params = new URLSearchParams(downloadToQueryString(detail));
+    expect(params.get('fileSize')).toBe('0');
   });
 });
