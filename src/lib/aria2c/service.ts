@@ -84,12 +84,20 @@ export class Aria2 extends EventEmitter {
 
       this.ws = new WebSocket(url);
 
+      const timeout = setTimeout(() => {
+        this.ws?.close();
+        this.ws = null;
+        reject(new Error('WebSocket connection timed out'));
+      }, 10_000);
+
       this.ws.onopen = () => {
+        clearTimeout(timeout);
         this.emit('open');
         resolve();
       };
 
       this.ws.onerror = error => {
+        clearTimeout(timeout);
         reject(error);
       };
 

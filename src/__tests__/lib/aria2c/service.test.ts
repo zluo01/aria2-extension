@@ -161,6 +161,34 @@ describe('EventEmitter', () => {
 
 // ─── Aria2 constructor ────────────────────────────────────────────────────
 
+// ─── Aria2.open — timeout ─────────────────────────────────────────────────
+
+describe('Aria2.open timeout', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test('rejects with timeout error when server never responds within 10s', async () => {
+    const aria2 = new Aria2();
+    const p = aria2.open(); // never triggers onopen
+    jest.advanceTimersByTime(10_000);
+    await expect(p).rejects.toThrow('timed out');
+  });
+
+  test('does not time out when connection opens before 10s', async () => {
+    const aria2 = new Aria2();
+    const p = aria2.open();
+    jest.advanceTimersByTime(5_000);
+    mockWsInstance.triggerOpen();
+    await expect(p).resolves.toBeUndefined();
+  });
+});
+
+// ─── Aria2 constructor ────────────────────────────────────────────────────
+
 describe('Aria2 constructor defaults', () => {
   test('builds ws://localhost:6800/jsonrpc when no options given', async () => {
     const aria2 = new Aria2();
