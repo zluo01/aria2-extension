@@ -31,11 +31,3 @@ export interface JSONRPCResponse {
     message: string;
   };
 }
-
-/**
- * Callback for pending RPC requests
- */
-export interface RPCCallback {
-  resolve: (value: any) => void;
-  reject: (reason: any) => void;
-}

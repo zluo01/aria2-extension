@@ -2,7 +2,6 @@ import {
   Aria2Options,
   JSONRPCRequest,
   JSONRPCResponse,
-  RPCCallback,
 } from '@/lib/aria2c/types';
 
 /**
@@ -17,7 +16,7 @@ export class Aria2 {
   private id: number = 0;
   private ws: WebSocket | null = null;
   private openingPromise: Promise<void> | null = null;
-  private callbacks: Map<number, RPCCallback> = new Map();
+  private callbacks: Map<number, PromiseWithResolvers<any>> = new Map();
 
   constructor(options: Aria2Options = {}) {
     this.host = options.host || 'localhost';
@@ -145,19 +144,13 @@ export class Aria2 {
   /**
    * Make RPC call via WebSocket
    */
-  private async callWs(method: string, params: any[]): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const id = ++this.id;
-      const request: JSONRPCRequest = {
-        jsonrpc: '2.0',
-        id,
-        method,
-        params,
-      };
-
-      this.callbacks.set(id, { resolve, reject });
-      this.ws!.send(JSON.stringify(request));
-    });
+  private callWs(method: string, params: any[]): Promise<any> {
+    const id = ++this.id;
+    const request: JSONRPCRequest = { jsonrpc: '2.0', id, method, params };
+    const resolvers = Promise.withResolvers<any>();
+    this.callbacks.set(id, resolvers);
+    this.ws!.send(JSON.stringify(request));
+    return resolvers.promise;
   }
 
   /**
