@@ -42,30 +42,34 @@ export class Aria2 {
       const protocol = this.secure ? 'wss' : 'ws';
       const url = `${protocol}://${this.host}:${this.port}${this.path}`;
 
-      this.ws = new WebSocket(url);
+      const ws = (this.ws = new WebSocket(url));
 
       const timeout = setTimeout(() => {
-        this.ws?.close();
-        this.ws = null;
+        ws.close();
+        if (this.ws === ws) this.ws = null;
         reject(new Error('WebSocket connection timed out'));
       }, 10_000);
 
-      this.ws.onopen = () => {
+      ws.onopen = () => {
         clearTimeout(timeout);
         resolve();
       };
 
-      this.ws.onerror = error => {
+      ws.onerror = error => {
         clearTimeout(timeout);
         reject(error);
       };
 
-      this.ws.onclose = () => {
-        this.ws = null;
-        this.rejectPendingCallbacks(new Error('WebSocket closed unexpectedly'));
+      ws.onclose = () => {
+        if (this.ws === ws) {
+          this.ws = null;
+          this.rejectPendingCallbacks(
+            new Error('WebSocket closed unexpectedly'),
+          );
+        }
       };
 
-      this.ws.onmessage = event => {
+      ws.onmessage = event => {
         this.handleMessage(event.data);
       };
     }).finally(() => {
