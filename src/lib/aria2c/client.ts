@@ -1,38 +1,34 @@
-import { Aria2Options } from '@/lib/aria2c/types';
+import { Aria2Connector, createConnector } from '@/lib/aria2c/connector';
+import { Aria2ClientType } from '@/lib/aria2c/types';
 import { client } from '@/lib/browser';
 import { IConfig, IDownload, IJob } from '@/types';
 
-import { Aria2 } from './service';
-
-type Aria2ClientType = 'ws' | 'http';
-
 export class Aria2Client {
-  private readonly protocol: Aria2ClientType;
-  private readonly options: Aria2Options;
-  private aria2: Aria2;
+  private readonly config: IConfig;
+  private readonly connector: Aria2Connector;
 
   constructor(config: IConfig) {
-    this.options = {
-      path: '/jsonrpc',
-      host: config.host,
-      port: config.port,
-      secure: config.protocol === 'https' || config.protocol === 'wss',
-      secret: config.token,
-    };
-    this.aria2 = new Aria2(this.options);
-    this.protocol =
+    const protocol: Aria2ClientType =
       config.protocol === 'ws' || config.protocol === 'wss' ? 'ws' : 'http';
+    const secure = config.protocol === 'https' || config.protocol === 'wss';
+
+    this.config = config;
+    this.connector = createConnector(
+      protocol,
+      config.host,
+      config.port,
+      secure,
+      config.path,
+    );
   }
 
   shouldReset(config: IConfig): boolean {
-    const isSecure = config.protocol === 'https' || config.protocol === 'wss';
-    const isWs = config.protocol === 'ws' || config.protocol === 'wss';
     return (
-      this.options.host !== config.host ||
-      this.options.port !== config.port ||
-      this.options.secure !== isSecure ||
-      this.options.secret !== config.token ||
-      (this.protocol === 'ws') !== isWs
+      this.config.path !== config.path ||
+      this.config.protocol !== config.protocol ||
+      this.config.host !== config.host ||
+      this.config.port !== config.port ||
+      this.config.token !== config.token
     );
   }
 
@@ -85,7 +81,7 @@ export class Aria2Client {
 
   async getNumJobs(): Promise<number> {
     try {
-      const data = await this.singleCall(() => this.aria2.call('tellActive'));
+      const data = await this.call('tellActive');
       return data.length;
     } catch (e) {
       console.error('Fail to get numJobs', e);
@@ -112,39 +108,102 @@ export class Aria2Client {
     options?: IDownload,
   ): Promise<void> {
     try {
-      await this.singleCall(() =>
-        this.aria2.call('addUri', [link], options || {}),
-      );
+      await this.call('addUri', [link], options || {});
       await client.notify(`Start downloading ${filename || ''} using Aria2`);
     } catch (e) {
       await client.notify(`Fail to add URI. ${e}`);
     }
   }
 
-  private async singleCall(func: () => Promise<any>): Promise<any> {
-    if (this.protocol === 'ws') {
-      try {
-        await this.aria2.open();
-        return await func();
-      } finally {
-        this.aria2.close();
-      }
-    }
-    return await func();
+  /**
+   * Call an aria2 method
+   */
+  private async call(method: string, ...params: any[]): Promise<any> {
+    const methodName = this.buildMethodName(method);
+    const requestParams = this.config.token
+      ? [`token:${this.config.token}`, ...params]
+      : params;
+
+    return this.connector.request(methodName, requestParams);
   }
 
+  /**
+   * Execute multiple calls in a single request
+   */
   private async multiCall(
-    callItems: (string | number | string[])[][],
-  ): Promise<any> {
-    if (this.protocol === 'ws') {
-      try {
-        await this.aria2.open();
-        return await this.aria2.multiCall(callItems);
-      } finally {
-        this.aria2.close();
+    calls: (string | number | string[])[][],
+  ): Promise<any[]> {
+    const multiCallParams = calls.map(call => {
+      const [method, ...params] = call;
+      return {
+        methodName: this.buildMethodName(method as string),
+        params: this.config.token
+          ? [`token:${this.config.token}`, ...params]
+          : params,
+      };
+    });
+
+    const results = await this.call('system.multicall', multiCallParams);
+
+    // Check for errors in results
+    return results.map((result: any[], index: number) => {
+      if (result.length === 0) {
+        throw new Error(`Call ${index} failed: empty result`);
       }
+      if (
+        result[0] &&
+        typeof result[0] === 'object' &&
+        'faultString' in result[0]
+      ) {
+        throw new Error(result[0].faultString);
+      }
+      return result[0];
+    });
+  }
+
+  /**
+   * Execute batch calls (returns array of promises)
+   */
+  async batch(
+    calls: (string | number | string[])[][],
+  ): Promise<Promise<any>[]> {
+    return calls.map(call => {
+      const [method, ...params] = call;
+      return this.call(method as string, ...params);
+    });
+  }
+
+  /**
+   * List available notifications
+   */
+  async listNotifications(): Promise<string[]> {
+    const notifications = await this.call('system.listNotifications');
+    return notifications.map((notification: string) =>
+      notification.startsWith('aria2.') ? notification.slice(6) : notification,
+    );
+  }
+
+  /**
+   * List available methods
+   */
+  async listMethods(): Promise<string[]> {
+    const methods = await this.call('system.listMethods');
+    return methods.map((method: string) =>
+      method.startsWith('aria2.') ? method.slice(6) : method,
+    );
+  }
+
+  /**
+   * Build full method name with aria2 prefix if needed
+   */
+  private buildMethodName(method: string): string {
+    if (method.startsWith('system.')) {
+      return method;
     }
-    return await this.aria2.multiCall(callItems);
+    if (!method.startsWith('aria2.')) {
+      return `aria2.${method}`;
+    }
+    return method;
   }
 
   private flatten(input: any[]): any[] {

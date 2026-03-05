@@ -1,20 +1,13 @@
-/**
- * Configuration options for Aria2 client
- */
-export interface Aria2Options {
-  host?: string;
-  port?: number;
-  secure?: boolean;
-  secret?: string;
-  path?: string;
-}
+import { z } from 'zod';
+
+export type Aria2ClientType = 'ws' | 'http';
 
 /**
  * JSON-RPC request structure
  */
 export interface JSONRPCRequest {
   jsonrpc: '2.0';
-  id: string | number;
+  id: string;
   method: string;
   params?: any[];
 }
@@ -22,12 +15,18 @@ export interface JSONRPCRequest {
 /**
  * JSON-RPC response structure
  */
-export interface JSONRPCResponse {
-  jsonrpc: '2.0';
-  id: string | number;
-  result?: any;
-  error?: {
-    code: number;
-    message: string;
-  };
-}
+export const JSONRPCResponseSchema = z.union([
+  z.object({
+    jsonrpc: z.literal('2.0'),
+    id: z.string(),
+    result: z.any(),
+  }),
+  z.object({
+    jsonrpc: z.literal('2.0'),
+    id: z.string(),
+    error: z.object({
+      code: z.number(),
+      message: z.string(),
+    }),
+  }),
+]);

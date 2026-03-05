@@ -1,17 +1,17 @@
 /**
- * Tests for Aria2Client — the high-level wrapper over the Aria2 service.
+ * Tests for Aria2Client — the high-level wrapper over the Aria2 JSON-RPC API.
  *
  * Protocol reference: https://aria2.github.io/manual/en/html/aria2c.html#rpc-interface
  *
- * Aria2Client responsibilities tested here:
- *   - WS: open → call → close lifecycle for every operation
- *   - HTTP: direct call without open/close
- *   - addUri wraps URI in an array: call('addUri', [link], options)
- *   - addUris maps each URI to ['addUri', [uri]]
- *   - getJobs: tellActive + tellWaiting(0, 25) via multiCall
- *   - getNumJobs: tellActive count
- *   - startJobs/pauseJobs/removeJobs: guard against empty gid list
- *   - Error paths return safe defaults and/or notify the user
+ * Coverage:
+ *   - shouldReset: returns true on any connection-param change, false for identical config
+ *   - getJobs: issues system.multicall with tellActive + tellWaiting(0,25); merges results
+ *   - getNumJobs: counts results from tellActive
+ *   - startJobs / pauseJobs / removeJobs: guard empty args; map to correct RPC methods
+ *   - addUri: wraps URI in array per protocol; passes options; notifies on success/failure
+ *   - addUris: maps each URI to [uri]; notifies count; guards empty args
+ *   - Token: prepended to every request's params when set
+ *   - multiCall error handling: faultString and empty-result propagate as thrown errors
  */
 import {
   afterEach,
@@ -35,17 +35,11 @@ jest.mock('@/lib/browser', () => ({
 
 jest.mock('webextension-polyfill', () => ({}));
 
-const mockOpen = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
-const mockClose = jest.fn<() => void>();
-const mockCall = jest.fn<(...args: any[]) => Promise<any>>();
-const mockMultiCall = jest.fn<(...args: any[]) => Promise<any>>();
+const mockRequest = jest.fn<(...args: any[]) => Promise<any>>();
 
-jest.mock('@/lib/aria2c/service', () => ({
-  Aria2: jest.fn().mockImplementation(() => ({
-    open: mockOpen,
-    close: mockClose,
-    call: mockCall,
-    multiCall: mockMultiCall,
+jest.mock('@/lib/aria2c/connector', () => ({
+  createConnector: jest.fn().mockImplementation(() => ({
+    request: mockRequest,
   })),
 }));
 
@@ -74,154 +68,148 @@ const waitingJob = {
   files: [{ path: '/tmp/other.zip' }],
 };
 
-// ─── helpers ──────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────
 
-function makeWsClient() {
-  return new Aria2Client({
-    host: '127.0.0.1',
-    port: 6800,
-    protocol: 'ws',
-    token: '',
-    path: '/jsonrpc',
-  });
+const BASE_CONFIG = {
+  host: '127.0.0.1',
+  port: 6800,
+  protocol: 'ws',
+  token: '',
+  path: '/jsonrpc',
+};
+
+function makeClient(overrides: Partial<typeof BASE_CONFIG> = {}) {
+  return new Aria2Client({ ...BASE_CONFIG, ...overrides });
 }
 
-function makeHttpClient() {
-  return new Aria2Client({
-    host: '127.0.0.1',
-    port: 6800,
-    protocol: 'http',
-    token: '',
-    path: '/jsonrpc',
-  });
+/**
+ * aria2's system.multicall wire format: each sub-call result is wrapped in a
+ * single-element array [value], or an object {faultCode, faultString} on error.
+ * This helper wraps each value so tests read naturally.
+ *
+ * Example: multicallResult([job1, job2], [job3]) → [[[job1, job2]], [[job3]]]
+ */
+function multicallResult(...values: any[]) {
+  return values.map(v => [v]);
 }
 
-beforeEach(() => {
-  jest.clearAllMocks();
-});
-
-afterEach(() => {
-  jest.clearAllMocks();
-});
+beforeEach(() => jest.clearAllMocks());
+afterEach(() => jest.clearAllMocks());
 
 // ─── shouldReset ──────────────────────────────────────────────────────────
 
 describe('Aria2Client.shouldReset', () => {
-  const base = {
-    host: '127.0.0.1',
-    port: 6800,
-    protocol: 'ws',
-    token: '',
-    path: '',
-  };
-
-  test('returns false when config is identical', () => {
-    expect(makeWsClient().shouldReset(base)).toBe(false);
+  test('returns false for identical config — no reconnect needed', () => {
+    expect(makeClient().shouldReset(BASE_CONFIG)).toBe(false);
   });
 
   test('returns true when host changes', () => {
-    expect(makeWsClient().shouldReset({ ...base, host: '192.168.1.1' })).toBe(
-      true,
-    );
+    expect(
+      makeClient().shouldReset({ ...BASE_CONFIG, host: '192.168.1.1' }),
+    ).toBe(true);
   });
 
   test('returns true when port changes', () => {
-    expect(makeWsClient().shouldReset({ ...base, port: 6801 })).toBe(true);
+    expect(makeClient().shouldReset({ ...BASE_CONFIG, port: 6801 })).toBe(true);
   });
 
   test('returns true when token changes', () => {
-    expect(makeWsClient().shouldReset({ ...base, token: 'secret' })).toBe(true);
-  });
-
-  test('returns true when switching ws → http (different transport)', () => {
-    expect(makeWsClient().shouldReset({ ...base, protocol: 'http' })).toBe(
+    expect(makeClient().shouldReset({ ...BASE_CONFIG, token: 'secret' })).toBe(
       true,
     );
   });
 
-  test('returns true when switching ws → wss (secure flag changes)', () => {
-    expect(makeWsClient().shouldReset({ ...base, protocol: 'wss' })).toBe(true);
-  });
-
-  test('returns true when switching http → https (secure flag changes)', () => {
-    expect(makeHttpClient().shouldReset({ ...base, protocol: 'https' })).toBe(
+  test('returns true when protocol changes (ws → http)', () => {
+    expect(makeClient().shouldReset({ ...BASE_CONFIG, protocol: 'http' })).toBe(
       true,
     );
   });
 
-  test('returns false when only download path changes (not a connection param)', () => {
+  test('returns true when protocol changes (ws → wss, adds TLS)', () => {
+    expect(makeClient().shouldReset({ ...BASE_CONFIG, protocol: 'wss' })).toBe(
+      true,
+    );
+  });
+
+  test('returns true when RPC path changes', () => {
+    expect(makeClient().shouldReset({ ...BASE_CONFIG, path: '/rpc' })).toBe(
+      true,
+    );
+  });
+
+  test('wss and https are both secure but different transports — triggers reset', () => {
     expect(
-      makeWsClient().shouldReset({ ...base, path: '/new/download/dir' }),
-    ).toBe(false);
-  });
-
-  test('wss and https both map to secure=true but different transports', () => {
-    const wssClient = new Aria2Client({ ...base, protocol: 'wss' });
-    expect(wssClient.shouldReset({ ...base, protocol: 'https' })).toBe(true);
+      makeClient({ protocol: 'wss' }).shouldReset({
+        ...BASE_CONFIG,
+        protocol: 'https',
+      }),
+    ).toBe(true);
   });
 });
 
 // ─── getJobs ─────────────────────────────────────────────────────────────
 
 describe('Aria2Client.getJobs', () => {
-  test('calls tellActive and tellWaiting(offset=0, num=25) via multiCall', async () => {
-    mockMultiCall.mockResolvedValueOnce([[activeJob], [waitingJob]]);
-    const client = makeWsClient();
-    await client.getJobs();
-    expect(mockMultiCall).toHaveBeenCalledWith([
-      ['tellActive'],
-      ['tellWaiting', 0, 25],
+  test('sends system.multicall with tellActive and tellWaiting(offset=0, num=25)', async () => {
+    mockRequest.mockResolvedValueOnce(multicallResult([], []));
+    await makeClient().getJobs();
+    expect(mockRequest).toHaveBeenCalledWith('system.multicall', [
+      [
+        { methodName: 'aria2.tellActive', params: [] },
+        { methodName: 'aria2.tellWaiting', params: [0, 25] },
+      ],
     ]);
   });
 
-  test('merges active and waiting jobs into a flat array preserving order', async () => {
-    mockMultiCall.mockResolvedValueOnce([[activeJob], [waitingJob]]);
-    const client = makeWsClient();
-    const jobs = await client.getJobs();
+  test('merges active and waiting results in order (active first)', async () => {
+    mockRequest.mockResolvedValueOnce(
+      multicallResult([activeJob], [waitingJob]),
+    );
+    const jobs = await makeClient().getJobs();
     expect(jobs.map(j => j.gid)).toEqual([GID_A, GID_B]);
   });
 
-  test('returns empty array when both active and waiting are empty', async () => {
-    mockMultiCall.mockResolvedValueOnce([[], []]);
-    const client = makeWsClient();
-    expect(await client.getJobs()).toEqual([]);
-  });
-
-  test('opens and closes WS connection around the multiCall', async () => {
-    mockMultiCall.mockResolvedValueOnce([[], []]);
-    const client = makeWsClient();
-    await client.getJobs();
-    expect(mockOpen).toHaveBeenCalledTimes(1);
-    expect(mockClose).toHaveBeenCalledTimes(1);
-  });
-
-  test('does NOT open/close WS for HTTP protocol', async () => {
-    mockMultiCall.mockResolvedValueOnce([[], []]);
-    const client = makeHttpClient();
-    await client.getJobs();
-    expect(mockOpen).not.toHaveBeenCalled();
-    expect(mockClose).not.toHaveBeenCalled();
+  test('returns empty array when both active and waiting lists are empty', async () => {
+    mockRequest.mockResolvedValueOnce(multicallResult([], []));
+    expect(await makeClient().getJobs()).toEqual([]);
   });
 
   test('returns [] and logs error on network failure', async () => {
     const consoleSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(jest.fn());
-    mockMultiCall.mockRejectedValueOnce(new Error('connection refused'));
-    const client = makeWsClient();
-    expect(await client.getJobs()).toEqual([]);
+    mockRequest.mockRejectedValueOnce(new Error('connection refused'));
+    expect(await makeClient().getJobs()).toEqual([]);
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 
-  test('WS is closed even when multiCall rejects (finally block)', async () => {
+  test('propagates faultString from a failing sub-call as a thrown error', async () => {
     const consoleSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(jest.fn());
-    mockMultiCall.mockRejectedValueOnce(new Error('timeout'));
-    const client = makeWsClient();
-    await client.getJobs();
-    expect(mockClose).toHaveBeenCalled();
+    mockRequest.mockResolvedValueOnce([
+      [[activeJob]],
+      [{ faultCode: 1, faultString: 'aria2 error: invalid params' }],
+    ]);
+    expect(await makeClient().getJobs()).toEqual([]);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Fail to get jobs',
+      expect.objectContaining({ message: 'aria2 error: invalid params' }),
+    );
+    consoleSpy.mockRestore();
+  });
+
+  test('treats an empty sub-call result as an error', async () => {
+    const consoleSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(jest.fn());
+    mockRequest.mockResolvedValueOnce([[[activeJob]], []]);
+    expect(await makeClient().getJobs()).toEqual([]);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Fail to get jobs',
+      expect.objectContaining({ message: expect.stringContaining('failed') }),
+    );
     consoleSpy.mockRestore();
   });
 });
@@ -229,25 +217,23 @@ describe('Aria2Client.getJobs', () => {
 // ─── getNumJobs ───────────────────────────────────────────────────────────
 
 describe('Aria2Client.getNumJobs', () => {
-  test('returns number of active jobs from tellActive', async () => {
-    mockCall.mockResolvedValueOnce([activeJob, waitingJob]); // 2 active
-    const client = makeWsClient();
-    expect(await client.getNumJobs()).toBe(2);
+  test('sends tellActive and returns the count of active jobs', async () => {
+    mockRequest.mockResolvedValueOnce([activeJob, waitingJob]);
+    expect(await makeClient().getNumJobs()).toBe(2);
+    expect(mockRequest).toHaveBeenCalledWith('aria2.tellActive', []);
   });
 
   test('returns 0 when no active jobs', async () => {
-    mockCall.mockResolvedValueOnce([]);
-    const client = makeWsClient();
-    expect(await client.getNumJobs()).toBe(0);
+    mockRequest.mockResolvedValueOnce([]);
+    expect(await makeClient().getNumJobs()).toBe(0);
   });
 
   test('returns 0 and logs error on failure', async () => {
     const consoleSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(jest.fn());
-    mockCall.mockRejectedValueOnce(new Error('timeout'));
-    const client = makeWsClient();
-    expect(await client.getNumJobs()).toBe(0);
+    mockRequest.mockRejectedValueOnce(new Error('timeout'));
+    expect(await makeClient().getNumJobs()).toBe(0);
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
@@ -257,16 +243,18 @@ describe('Aria2Client.getNumJobs', () => {
 
 describe('Aria2Client.startJobs', () => {
   test('does nothing when called with no gids', async () => {
-    await makeWsClient().startJobs();
-    expect(mockMultiCall).not.toHaveBeenCalled();
+    await makeClient().startJobs();
+    expect(mockRequest).not.toHaveBeenCalled();
   });
 
-  test('calls unpause for each gid via multiCall', async () => {
-    mockMultiCall.mockResolvedValueOnce([GID_A, GID_B]);
-    await makeWsClient().startJobs(GID_A, GID_B);
-    expect(mockMultiCall).toHaveBeenCalledWith([
-      ['unpause', GID_A],
-      ['unpause', GID_B],
+  test('sends unpause for each gid via system.multicall', async () => {
+    mockRequest.mockResolvedValueOnce(multicallResult(GID_A, GID_B));
+    await makeClient().startJobs(GID_A, GID_B);
+    expect(mockRequest).toHaveBeenCalledWith('system.multicall', [
+      [
+        { methodName: 'aria2.unpause', params: [GID_A] },
+        { methodName: 'aria2.unpause', params: [GID_B] },
+      ],
     ]);
   });
 
@@ -274,8 +262,8 @@ describe('Aria2Client.startJobs', () => {
     const consoleSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(jest.fn());
-    mockMultiCall.mockRejectedValueOnce(new Error('fail'));
-    await makeWsClient().startJobs(GID_A);
+    mockRequest.mockRejectedValueOnce(new Error('fail'));
+    await makeClient().startJobs(GID_A);
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
@@ -285,14 +273,16 @@ describe('Aria2Client.startJobs', () => {
 
 describe('Aria2Client.pauseJobs', () => {
   test('does nothing when called with no gids', async () => {
-    await makeWsClient().pauseJobs();
-    expect(mockMultiCall).not.toHaveBeenCalled();
+    await makeClient().pauseJobs();
+    expect(mockRequest).not.toHaveBeenCalled();
   });
 
-  test('calls pause for each gid via multiCall', async () => {
-    mockMultiCall.mockResolvedValueOnce([GID_C]);
-    await makeWsClient().pauseJobs(GID_C);
-    expect(mockMultiCall).toHaveBeenCalledWith([['pause', GID_C]]);
+  test('sends pause for each gid via system.multicall', async () => {
+    mockRequest.mockResolvedValueOnce(multicallResult(GID_C));
+    await makeClient().pauseJobs(GID_C);
+    expect(mockRequest).toHaveBeenCalledWith('system.multicall', [
+      [{ methodName: 'aria2.pause', params: [GID_C] }],
+    ]);
   });
 });
 
@@ -300,98 +290,96 @@ describe('Aria2Client.pauseJobs', () => {
 
 describe('Aria2Client.removeJobs', () => {
   test('does nothing when called with no gids', async () => {
-    await makeWsClient().removeJobs();
-    expect(mockMultiCall).not.toHaveBeenCalled();
+    await makeClient().removeJobs();
+    expect(mockRequest).not.toHaveBeenCalled();
   });
 
-  test('calls remove for each gid via multiCall', async () => {
-    mockMultiCall.mockResolvedValueOnce([GID_A, GID_B, GID_C]);
-    await makeWsClient().removeJobs(GID_A, GID_B, GID_C);
-    expect(mockMultiCall).toHaveBeenCalledWith([
-      ['remove', GID_A],
-      ['remove', GID_B],
-      ['remove', GID_C],
+  test('sends remove for each gid via system.multicall', async () => {
+    mockRequest.mockResolvedValueOnce(multicallResult(GID_A, GID_B, GID_C));
+    await makeClient().removeJobs(GID_A, GID_B, GID_C);
+    expect(mockRequest).toHaveBeenCalledWith('system.multicall', [
+      [
+        { methodName: 'aria2.remove', params: [GID_A] },
+        { methodName: 'aria2.remove', params: [GID_B] },
+        { methodName: 'aria2.remove', params: [GID_C] },
+      ],
     ]);
   });
 });
 
 // ─── addUri ───────────────────────────────────────────────────────────────
-// Per protocol: call('addUri', [link], options) → params = [[link], options]
+// Protocol requirement: URI must be wrapped in an array: addUri([[uri], options])
 
 describe('Aria2Client.addUri', () => {
-  test('calls aria2.call with URI wrapped in an array as per the protocol', async () => {
-    mockCall.mockResolvedValueOnce(GID_A);
-    await makeWsClient().addUri(
-      'https://example.com/ubuntu.iso',
-      'ubuntu.iso',
-      {
-        out: 'ubuntu.iso',
-        dir: '/downloads',
-      },
-    );
-    expect(mockCall).toHaveBeenCalledWith(
-      'addUri',
+  test('calls aria2.addUri with URI wrapped in array and options object', async () => {
+    mockRequest.mockResolvedValueOnce(GID_A);
+    await makeClient().addUri('https://example.com/ubuntu.iso', 'ubuntu.iso', {
+      out: 'ubuntu.iso',
+      dir: '/downloads',
+    });
+    expect(mockRequest).toHaveBeenCalledWith('aria2.addUri', [
       ['https://example.com/ubuntu.iso'],
       { out: 'ubuntu.iso', dir: '/downloads' },
-    );
+    ]);
   });
 
-  test('uses empty options {} when none provided', async () => {
-    mockCall.mockResolvedValueOnce(GID_A);
-    await makeWsClient().addUri('https://example.com/f.zip');
-    const args = mockCall.mock.calls[0] as any[];
-    expect(args[2]).toEqual({});
+  test('passes empty options {} when none provided', async () => {
+    mockRequest.mockResolvedValueOnce(GID_A);
+    await makeClient().addUri('https://example.com/f.zip');
+    const [, params] = mockRequest.mock.calls[0] as [string, any[]];
+    expect(params[1]).toEqual({});
   });
 
   test('notifies user with filename on success', async () => {
-    mockCall.mockResolvedValueOnce(GID_A);
-    await makeWsClient().addUri('https://example.com/f.zip', 'f.zip');
+    mockRequest.mockResolvedValueOnce(GID_A);
+    await makeClient().addUri('https://example.com/f.zip', 'f.zip');
     expect(jest.mocked(browserClient.notify)).toHaveBeenCalledWith(
       expect.stringContaining('f.zip'),
     );
   });
 
   test('notifies user of failure on RPC error', async () => {
-    mockCall.mockRejectedValueOnce(new Error('Unauthorized'));
-    await makeWsClient().addUri('https://example.com/f.zip', 'f.zip');
+    mockRequest.mockRejectedValueOnce(new Error('Unauthorized'));
+    await makeClient().addUri('https://example.com/f.zip', 'f.zip');
     expect(jest.mocked(browserClient.notify)).toHaveBeenCalledWith(
       expect.stringContaining('Fail'),
     );
   });
-
-  test('opens and closes WS connection around the singleCall', async () => {
-    mockCall.mockResolvedValueOnce(GID_A);
-    await makeWsClient().addUri('https://example.com/f.zip');
-    expect(mockOpen).toHaveBeenCalled();
-    expect(mockClose).toHaveBeenCalled();
-  });
 });
 
 // ─── addUris ──────────────────────────────────────────────────────────────
-// Per protocol: each URI maps to ['addUri', [uri]] in the multiCall list
+// Each URI maps to {methodName: 'aria2.addUri', params: [[uri]]} in the multicall
 
 describe('Aria2Client.addUris', () => {
   test('does nothing and sends no notification when called with no URIs', async () => {
-    await makeWsClient().addUris();
-    expect(mockMultiCall).not.toHaveBeenCalled();
+    await makeClient().addUris();
+    expect(mockRequest).not.toHaveBeenCalled();
     expect(jest.mocked(browserClient.notify)).not.toHaveBeenCalled();
   });
 
-  test('maps each URI to ["addUri", [uri]] in multiCall', async () => {
-    mockMultiCall.mockResolvedValueOnce([GID_A, GID_B]);
-    await makeWsClient().addUris(
+  test('maps each URI to {methodName: aria2.addUri, params: [[uri]]} in multicall', async () => {
+    mockRequest.mockResolvedValueOnce(multicallResult(GID_A, GID_B));
+    await makeClient().addUris(
       'https://a.example.com/1.zip',
       'https://b.example.com/2.zip',
     );
-    expect(mockMultiCall).toHaveBeenCalledWith([
-      ['addUri', ['https://a.example.com/1.zip']],
-      ['addUri', ['https://b.example.com/2.zip']],
+    expect(mockRequest).toHaveBeenCalledWith('system.multicall', [
+      [
+        {
+          methodName: 'aria2.addUri',
+          params: [['https://a.example.com/1.zip']],
+        },
+        {
+          methodName: 'aria2.addUri',
+          params: [['https://b.example.com/2.zip']],
+        },
+      ],
     ]);
   });
 
   test('notifies user with the number of files added', async () => {
-    mockMultiCall.mockResolvedValueOnce([GID_A, GID_B, GID_C]);
-    await makeWsClient().addUris(
+    mockRequest.mockResolvedValueOnce(multicallResult(GID_A, GID_B, GID_C));
+    await makeClient().addUris(
       'https://a.com/1',
       'https://b.com/2',
       'https://c.com/3',
@@ -402,10 +390,37 @@ describe('Aria2Client.addUris', () => {
   });
 
   test('notifies user of failure on RPC error', async () => {
-    mockMultiCall.mockRejectedValueOnce(new Error('Unauthorized'));
-    await makeWsClient().addUris('https://a.com/f');
+    mockRequest.mockRejectedValueOnce(new Error('Unauthorized'));
+    await makeClient().addUris('https://a.com/f');
     expect(jest.mocked(browserClient.notify)).toHaveBeenCalledWith(
       expect.stringContaining('Fail'),
     );
+  });
+});
+
+// ─── Token handling ───────────────────────────────────────────────────────
+
+describe('Aria2Client token handling', () => {
+  test('prepends token:SECRET to params for direct RPC calls', async () => {
+    mockRequest.mockResolvedValueOnce([]);
+    await makeClient({ token: 'SECRET' }).getNumJobs();
+    expect(mockRequest).toHaveBeenCalledWith('aria2.tellActive', [
+      'token:SECRET',
+    ]);
+  });
+
+  test('prepends token:SECRET to each sub-call params inside system.multicall', async () => {
+    mockRequest.mockResolvedValueOnce(multicallResult([], []));
+    await makeClient({ token: 'SECRET' }).getJobs();
+    const [, outerParams] = mockRequest.mock.calls[0] as [string, [any[]]];
+    const subCalls = outerParams[1]; // index 1 because token is at index 0
+    expect(subCalls[0]).toMatchObject({
+      methodName: 'aria2.tellActive',
+      params: ['token:SECRET'],
+    });
+    expect(subCalls[1]).toMatchObject({
+      methodName: 'aria2.tellWaiting',
+      params: ['token:SECRET', 0, 25],
+    });
   });
 });
