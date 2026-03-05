@@ -16,6 +16,7 @@ export class Aria2 {
   private readonly path: string;
   private id: number = 0;
   private ws: WebSocket | null = null;
+  private openingPromise: Promise<void> | null = null;
   private callbacks: Map<number, RPCCallback> = new Map();
 
   constructor(options: Aria2Options = {}) {
@@ -30,12 +31,15 @@ export class Aria2 {
    * Open WebSocket connection
    */
   async open(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        resolve();
-        return;
-      }
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      return;
+    }
 
+    if (this.openingPromise) {
+      return this.openingPromise;
+    }
+
+    this.openingPromise = new Promise<void>((resolve, reject) => {
       const protocol = this.secure ? 'wss' : 'ws';
       const url = `${protocol}://${this.host}:${this.port}${this.path}`;
 
@@ -65,7 +69,11 @@ export class Aria2 {
       this.ws.onmessage = event => {
         this.handleMessage(event.data);
       };
+    }).finally(() => {
+      this.openingPromise = null;
     });
+
+    return this.openingPromise;
   }
 
   /**
