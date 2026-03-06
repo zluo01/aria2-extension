@@ -4,6 +4,8 @@ import {
   JSONRPCResponseSchema,
 } from '@/lib/aria2c/types';
 
+const REQUEST_TIMEOUT = 3_000;
+
 export function createConnector(
   protocol: Aria2ClientType,
   host: string,
@@ -143,6 +145,20 @@ class Aria2WebSocketConnector implements Aria2Connector {
     const id: string = crypto.randomUUID();
     const request: JSONRPCRequest = { jsonrpc: '2.0', id, method, params };
     const resolvers = Promise.withResolvers<any>();
+    const timer = setTimeout(() => {
+      this.callbacks.delete(id);
+      resolvers.reject(new Error(`Request timed out: ${method}`));
+    }, REQUEST_TIMEOUT);
+    const originalResolve = resolvers.resolve;
+    const originalReject = resolvers.reject;
+    resolvers.resolve = (value: any) => {
+      clearTimeout(timer);
+      originalResolve(value);
+    };
+    resolvers.reject = (reason: any) => {
+      clearTimeout(timer);
+      originalReject(reason);
+    };
     this.callbacks.set(id, resolvers);
     this.ws?.send(JSON.stringify(request));
     return resolvers.promise;
@@ -184,6 +200,7 @@ class Aria2HttpConnector implements Aria2Connector {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(request),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT),
     });
 
     if (!response.ok) {
