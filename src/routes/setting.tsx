@@ -61,8 +61,9 @@ function Setting() {
   async function updatePort(
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ): Promise<void> {
-    if (config) {
-      await updateConfig({ ...config, port: parseInt(e.target.value) });
+    const port = parseInt(e.target.value, 10);
+    if (config && !Number.isNaN(port) && port >= 1 && port <= 65535) {
+      await updateConfig({ ...config, port });
     }
   }
 
@@ -148,7 +149,14 @@ function Setting() {
               </Field>
               <Field>
                 <FieldLabel>Port</FieldLabel>
-                <Input value={config?.port} onChange={updatePort} required />
+                <Input
+                  type="number"
+                  min={1}
+                  max={65535}
+                  value={config?.port}
+                  onChange={updatePort}
+                  required
+                />
                 <FieldDescription>Aria2 RPC port</FieldDescription>
               </Field>
               <Field>
