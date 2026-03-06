@@ -44,28 +44,32 @@ browser.runtime.onMessage.addListener(async (data: unknown) => {
     console.error('Invalid message', result.error);
     return;
   }
-  const c = await aria2Client();
-  switch (result.data.type) {
-    case MessageType.Signal:
-      return cacheSet(result.data.message);
-    case MessageType.GetJobs:
-      return c.getJobs();
-    case MessageType.GetNumJobs:
-      return c.getNumJobs();
-    case MessageType.AddUri:
-      return c.addUri(
-        result.data.link,
-        result.data.filename,
-        result.data.options,
-      );
-    case MessageType.AddUris:
-      return c.addUris(...result.data.uris);
-    case MessageType.StartJobs:
-      return c.startJobs(...result.data.gids);
-    case MessageType.PauseJobs:
-      return c.pauseJobs(...result.data.gids);
-    case MessageType.RemoveJobs:
-      return c.removeJobs(...result.data.gids);
+  try {
+    const c = await aria2Client();
+    switch (result.data.type) {
+      case MessageType.Signal:
+        return cacheSet(result.data.message);
+      case MessageType.GetJobs:
+        return c.getJobs();
+      case MessageType.GetNumJobs:
+        return c.getNumJobs();
+      case MessageType.AddUri:
+        return c.addUri(
+          result.data.link,
+          result.data.filename,
+          result.data.options,
+        );
+      case MessageType.AddUris:
+        return c.addUris(...result.data.uris);
+      case MessageType.StartJobs:
+        return c.startJobs(...result.data.gids);
+      case MessageType.PauseJobs:
+        return c.pauseJobs(...result.data.gids);
+      case MessageType.RemoveJobs:
+        return c.removeJobs(...result.data.gids);
+    }
+  } catch (e) {
+    console.error('Failed to handle message', result.data.type, e);
   }
 });
 
