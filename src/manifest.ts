@@ -16,7 +16,6 @@ const base = {
     'notifications',
     'storage',
     'downloads',
-    'alarms',
   ],
   host_permissions: ['<all_urls>'],
   content_security_policy: {
