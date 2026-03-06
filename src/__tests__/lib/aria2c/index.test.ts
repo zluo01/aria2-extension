@@ -32,6 +32,7 @@ async function loadModule(opts: {
   const shouldResetFn = opts.shouldReset ?? jest.fn().mockReturnValue(false);
   const MockAria2Client = jest.fn().mockImplementation(() => ({
     shouldReset: shouldResetFn,
+    close: jest.fn(),
   }));
 
   jest.doMock('webextension-polyfill', () => ({}));

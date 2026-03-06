@@ -13,6 +13,7 @@ export async function aria2Client(): Promise<Aria2Client> {
   const instance = await singletonPromise;
   const config = await client.getConfiguration();
   if (instance.shouldReset(config)) {
+    instance.close();
     const newInstance = new Aria2Client(config);
     singletonPromise = Promise.resolve(newInstance);
     return newInstance;

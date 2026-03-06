@@ -22,6 +22,10 @@ export class Aria2Client {
     );
   }
 
+  close(): void {
+    this.connector.close();
+  }
+
   shouldReset(config: IConfig): boolean {
     return (
       this.config.path !== config.path ||

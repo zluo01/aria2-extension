@@ -18,11 +18,13 @@ export function createConnector(
 
 export interface Aria2Connector {
   request(method: string, params: any[]): Promise<any>;
+  close(): void;
 }
 
 class Aria2WebSocketConnector implements Aria2Connector {
   private ws: WebSocket | null;
   private callbacks: Map<string, PromiseWithResolvers<any>>;
+  private keepAliveIntervalId: ReturnType<typeof setInterval> | null = null;
 
   constructor(host: string, port: number, secure: boolean, path: string) {
     const protocol = secure ? 'wss' : 'ws';
@@ -43,6 +45,7 @@ class Aria2WebSocketConnector implements Aria2Connector {
     this.ws.onclose = () => {
       console.warn('Aria2 Websocket Closed');
       this.ws = null;
+      this.rejectAllCallbacks();
     };
 
     this.ws.onmessage = event => {
@@ -98,13 +101,38 @@ class Aria2WebSocketConnector implements Aria2Connector {
    * https://developer.chrome.com/docs/extensions/how-to/web-platform/websockets#websocket-keepalive
    */
   private keepAlive() {
-    const keepAliveIntervalId = setInterval(() => {
+    this.keepAliveIntervalId = setInterval(() => {
       if (this.ws && this.isConnected()) {
         this.request('aria2.getVersion', []).catch(console.error);
       } else {
-        clearInterval(keepAliveIntervalId);
+        this.clearKeepAlive();
       }
     }, 20 * 1000);
+  }
+
+  private clearKeepAlive() {
+    if (this.keepAliveIntervalId !== null) {
+      clearInterval(this.keepAliveIntervalId);
+      this.keepAliveIntervalId = null;
+    }
+  }
+
+  private rejectAllCallbacks() {
+    const error = new Error('Aria2 Websocket closed');
+    for (const [, callback] of this.callbacks) {
+      callback.reject(error);
+    }
+    this.callbacks.clear();
+  }
+
+  close() {
+    this.clearKeepAlive();
+    this.rejectAllCallbacks();
+    if (this.ws) {
+      this.ws.onclose = null;
+      this.ws.close();
+      this.ws = null;
+    }
   }
 
   request(method: string, params: any[]): Promise<any> {
@@ -130,6 +158,10 @@ class Aria2HttpConnector implements Aria2Connector {
   constructor(host: string, port: number, secure: boolean, path: string) {
     const protocol = secure ? 'https' : 'http';
     this.url = `${protocol}://${host}:${port}${path}`;
+  }
+
+  close() {
+    // no-op: HTTP connector is stateless
   }
 
   async request(method: string, params: any[]): Promise<any> {
