@@ -179,43 +179,24 @@ describe('Aria2Client.getJobs', () => {
     expect(await makeClient().getJobs()).toEqual([]);
   });
 
-  test('returns [] and logs error on network failure', async () => {
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(jest.fn());
+  test('propagates error on network failure', async () => {
     mockRequest.mockRejectedValueOnce(new Error('connection refused'));
-    expect(await makeClient().getJobs()).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    await expect(makeClient().getJobs()).rejects.toThrow('connection refused');
   });
 
   test('propagates faultString from a failing sub-call as a thrown error', async () => {
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(jest.fn());
     mockRequest.mockResolvedValueOnce([
       [[activeJob]],
       [{ faultCode: 1, faultString: 'aria2 error: invalid params' }],
     ]);
-    expect(await makeClient().getJobs()).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Fail to get jobs',
-      expect.objectContaining({ message: 'aria2 error: invalid params' }),
+    await expect(makeClient().getJobs()).rejects.toThrow(
+      'aria2 error: invalid params',
     );
-    consoleSpy.mockRestore();
   });
 
   test('treats an empty sub-call result as an error', async () => {
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(jest.fn());
     mockRequest.mockResolvedValueOnce([[[activeJob]], []]);
-    expect(await makeClient().getJobs()).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Fail to get jobs',
-      expect.objectContaining({ message: expect.stringContaining('failed') }),
-    );
-    consoleSpy.mockRestore();
+    await expect(makeClient().getJobs()).rejects.toThrow('failed');
   });
 });
 
@@ -233,14 +214,9 @@ describe('Aria2Client.getNumJobs', () => {
     expect(await makeClient().getNumJobs()).toBe(0);
   });
 
-  test('returns 0 and logs error on failure', async () => {
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(jest.fn());
+  test('propagates error on failure', async () => {
     mockRequest.mockRejectedValueOnce(new Error('timeout'));
-    expect(await makeClient().getNumJobs()).toBe(0);
-    expect(consoleSpy).toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    await expect(makeClient().getNumJobs()).rejects.toThrow('timeout');
   });
 });
 
@@ -263,14 +239,9 @@ describe('Aria2Client.startJobs', () => {
     ]);
   });
 
-  test('logs error on failure', async () => {
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(jest.fn());
+  test('propagates error on failure', async () => {
     mockRequest.mockRejectedValueOnce(new Error('fail'));
-    await makeClient().startJobs(GID_A);
-    expect(consoleSpy).toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    await expect(makeClient().startJobs(GID_A)).rejects.toThrow('fail');
   });
 });
 

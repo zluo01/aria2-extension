@@ -32,8 +32,11 @@ export const getThemeQueryOptions = queryOptions({
   staleTime: Infinity,
 });
 
-async function getJobs() {
-  return client.sendMessage<IJob[]>({ type: MessageType.GetJobs });
+async function getJobs(): Promise<IJob[]> {
+  const jobs = await client
+    .sendMessage<IJob[]>({ type: MessageType.GetJobs })
+    .catch(() => null);
+  return jobs ?? [];
 }
 
 export async function addUri(

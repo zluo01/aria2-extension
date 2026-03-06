@@ -32,9 +32,10 @@ async function loadModule(opts: {
 }) {
   const shouldResetFn = opts.shouldReset ?? jest.fn().mockReturnValue(false);
   const isAliveFn = opts.isAlive ?? jest.fn().mockReturnValue(true);
+  const closeFn = jest.fn();
   const MockAria2Client = jest.fn().mockImplementation(() => ({
     shouldReset: shouldResetFn,
-    close: jest.fn(),
+    close: closeFn,
     isAlive: isAliveFn,
   }));
 
@@ -45,7 +46,7 @@ async function loadModule(opts: {
   jest.doMock('@/lib/aria2c/client', () => ({ Aria2Client: MockAria2Client }));
 
   const { aria2Client } = await import('@/lib/aria2c');
-  return { aria2Client, MockAria2Client, shouldResetFn };
+  return { aria2Client, MockAria2Client, shouldResetFn, closeFn };
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────
@@ -101,7 +102,7 @@ describe('aria2Client singleton', () => {
     expect(c2).toBe(c3);
   });
 
-  test('creates a new instance when shouldReset returns true', async () => {
+  test('creates a new instance when shouldReset returns true and closes the old one', async () => {
     // shouldReset: first call stable, second call config changed.
     const shouldReset = jest
       .fn<() => boolean>()
@@ -114,7 +115,7 @@ describe('aria2Client singleton', () => {
       .mockResolvedValueOnce(BASE_CONFIG) // first shouldReset check → stable
       .mockResolvedValue(NEW_CONFIG); // second shouldReset check → changed
 
-    const { aria2Client, MockAria2Client } = await loadModule({
+    const { aria2Client, MockAria2Client, closeFn } = await loadModule({
       getConfiguration,
       shouldReset,
     });
@@ -124,6 +125,7 @@ describe('aria2Client singleton', () => {
 
     expect(MockAria2Client).toHaveBeenCalledTimes(2); // new instance created
     expect(c1).not.toBe(c2);
+    expect(closeFn).toHaveBeenCalledTimes(1); // old instance closed
   });
 
   test('after reset the new instance becomes the singleton for future calls', async () => {
@@ -152,7 +154,7 @@ describe('aria2Client singleton', () => {
     expect(c2).toBe(c3);
   });
 
-  test('creates a new instance when isAlive returns false (dead connection)', async () => {
+  test('creates a new instance when isAlive returns false without closing', async () => {
     const isAlive = jest
       .fn<() => boolean>()
       .mockReturnValueOnce(true) // first call: connection alive
@@ -162,7 +164,7 @@ describe('aria2Client singleton', () => {
       .fn<() => Promise<IConfig>>()
       .mockResolvedValue(BASE_CONFIG);
 
-    const { aria2Client, MockAria2Client } = await loadModule({
+    const { aria2Client, MockAria2Client, closeFn } = await loadModule({
       getConfiguration,
       isAlive,
     });
@@ -172,5 +174,6 @@ describe('aria2Client singleton', () => {
 
     expect(MockAria2Client).toHaveBeenCalledTimes(2);
     expect(c1).not.toBe(c2);
+    expect(closeFn).not.toHaveBeenCalled(); // dead connection — nothing to close
   });
 });

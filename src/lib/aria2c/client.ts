@@ -41,60 +41,38 @@ export class Aria2Client {
   }
 
   async getJobs(): Promise<IJob[]> {
-    try {
-      const multiCallItems = [['tellActive'], ['tellWaiting', 0, 25]];
-      const data = await this.multiCall(multiCallItems);
-      return this.flatten(data);
-    } catch (e) {
-      console.error('Fail to get jobs', e);
-    }
-    return [];
+    const multiCallItems = [['tellActive'], ['tellWaiting', 0, 25]];
+    const data = await this.multiCall(multiCallItems);
+    return this.flatten(data);
   }
 
   async startJobs(...gid: string[]): Promise<void> {
     if (!gid.length) {
       return;
     }
-    try {
-      const multiCallItems = gid.map(o => ['unpause', o]);
-      await this.multiCall(multiCallItems);
-    } catch (e) {
-      console.error('Start Jobs', e);
-    }
+    const multiCallItems = gid.map(o => ['unpause', o]);
+    await this.multiCall(multiCallItems);
   }
 
   async pauseJobs(...gid: string[]): Promise<void> {
     if (!gid.length) {
       return;
     }
-    try {
-      const multiCallItems = gid.map(o => ['pause', o]);
-      await this.multiCall(multiCallItems);
-    } catch (e) {
-      console.error('Pause Jobs', e);
-    }
+    const multiCallItems = gid.map(o => ['pause', o]);
+    await this.multiCall(multiCallItems);
   }
 
   async removeJobs(...gid: string[]): Promise<void> {
     if (!gid.length) {
       return;
     }
-    try {
-      const multiCallItems = gid.map(o => ['remove', o]);
-      await this.multiCall(multiCallItems);
-    } catch (e) {
-      console.error('Remove Jobs', e);
-    }
+    const multiCallItems = gid.map(o => ['remove', o]);
+    await this.multiCall(multiCallItems);
   }
 
   async getNumJobs(): Promise<number> {
-    try {
-      const data = await this.call('tellActive');
-      return data.length;
-    } catch (e) {
-      console.error('Fail to get numJobs', e);
-    }
-    return 0;
+    const data = await this.call('tellActive');
+    return data.length;
   }
 
   async addUris(...uris: string[]): Promise<void> {
