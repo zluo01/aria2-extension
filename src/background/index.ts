@@ -69,12 +69,21 @@ browser.runtime.onMessage.addListener(async (data: unknown) => {
   }
 });
 
+const POLL_MIN = 1000;
+const POLL_MAX = 30_000;
+let pollInterval = POLL_MIN;
+
 async function updateActiveJobNumber(): Promise<void> {
-  return aria2Client()
-    .then(o => o.getNumJobs())
-    .then(num => client.updateBadge(num))
-    .catch(err => console.error(err))
-    .finally(() => setTimeout(updateActiveJobNumber, 1000));
+  try {
+    const c = await aria2Client();
+    const num = await c.getNumJobs();
+    await client.updateBadge(num);
+    pollInterval = POLL_MIN;
+  } catch {
+    pollInterval = Math.min(pollInterval * 2, POLL_MAX);
+  } finally {
+    setTimeout(updateActiveJobNumber, pollInterval);
+  }
 }
 
 updateActiveJobNumber();
