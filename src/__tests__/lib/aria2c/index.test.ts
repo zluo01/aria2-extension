@@ -28,11 +28,14 @@ const NEW_CONFIG = { ...BASE_CONFIG, host: '192.168.1.1' };
 async function loadModule(opts: {
   getConfiguration: jest.Mock<() => Promise<IConfig>>;
   shouldReset?: jest.Mock<() => boolean>;
+  isAlive?: jest.Mock<() => boolean>;
 }) {
   const shouldResetFn = opts.shouldReset ?? jest.fn().mockReturnValue(false);
+  const isAliveFn = opts.isAlive ?? jest.fn().mockReturnValue(true);
   const MockAria2Client = jest.fn().mockImplementation(() => ({
     shouldReset: shouldResetFn,
     close: jest.fn(),
+    isAlive: isAliveFn,
   }));
 
   jest.doMock('webextension-polyfill', () => ({}));
@@ -147,5 +150,27 @@ describe('aria2Client singleton', () => {
     expect(MockAria2Client).toHaveBeenCalledTimes(2); // only one reset happened
     expect(c1).toBe(c2); // new instance reused
     expect(c2).toBe(c3);
+  });
+
+  test('creates a new instance when isAlive returns false (dead connection)', async () => {
+    const isAlive = jest
+      .fn<() => boolean>()
+      .mockReturnValueOnce(true) // first call: connection alive
+      .mockReturnValueOnce(false); // second call: connection dead
+
+    const getConfiguration = jest
+      .fn<() => Promise<IConfig>>()
+      .mockResolvedValue(BASE_CONFIG);
+
+    const { aria2Client, MockAria2Client } = await loadModule({
+      getConfiguration,
+      isAlive,
+    });
+
+    const c1 = await aria2Client();
+    const c2 = await aria2Client();
+
+    expect(MockAria2Client).toHaveBeenCalledTimes(2);
+    expect(c1).not.toBe(c2);
   });
 });

@@ -19,6 +19,7 @@ export function createConnector(
 export interface Aria2Connector {
   request(method: string, params: any[]): Promise<any>;
   close(): void;
+  isAlive(): boolean;
 }
 
 class Aria2WebSocketConnector implements Aria2Connector {
@@ -102,7 +103,7 @@ class Aria2WebSocketConnector implements Aria2Connector {
    */
   private keepAlive() {
     this.keepAliveIntervalId = setInterval(() => {
-      if (this.ws && this.isConnected()) {
+      if (this.ws && this.isAlive()) {
         this.request('aria2.getVersion', []).catch(console.error);
       } else {
         this.clearKeepAlive();
@@ -136,7 +137,7 @@ class Aria2WebSocketConnector implements Aria2Connector {
   }
 
   request(method: string, params: any[]): Promise<any> {
-    if (!this.isConnected()) {
+    if (!this.isAlive()) {
       return Promise.reject(new Error('Aria2 Websocket is not connected'));
     }
     const id: string = crypto.randomUUID();
@@ -147,7 +148,7 @@ class Aria2WebSocketConnector implements Aria2Connector {
     return resolvers.promise;
   }
 
-  private isConnected(): boolean {
+  isAlive(): boolean {
     return this.ws != null && this.ws.readyState === WebSocket.OPEN;
   }
 }
@@ -162,6 +163,10 @@ class Aria2HttpConnector implements Aria2Connector {
 
   close() {
     // no-op: HTTP connector is stateless
+  }
+
+  isAlive(): boolean {
+    return true;
   }
 
   async request(method: string, params: any[]): Promise<any> {
