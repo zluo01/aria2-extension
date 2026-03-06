@@ -37,7 +37,7 @@ class Aira2WebSocketConnector implements Aria2Connector {
     };
 
     this.ws.onerror = error => {
-      console.error('Aria2 Websocket Error', error);
+      console.error('Aria2 Websocket Error', JSON.stringify(error));
     };
 
     this.ws.onclose = () => {
@@ -60,17 +60,26 @@ class Aira2WebSocketConnector implements Aria2Connector {
         console.error(
           'Failed to validate JSON-RPC response:',
           rpcResponse.error,
-          { data },
+          data,
         );
         return;
       }
 
-      const id = rpcResponse.data.id;
+      // Server-pushed notification (aria2.onDownloadComplete etc.) — no id.
+      if ('method' in rpcResponse.data) {
+        return;
+      }
+
+      const { id } = rpcResponse.data;
+      // id is null when aria2 could not parse our request (JSON-RPC spec §5).
+      if (id === null) {
+        console.error('Received JSON-RPC error with null id:', data);
+        return;
+      }
+
       const callback = this.callbacks.get(id);
       if (!callback) {
-        console.error('No callback found for JSON-RPC response id:', id, {
-          data: rpcResponse.data,
-        });
+        console.error('No callback found for JSON-RPC response id:', id, data);
         return;
       }
       this.callbacks.delete(id);
@@ -85,21 +94,17 @@ class Aira2WebSocketConnector implements Aria2Connector {
   }
 
   /**
+   * Sends a lightweight JSON-RPC request every 20 s to keep the Chrome service worker alive.
    * https://developer.chrome.com/docs/extensions/how-to/web-platform/websockets#websocket-keepalive
-   * @private
    */
   private keepAlive() {
-    const keepAliveIntervalId = setInterval(
-      () => {
-        if (this.ws) {
-          this.ws.send('keepalive');
-        } else {
-          clearInterval(keepAliveIntervalId);
-        }
-      },
-      // Set the interval to 20 seconds to prevent the service worker from becoming inactive.
-      20 * 1000,
-    );
+    const keepAliveIntervalId = setInterval(() => {
+      if (this.ws && this.isConnected()) {
+        this.request('aria2.getVersion', []).catch(console.error);
+      } else {
+        clearInterval(keepAliveIntervalId);
+      }
+    }, 20 * 1000);
   }
 
   request(method: string, params: any[]): Promise<any> {
@@ -154,6 +159,10 @@ class Aria2HttpConnector implements Aria2Connector {
       throw new Error(
         `Fail to validate response: ${rpcResponse.error.message} for data ${JSON.stringify(resp)}`,
       );
+    }
+
+    if ('method' in rpcResponse.data) {
+      throw new Error('Unexpected notification received over HTTP');
     }
 
     if ('error' in rpcResponse.data) {

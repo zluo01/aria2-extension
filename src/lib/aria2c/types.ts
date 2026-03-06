@@ -13,7 +13,12 @@ export interface JSONRPCRequest {
 }
 
 /**
- * JSON-RPC response structure
+ * JSON-RPC message structure — covers three variants:
+ *   - Success response:  { id: string, result }
+ *   - Error response:    { id: string | null, error }  (id is null when the
+ *                        server could not parse the request, per spec §5)
+ *   - Notification:      { method, params }            (server-pushed event,
+ *                        no id — e.g. aria2.onDownloadComplete)
  */
 export const JSONRPCResponseSchema = z.union([
   z.object({
@@ -23,10 +28,15 @@ export const JSONRPCResponseSchema = z.union([
   }),
   z.object({
     jsonrpc: z.literal('2.0'),
-    id: z.string(),
+    id: z.string().nullable(),
     error: z.object({
       code: z.number(),
       message: z.string(),
     }),
+  }),
+  z.object({
+    jsonrpc: z.literal('2.0'),
+    method: z.string(),
+    params: z.array(z.any()),
   }),
 ]);
