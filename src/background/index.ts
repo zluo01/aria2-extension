@@ -83,7 +83,8 @@ async function updateActiveJobNumber(): Promise<void> {
     const num = await c.getNumJobs();
     await client.updateBadge(num);
     pollInterval = POLL_MIN;
-  } catch {
+  } catch (e) {
+    console.error('Failed to update job number', e);
     pollInterval = Math.min(pollInterval * 2, POLL_MAX);
   } finally {
     setTimeout(updateActiveJobNumber, pollInterval);
