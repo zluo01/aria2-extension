@@ -9,12 +9,7 @@ export interface BrowserClient {
   openDetail(fromExtension: boolean): void;
   openSetting(): Promise<void>;
   notify(msg: string): Promise<void>;
-  download(
-    url: string,
-    filename: string,
-    filePath: string,
-    header: string[],
-  ): Promise<void>;
+  download(url: string, filename: string, filePath: string): Promise<void>;
   saveFile(url: string, filename: string, saveAs: boolean): Promise<void>;
   updateBadge(num: number): Promise<void>;
   registerDownloadInterceptor(): void;

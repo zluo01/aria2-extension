@@ -58,7 +58,7 @@ function DownloadPanel() {
   });
 
   async function downloadFile(url: string, fileName: string, filePath: string) {
-    await client.download(url, fileName, filePath, []);
+    await client.download(url, fileName, filePath);
   }
 
   return (

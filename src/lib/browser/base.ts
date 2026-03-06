@@ -86,7 +86,6 @@ export abstract class IBaseBrowserClient<T> implements BrowserClient {
     url: string,
     filename: string,
     filePath: string,
-    header: string[],
   ): Promise<void> {
     try {
       const options: IDownload = {
@@ -94,9 +93,6 @@ export abstract class IBaseBrowserClient<T> implements BrowserClient {
       };
       if (filePath) {
         options.dir = filePath.replace(/\\/g, '\\\\');
-      }
-      if (header) {
-        options.header = header as string[];
       }
       await addUri(url, filename, options);
       const windowInfo = await this.getCurrentWindow();
