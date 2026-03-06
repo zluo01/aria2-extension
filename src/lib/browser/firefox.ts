@@ -119,20 +119,24 @@ export class FirefoxClient extends IBaseBrowserClient<Downloads.DownloadItem> {
 
   registerDownloadInterceptor(): void {
     browser.downloads.onCreated.addListener(async downloadItem => {
-      const id = downloadItem.id;
+      try {
+        const id = downloadItem.id;
 
-      const fileDetail = await this.getDownloadDetail(downloadItem);
-      if (this.shouldIgnoreDownloadURL(fileDetail.url)) {
-        return;
+        const fileDetail = await this.getDownloadDetail(downloadItem);
+        if (this.shouldIgnoreDownloadURL(fileDetail.url)) {
+          return;
+        }
+
+        // do nothing when user choose to download with built-in downloader
+        if (await cacheRemove(fileDetail.url)) {
+          return;
+        }
+
+        await this.cancelDownload(id);
+        await this.prepareDownload(fileDetail);
+      } catch (e) {
+        console.error('Download interceptor error', e);
       }
-
-      // do nothing when user choose to download with built-in downloader
-      if (await cacheRemove(fileDetail.url)) {
-        return;
-      }
-
-      await this.cancelDownload(id);
-      await this.prepareDownload(fileDetail);
     });
   }
 }
