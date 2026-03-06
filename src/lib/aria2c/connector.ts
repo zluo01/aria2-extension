@@ -12,7 +12,7 @@ export function createConnector(
   path: string,
 ) {
   return protocol === 'ws'
-    ? new Aira2WebSocketConnector(host, port, secure, path)
+    ? new Aria2WebSocketConnector(host, port, secure, path)
     : new Aria2HttpConnector(host, port, secure, path);
 }
 
@@ -20,7 +20,7 @@ export interface Aria2Connector {
   request(method: string, params: any[]): Promise<any>;
 }
 
-class Aira2WebSocketConnector implements Aria2Connector {
+class Aria2WebSocketConnector implements Aria2Connector {
   private ws: WebSocket | null;
   private callbacks: Map<string, PromiseWithResolvers<any>>;
 
