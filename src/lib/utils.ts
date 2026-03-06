@@ -46,9 +46,9 @@ export function parseBytes(value: number): string {
   const symbol = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   let speed = value;
   let order = 0;
-  while (speed >= 1000 && order < symbol.length - 1) {
+  while (speed >= 1024 && order < symbol.length - 1) {
     order++;
-    speed = speed / 1000;
+    speed = speed / 1024;
   }
   return `${speed.toFixed(2)} ${symbol[order]}`;
 }
