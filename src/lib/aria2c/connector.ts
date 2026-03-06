@@ -25,8 +25,9 @@ export interface Aria2Connector {
 }
 
 class Aria2WebSocketConnector implements Aria2Connector {
+  private readonly callbacks: Map<string, PromiseWithResolvers<any>>;
+
   private ws: WebSocket | null;
-  private callbacks: Map<string, PromiseWithResolvers<any>>;
   private keepAliveIntervalId: ReturnType<typeof setInterval> | null = null;
 
   constructor(host: string, port: number, secure: boolean, path: string) {
@@ -38,7 +39,7 @@ class Aria2WebSocketConnector implements Aria2Connector {
 
     this.ws.onopen = () => {
       console.warn('Aria2 Websocket Connected');
-      this.keepAlive();
+      this.keepAliveIntervalId = this.keepAlive();
     };
 
     this.ws.onerror = error => {
@@ -103,8 +104,8 @@ class Aria2WebSocketConnector implements Aria2Connector {
    * Sends a lightweight JSON-RPC request every 20 s to keep the Chrome service worker alive.
    * https://developer.chrome.com/docs/extensions/how-to/web-platform/websockets#websocket-keepalive
    */
-  private keepAlive() {
-    this.keepAliveIntervalId = setInterval(() => {
+  private keepAlive(): ReturnType<typeof setInterval> {
+    return setInterval(() => {
       if (this.ws && this.isAlive()) {
         this.request('aria2.getVersion', []).catch(console.error);
       } else {
