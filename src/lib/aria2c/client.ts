@@ -18,7 +18,6 @@ export class Aria2Client {
       config.host,
       config.port,
       secure,
-      config.path,
     );
   }
 

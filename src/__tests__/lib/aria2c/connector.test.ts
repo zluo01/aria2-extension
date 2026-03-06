@@ -34,7 +34,7 @@ beforeEach(() => {
 // ─── Helper ──────────────────────────────────────────────────────────────────
 
 function makeWsConnector() {
-  const connector = createConnector('ws', '127.0.0.1', 6800, false, '/jsonrpc');
+  const connector = createConnector('ws', '127.0.0.1', 6800, false);
   // Simulate connection open
   wsInstance.onopen?.();
   return connector;
@@ -119,13 +119,7 @@ describe('HTTP connector timeout', () => {
     );
     globalThis.fetch = mockFetch;
 
-    const connector = createConnector(
-      'http',
-      '127.0.0.1',
-      6800,
-      false,
-      '/jsonrpc',
-    );
+    const connector = createConnector('http', '127.0.0.1', 6800, false);
     await connector.request('aria2.getVersion', []);
 
     expect(timeoutSpy).toHaveBeenCalledWith(3_000);

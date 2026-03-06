@@ -11,11 +11,10 @@ export function createConnector(
   host: string,
   port: number,
   secure: boolean,
-  path: string,
 ) {
   return protocol === 'ws'
-    ? new Aria2WebSocketConnector(host, port, secure, path)
-    : new Aria2HttpConnector(host, port, secure, path);
+    ? new Aria2WebSocketConnector(host, port, secure)
+    : new Aria2HttpConnector(host, port, secure);
 }
 
 export interface Aria2Connector {
@@ -30,9 +29,9 @@ class Aria2WebSocketConnector implements Aria2Connector {
   private ws: WebSocket | null;
   private keepAliveIntervalId: ReturnType<typeof setInterval> | null = null;
 
-  constructor(host: string, port: number, secure: boolean, path: string) {
+  constructor(host: string, port: number, secure: boolean) {
     const protocol = secure ? 'wss' : 'ws';
-    const url = `${protocol}://${host}:${port}${path}`;
+    const url = `${protocol}://${host}:${port}/jsonrpc`;
 
     this.callbacks = new Map();
     this.ws = new WebSocket(url);
@@ -173,9 +172,9 @@ class Aria2WebSocketConnector implements Aria2Connector {
 class Aria2HttpConnector implements Aria2Connector {
   private readonly url: string;
 
-  constructor(host: string, port: number, secure: boolean, path: string) {
+  constructor(host: string, port: number, secure: boolean) {
     const protocol = secure ? 'https' : 'http';
-    this.url = `${protocol}://${host}:${port}${path}`;
+    this.url = `${protocol}://${host}:${port}/jsonrpc`;
   }
 
   close() {
