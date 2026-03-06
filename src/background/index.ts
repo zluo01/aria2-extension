@@ -21,7 +21,12 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
     if (!url) {
       return;
     }
-    await aria2Client().then(o => o.addUri(url));
+    try {
+      const c = await aria2Client();
+      await c.addUri(url);
+    } catch (e) {
+      await client.notify(`Fail to download with Aria2: ${e}`);
+    }
   }
 });
 
