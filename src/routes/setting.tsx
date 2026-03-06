@@ -153,7 +153,11 @@ function Setting() {
               </Field>
               <Field>
                 <FieldLabel>Token</FieldLabel>
-                <Input value={config?.token} onChange={updateToken} />
+                <Input
+                  type="password"
+                  value={config?.token}
+                  onChange={updateToken}
+                />
                 <FieldDescription>Aria2 RPC secret, optional.</FieldDescription>
               </Field>
             </FieldGroup>
