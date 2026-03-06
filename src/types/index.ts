@@ -81,7 +81,7 @@ export interface IConfig {
 }
 
 export const DEFAULT_CONFIG: IConfig = {
-  path: '',
+  path: '/jsonrpc',
   protocol: 'ws',
   host: '127.0.0.1',
   port: 6800,
