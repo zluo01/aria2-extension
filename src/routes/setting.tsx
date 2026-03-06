@@ -22,7 +22,7 @@ import { client } from '@/lib/browser';
 import { getConfigurationQueryOptions, queryClient } from '@/lib/queries';
 import { useTheme } from '@/lib/theme';
 import { Chrome } from '@/manifest';
-import { IConfig } from '@/types';
+import { IConfig, Protocol } from '@/types';
 
 export const Route = createFileRoute('/setting')({
   loader: ({ context: { queryClient } }) =>
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/setting')({
   component: Setting,
 });
 
-const protocol = {
+const protocol: Record<Protocol, string> = {
   ws: 'WebSocket',
   wss: 'WebSocket (Security)',
   http: 'Http',
@@ -74,7 +74,7 @@ function Setting() {
     }
   }
 
-  async function updateProtocol(protocol: string): Promise<void> {
+  async function updateProtocol(protocol: Protocol): Promise<void> {
     if (config) {
       await updateConfig({ ...config, protocol });
     }
@@ -120,7 +120,10 @@ function Setting() {
               </Field>
               <Field>
                 <FieldLabel>Protocol</FieldLabel>
-                <Select onValueChange={updateProtocol} value={config?.protocol}>
+                <Select
+                  onValueChange={v => updateProtocol(v as Protocol)}
+                  value={config?.protocol}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>

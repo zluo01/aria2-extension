@@ -24,6 +24,7 @@ import {
 
 import { Aria2Client } from '@/lib/aria2c/client';
 import { client as browserClient } from '@/lib/browser';
+import { IConfig } from '@/types';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ const waitingJob = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
-const BASE_CONFIG = {
+const BASE_CONFIG: IConfig = {
   host: '127.0.0.1',
   port: 6800,
   protocol: 'ws',

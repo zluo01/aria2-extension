@@ -72,9 +72,11 @@ export const PAUSED_JOB = 'paused';
 
 export type Theme = 'dark' | 'light' | 'system';
 
+export type Protocol = 'ws' | 'wss' | 'http' | 'https';
+
 export interface IConfig {
   path: string;
-  protocol: string;
+  protocol: Protocol;
   host: string;
   port: number;
   token: string;
