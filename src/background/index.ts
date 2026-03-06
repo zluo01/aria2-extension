@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 
-import { getAria2Client } from '@/lib/aria2c';
+import { aria2Client } from '@/lib/aria2c';
 import { client } from '@/lib/browser';
 import { cacheSet } from '@/lib/session-cache';
 import { MessageSchema, MessageType } from '@/types';
@@ -18,12 +18,10 @@ browser.runtime.onInstalled.addListener(() => {
 browser.contextMenus.onClicked.addListener(async (info, _tab) => {
   if (info.menuItemId === CONTEXT_ID) {
     const url = info.srcUrl ?? info.linkUrl;
-    if (!url) return;
-    try {
-      await (await getAria2Client()).addUri(url);
-    } catch (e) {
-      await client.notify(`fail to download url, msg: ${e}`);
+    if (!url) {
+      return;
     }
+    await aria2Client().then(o => o.addUri(url));
   }
 });
 
@@ -41,7 +39,7 @@ browser.runtime.onMessage.addListener(async (data: unknown) => {
     console.error('Invalid message', result.error);
     return;
   }
-  const c = await getAria2Client();
+  const c = await aria2Client();
   switch (result.data.type) {
     case MessageType.Signal:
       return cacheSet(result.data.message);
@@ -67,15 +65,11 @@ browser.runtime.onMessage.addListener(async (data: unknown) => {
 });
 
 async function updateActiveJobNumber(): Promise<void> {
-  try {
-    const c = await getAria2Client();
-    const num = await c.getNumJobs();
-    await client.updateBadge(num);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setTimeout(updateActiveJobNumber, 1000);
-  }
+  return aria2Client()
+    .then(o => o.getNumJobs())
+    .then(num => client.updateBadge(num))
+    .catch(err => console.error(err))
+    .finally(() => setTimeout(updateActiveJobNumber, 1000));
 }
 
 updateActiveJobNumber();

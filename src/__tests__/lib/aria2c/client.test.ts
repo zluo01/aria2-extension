@@ -93,8 +93,12 @@ function multicallResult(...values: any[]) {
   return values.map(v => [v]);
 }
 
-beforeEach(() => jest.clearAllMocks());
-afterEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 // ─── shouldReset ──────────────────────────────────────────────────────────
 
@@ -412,8 +416,9 @@ describe('Aria2Client token handling', () => {
   test('prepends token:SECRET to each sub-call params inside system.multicall', async () => {
     mockRequest.mockResolvedValueOnce(multicallResult([], []));
     await makeClient({ token: 'SECRET' }).getJobs();
-    const [, outerParams] = mockRequest.mock.calls[0] as [string, [any[]]];
-    const subCalls = outerParams[1]; // index 1 because token is at index 0
+    // Call shape: request('system.multicall', ['token:SECRET', [...subCalls]])
+    const [, outerParams] = mockRequest.mock.calls[0] as [string, any[]];
+    const subCalls = outerParams[1] as any[]; // index 1 because token is at index 0
     expect(subCalls[0]).toMatchObject({
       methodName: 'aria2.tellActive',
       params: ['token:SECRET'],

@@ -1,12 +1,21 @@
 import { Aria2Client } from '@/lib/aria2c/client';
 import { client } from '@/lib/browser';
 
-let instance: Aria2Client | undefined;
+let singletonPromise: Promise<Aria2Client> | null = null;
 
-export async function getAria2Client(): Promise<Aria2Client> {
+export async function aria2Client(): Promise<Aria2Client> {
+  if (!singletonPromise) {
+    singletonPromise = client
+      .getConfiguration()
+      .then(config => new Aria2Client(config));
+  }
+
+  const instance = await singletonPromise;
   const config = await client.getConfiguration();
-  if (!instance || instance.shouldReset(config)) {
-    instance = new Aria2Client(config);
+  if (instance.shouldReset(config)) {
+    const newInstance = new Aria2Client(config);
+    singletonPromise = Promise.resolve(newInstance);
+    return newInstance;
   }
   return instance;
 }
