@@ -1,2 +1,2 @@
-pnpm run test
-pnpm exec lint-staged
+pnpm biome check --staged --no-errors-on-unmatched
+pnpm type-check

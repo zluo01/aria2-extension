@@ -3,27 +3,27 @@
  * @param input url or hash string
  */
 export function augmentDownloadLink(input: string): string {
-  // Remove any leading or trailing whitespace before any check
-  input = input.trim();
+	// Remove any leading or trailing whitespace before any check
+	input = input.trim();
 
-  if (input.startsWith('http') || input.startsWith('https')) {
-    return input;
-  }
+	if (input.startsWith('http') || input.startsWith('https')) {
+		return input;
+	}
 
-  // Determine hash type and validate
-  let hashType: string | null = null;
+	// Determine hash type and validate
+	let hashType: string | null = null;
 
-  if (/^[0-9a-f]{40}$/i.test(input)) {
-    // SHA-1
-    hashType = 'btih';
-  } else if (/^[0-9a-f]{64}$/i.test(input)) {
-    // SHA-256
-    hashType = 'btmh';
-  } else if (/^[a-f0-9]{32}$/i.test(input)) {
-    // md5
-    hashType = 'md5';
-  } else {
-    return input;
-  }
-  return `magnet:?xt=urn:${hashType}:${input}`;
+	if (/^[0-9a-f]{40}$/i.test(input)) {
+		// SHA-1
+		hashType = 'btih';
+	} else if (/^[0-9a-f]{64}$/i.test(input)) {
+		// SHA-256
+		hashType = 'btmh';
+	} else if (/^[a-f0-9]{32}$/i.test(input)) {
+		// md5
+		hashType = 'md5';
+	} else {
+		return input;
+	}
+	return `magnet:?xt=urn:${hashType}:${input}`;
 }

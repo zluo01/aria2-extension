@@ -6,10 +6,10 @@ export type Aria2ClientType = 'ws' | 'http';
  * JSON-RPC request structure
  */
 export interface JSONRPCRequest {
-  jsonrpc: '2.0';
-  id: string;
-  method: string;
-  params?: any[];
+	jsonrpc: '2.0';
+	id: string;
+	method: string;
+	params?: any[];
 }
 
 /**
@@ -21,22 +21,22 @@ export interface JSONRPCRequest {
  *                        no id — e.g. aria2.onDownloadComplete)
  */
 export const JSONRPCResponseSchema = z.union([
-  z.object({
-    jsonrpc: z.literal('2.0'),
-    id: z.string(),
-    result: z.any(),
-  }),
-  z.object({
-    jsonrpc: z.literal('2.0'),
-    id: z.string().nullable(),
-    error: z.object({
-      code: z.number(),
-      message: z.string(),
-    }),
-  }),
-  z.object({
-    jsonrpc: z.literal('2.0'),
-    method: z.string(),
-    params: z.array(z.any()),
-  }),
+	z.object({
+		jsonrpc: z.literal('2.0'),
+		id: z.string(),
+		result: z.any(),
+	}),
+	z.object({
+		jsonrpc: z.literal('2.0'),
+		id: z.string().nullable(),
+		error: z.object({
+			code: z.number(),
+			message: z.string(),
+		}),
+	}),
+	z.object({
+		jsonrpc: z.literal('2.0'),
+		method: z.string(),
+		params: z.array(z.any()),
+	}),
 ]);

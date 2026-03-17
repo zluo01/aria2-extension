@@ -1,45 +1,61 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base", ":disableDependencyDashboard"],
+  "extends": ["config:recommended", ":disableDependencyDashboard"],
   "schedule": ["every weekend"],
   "packageRules": [
     {
-      "updateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
     },
     {
-      "matchDepTypes": ["devDependencies"],
-      "matchPackagePatterns": ["lint", "prettier", "husky", "@trivago/"]
-    },
-    {
-      "groupName": "definitelyTyped",
-      "matchPackagePrefixes": ["@types/"]
-    },
-    {
-      "groupName": "eslint",
-      "matchPackagePrefixes": [
-        "@eslint",
-        "eslint",
-        "typescript-eslint",
-        "globals"
+      "groupName": "frontend",
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "@vitejs/plugin-react",
+        "babel-plugin-react-compiler",
+        "@tanstack/**",
+        "@radix-ui/**",
+        "class-variance-authority",
+        "lucide-react",
+        "clsx",
+        "tailwindcss",
+        "@tailwindcss/**",
+        "tailwind-merge",
+        "tw-animate-css"
       ]
     },
     {
-      "groupName": "styling",
-      "matchPackagePrefixes": ["@emotion/", "@mui/"]
+      "groupName": "webextension",
+      "matchPackageNames": [
+        "web-ext",
+        "webextension-polyfill",
+        "@types/webextension-polyfill",
+        "@types/chrome"
+      ]
     },
     {
-      "groupName": "tools",
-      "matchPackagePrefixes": ["@tanstack", "web-ext", "webextension-polyfill"]
-    },
-    {
-      "groupName": "framework",
-      "matchPackagePrefixes": ["react"]
-    },
-    {
-      "groupName": "build-tools",
-      "matchPackagePrefixes": ["vite", "@vitejs/"]
+      "groupName": "tooling",
+      "matchPackageNames": [
+        "vite",
+        "vite-**",
+        "@vitejs/**",
+        "!@vitejs/plugin-react",
+        "typescript",
+        "@biomejs/**",
+        "husky",
+        "jest",
+        "@jest/**",
+        "ts-jest",
+        "@types/**",
+        "!@types/react",
+        "!@types/react-dom",
+        "!@types/chrome",
+        "!@types/webextension-polyfill"
+      ]
     }
   ],
-  "postUpdateOptions": ["npmDedupe"]
+  "postUpdateOptions": ["pnpmDedupe"]
 }

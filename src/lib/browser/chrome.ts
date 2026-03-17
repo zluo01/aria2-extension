@@ -1,33 +1,33 @@
 import { cacheRemove } from '@/lib/session-cache';
 import { downloadToQueryString } from '@/lib/utils';
-import { IFileDetail } from '@/types';
+import type { IFileDetail } from '@/types';
 
 import { IBaseBrowserClient } from './base';
 
 export class ChromeClient extends IBaseBrowserClient<chrome.downloads.DownloadItem> {
-  async createDownloadPanel(detail: IFileDetail): Promise<void> {
-    try {
-      const w = 560;
-      const h = 365;
+	async createDownloadPanel(detail: IFileDetail): Promise<void> {
+		try {
+			const w = 560;
+			const h = 365;
 
-      const baseUrl = chrome.runtime.getURL('index.html');
+			const baseUrl = chrome.runtime.getURL('index.html');
 
-      const createOptions: chrome.windows.CreateData = {
-        url: `${baseUrl}#/download?${downloadToQueryString(detail)}`,
-        type: 'popup',
-        width: w,
-        height: h,
-        incognito: detail.incognito,
-        focused: true,
-      };
+			const createOptions: chrome.windows.CreateData = {
+				url: `${baseUrl}#/download?${downloadToQueryString(detail)}`,
+				type: 'popup',
+				width: w,
+				height: h,
+				incognito: detail.incognito,
+				focused: true,
+			};
 
-      await chrome.windows.create(createOptions);
-    } catch (e) {
-      console.error(`Fail to create download panel. ${e}`);
-    }
-  }
+			await chrome.windows.create(createOptions);
+		} catch (e) {
+			console.error(`Fail to create download panel. ${e}`);
+		}
+	}
 
-  /*
+	/*
   {
      "bytesReceived":0,
      "canResume":false,
@@ -47,48 +47,48 @@ export class ChromeClient extends IBaseBrowserClient<chrome.downloads.DownloadIt
      "url":"https://releases.ubuntu.com/24.04.4/ubuntu-24.04.4-desktop-amd64.iso"
   }
    */
-  protected async getDownloadDetail(
-    item: chrome.downloads.DownloadItem,
-  ): Promise<IFileDetail> {
-    return {
-      filename: item.filename,
-      fileSize: item.fileSize,
-      url: item.finalUrl ?? item.url,
-      incognito: item.incognito,
-    };
-  }
+	protected async getDownloadDetail(
+		item: chrome.downloads.DownloadItem,
+	): Promise<IFileDetail> {
+		return {
+			filename: item.filename,
+			fileSize: item.fileSize,
+			url: item.finalUrl ?? item.url,
+			incognito: item.incognito,
+		};
+	}
 
-  protected async initializeBrowserDownload(
-    filename: string,
-    saveAs: boolean,
-    url: string,
-    _incognito: boolean,
-  ): Promise<void> {
-    const downloadOptions: chrome.downloads.DownloadOptions =
-      filename !== '' ? { filename, saveAs, url } : { saveAs, url };
-    await chrome.downloads.download(downloadOptions);
-  }
+	protected async initializeBrowserDownload(
+		filename: string,
+		saveAs: boolean,
+		url: string,
+		_incognito: boolean,
+	): Promise<void> {
+		const downloadOptions: chrome.downloads.DownloadOptions =
+			filename !== '' ? { filename, saveAs, url } : { saveAs, url };
+		await chrome.downloads.download(downloadOptions);
+	}
 
-  registerDownloadInterceptor(): void {
-    chrome.downloads.onDeterminingFilename.addListener(async downloadItem => {
-      try {
-        const id = downloadItem.id;
+	registerDownloadInterceptor(): void {
+		chrome.downloads.onDeterminingFilename.addListener(async (downloadItem) => {
+			try {
+				const id = downloadItem.id;
 
-        const fileDetail = await this.getDownloadDetail(downloadItem);
-        if (this.shouldIgnoreDownloadURL(fileDetail.url)) {
-          return;
-        }
+				const fileDetail = await this.getDownloadDetail(downloadItem);
+				if (this.shouldIgnoreDownloadURL(fileDetail.url)) {
+					return;
+				}
 
-        // do nothing when user choose to download with built-in downloader
-        if (await cacheRemove(fileDetail.url)) {
-          return;
-        }
+				// do nothing when user choose to download with built-in downloader
+				if (await cacheRemove(fileDetail.url)) {
+					return;
+				}
 
-        await this.cancelDownload(id);
-        await this.prepareDownload(fileDetail);
-      } catch (e) {
-        console.error('Download interceptor error', e);
-      }
-    });
-  }
+				await this.cancelDownload(id);
+				await this.prepareDownload(fileDetail);
+			} catch (e) {
+				console.error('Download interceptor error', e);
+			}
+		});
+	}
 }
