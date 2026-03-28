@@ -50,7 +50,7 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.8",
+    "@biomejs/biome": "2.4.9",
     "@jest/globals": "30.3.0",
     "@tanstack/router-plugin": "1.167.2",
     "@types/chrome": "0.1.38",
