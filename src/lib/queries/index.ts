@@ -20,7 +20,7 @@ export const getTasksQueryOptions = queryOptions({
 
 export const getConfigurationQueryOptions = queryOptions({
 	queryKey: [FetchKey.SETTING],
-	queryFn: client.getConfiguration,
+	queryFn: () => client.getConfiguration(),
 });
 
 export const getThemeQueryOptions = queryOptions({

@@ -193,6 +193,70 @@ describe('openDetail', () => {
 	});
 });
 
+// ─── getConfiguration / setConfiguration ─────────────────────────────────
+
+describe('getConfiguration', () => {
+	let client: TestBrowserClient;
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		client = new TestBrowserClient();
+	});
+
+	function getBrowser() {
+		return jest.requireMock<typeof import('webextension-polyfill')>(
+			'webextension-polyfill',
+		);
+	}
+
+	test('returns stored config from browser.storage.local', async () => {
+		const stored = {
+			protocol: 'wss' as const,
+			host: '10.0.0.1',
+			port: 6801,
+			token: 'tok',
+			path: '/dl',
+		};
+		jest.mocked(getBrowser().storage.local.get).mockResolvedValue({
+			config: stored,
+		});
+
+		const result = await client.getConfiguration();
+		expect(result).toEqual(stored);
+	});
+
+	test('returns DEFAULT_CONFIG when storage is empty', async () => {
+		jest.mocked(getBrowser().storage.local.get).mockResolvedValue({});
+
+		const result = await client.getConfiguration();
+		expect(result).toEqual({
+			path: '',
+			protocol: 'ws',
+			host: '127.0.0.1',
+			port: 6800,
+			token: '',
+		});
+	});
+
+	test('setConfiguration writes config to browser.storage.local', async () => {
+		const browser = getBrowser();
+		jest.mocked(browser.storage.local.set).mockResolvedValue(undefined as any);
+
+		const newConfig = {
+			protocol: 'https' as const,
+			host: 'aria2.local',
+			port: 443,
+			token: 'pw',
+			path: '/downloads',
+		};
+		await client.setConfiguration(newConfig);
+
+		expect(browser.storage.local.set).toHaveBeenCalledWith({
+			config: newConfig,
+		});
+	});
+});
+
 // ─── download ────────────────────────────────────────────────────────────
 
 describe('download', () => {
