@@ -42,7 +42,7 @@ export class Aria2Client {
 	async getJobs(): Promise<IJob[]> {
 		const multiCallItems = [['tellActive'], ['tellWaiting', 0, 25]];
 		const data = await this.multiCall(multiCallItems);
-		return this.flatten(data);
+		return data.flat();
 	}
 
 	async startJobs(...gid: string[]): Promise<void> {
@@ -189,22 +189,5 @@ export class Aria2Client {
 			return `aria2.${method}`;
 		}
 		return method;
-	}
-
-	private flatten(input: any[]): any[] {
-		const stack = [...input];
-		const res = [];
-		while (stack.length) {
-			// pop value from stack
-			const next = stack.pop();
-			if (Array.isArray(next)) {
-				// push back array items, won't modify the original input
-				stack.push(...next);
-			} else {
-				res.push(next);
-			}
-		}
-		// reverse to restore input order
-		return res.reverse();
 	}
 }
