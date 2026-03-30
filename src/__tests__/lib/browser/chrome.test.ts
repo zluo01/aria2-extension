@@ -7,66 +7,66 @@
  *   - fileSize comes directly from item.fileSize (no HEAD request)
  *   - incognito is not supported in initializeBrowserDownload options
  */
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { ChromeClient } from '@/lib/browser/chrome';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 
-jest.mock('@/lib/session-cache', () => ({
-	cacheRemove: jest.fn<() => Promise<boolean>>().mockResolvedValue(false),
+vi.mock('@/lib/session-cache', () => ({
+	cacheRemove: vi.fn<() => Promise<boolean>>().mockResolvedValue(false),
 }));
 
-jest.mock('webextension-polyfill', () => ({
+vi.mock('webextension-polyfill', () => ({
 	storage: {
-		local: { get: jest.fn(), set: jest.fn() },
-		session: { get: jest.fn(), set: jest.fn(), remove: jest.fn() },
+		local: { get: vi.fn(), set: vi.fn() },
+		session: { get: vi.fn(), set: vi.fn(), remove: vi.fn() },
 	},
 	runtime: {
-		sendMessage: jest.fn(),
-		getPlatformInfo: jest.fn(),
-		openOptionsPage: jest.fn(),
-		getURL: jest.fn((p: unknown) => `chrome-extension://test/${p}`),
+		sendMessage: vi.fn(),
+		getPlatformInfo: vi.fn(),
+		openOptionsPage: vi.fn(),
+		getURL: vi.fn((p: unknown) => `chrome-extension://test/${p}`),
 	},
-	tabs: { query: jest.fn(), remove: jest.fn(), create: jest.fn() },
+	tabs: { query: vi.fn(), remove: vi.fn(), create: vi.fn() },
 	windows: {
-		getCurrent: jest.fn(),
-		remove: jest.fn(),
-		create: jest.fn(),
+		getCurrent: vi.fn(),
+		remove: vi.fn(),
+		create: vi.fn(),
 	},
-	notifications: { create: jest.fn() },
+	notifications: { create: vi.fn() },
 	action: {
-		setBadgeText: jest.fn(),
-		setBadgeBackgroundColor: jest.fn(),
+		setBadgeText: vi.fn(),
+		setBadgeBackgroundColor: vi.fn(),
 	},
 	downloads: {
-		cancel: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-		removeFile: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-		erase: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-		onDeterminingFilename: { addListener: jest.fn() },
+		cancel: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+		removeFile: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+		erase: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+		onDeterminingFilename: { addListener: vi.fn() },
 	},
 }));
 
 // Chrome global mock — ChromeClient calls chrome.* APIs directly
-const mockChromeDownload = jest
+const mockChromeDownload = vi
 	.fn<(opts: any) => Promise<number>>()
 	.mockResolvedValue(1);
-const mockChromeWindowsCreate = jest
+const mockChromeWindowsCreate = vi
 	.fn<(opts: any) => Promise<chrome.windows.Window>>()
 	.mockResolvedValue({ id: 1 } as chrome.windows.Window);
 
 beforeEach(() => {
 	(global as any).chrome = {
 		runtime: {
-			getURL: jest.fn((p: string) => `chrome-extension://ext/${p}`),
+			getURL: vi.fn((p: string) => `chrome-extension://ext/${p}`),
 		},
 		windows: { create: mockChromeWindowsCreate },
 		downloads: {
 			download: mockChromeDownload,
-			onDeterminingFilename: { addListener: jest.fn() },
+			onDeterminingFilename: { addListener: vi.fn() },
 		},
 	};
-	jest.clearAllMocks();
+	vi.clearAllMocks();
 });
 
 // ─── helpers ──────────────────────────────────────────────────────────────
@@ -104,7 +104,7 @@ describe('ChromeClient.getDownloadDetail', () => {
 	});
 
 	test('uses item.fileSize directly without issuing a HEAD request', async () => {
-		const mockFetch = jest.spyOn(global, 'fetch' as any);
+		const mockFetch = vi.spyOn(global, 'fetch' as any);
 		const client = new ChromeClient();
 		const detail = await (client as any).getDownloadDetail(
 			makeItem({ fileSize: 6655619072 }),

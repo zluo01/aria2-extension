@@ -7,7 +7,7 @@
  *   - shouldReset returning true creates a new instance and stores it as the new singleton
  *   - After a reset, the next call uses the new instance (not the old one)
  */
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, type Mock, test, vi } from 'vitest';
 
 import type { Config } from '@/types';
 
@@ -23,27 +23,30 @@ const NEW_CONFIG = { ...BASE_CONFIG, host: '192.168.1.1' };
 
 // ─── Module loader ────────────────────────────────────────────────────────
 // Each test gets a fresh module (singletonPromise reset to null) via
-// jest.resetModules() + jest.doMock() + dynamic import.
+// vi.resetModules() + vi.doMock() + dynamic import.
 
 async function loadModule(opts: {
-	getConfiguration: jest.Mock<() => Promise<Config>>;
-	shouldReset?: jest.Mock<() => boolean>;
-	isAlive?: jest.Mock<() => boolean>;
+	getConfiguration: Mock<() => Promise<Config>>;
+	shouldReset?: Mock<() => boolean>;
+	isAlive?: Mock<() => boolean>;
 }) {
-	const shouldResetFn = opts.shouldReset ?? jest.fn().mockReturnValue(false);
-	const isAliveFn = opts.isAlive ?? jest.fn().mockReturnValue(true);
-	const closeFn = jest.fn();
-	const MockAria2Client = jest.fn().mockImplementation(() => ({
-		shouldReset: shouldResetFn,
-		close: closeFn,
-		isAlive: isAliveFn,
-	}));
+	const shouldResetFn = opts.shouldReset ?? vi.fn().mockReturnValue(false);
+	const isAliveFn = opts.isAlive ?? vi.fn().mockReturnValue(true);
+	const closeFn = vi.fn();
+	// biome-ignore lint/complexity/useArrowFunction: must be constructable for `new Aria2Client()`
+	const MockAria2Client = vi.fn().mockImplementation(function () {
+		return {
+			shouldReset: shouldResetFn,
+			close: closeFn,
+			isAlive: isAliveFn,
+		};
+	});
 
-	jest.doMock('webextension-polyfill', () => ({}));
-	jest.doMock('@/lib/browser', () => ({
+	vi.doMock('webextension-polyfill', () => ({}));
+	vi.doMock('@/lib/browser', () => ({
 		client: { getConfiguration: opts.getConfiguration },
 	}));
-	jest.doMock('@/lib/aria2c/client', () => ({ Aria2Client: MockAria2Client }));
+	vi.doMock('@/lib/aria2c/client', () => ({ Aria2Client: MockAria2Client }));
 
 	const { aria2Client } = await import('@/lib/aria2c');
 	return { aria2Client, MockAria2Client, shouldResetFn, closeFn };
@@ -53,7 +56,7 @@ async function loadModule(opts: {
 
 describe('aria2Client singleton', () => {
 	beforeEach(() => {
-		jest.resetModules();
+		vi.resetModules();
 	});
 
 	test('concurrent calls before factory resolves share one Aria2Client', async () => {
@@ -63,7 +66,7 @@ describe('aria2Client singleton', () => {
 			resolveConfig = resolve;
 		});
 
-		const getConfiguration = jest
+		const getConfiguration = vi
 			.fn<() => Promise<Config>>()
 			.mockReturnValueOnce(deferred) // factory call — held pending
 			.mockResolvedValue(BASE_CONFIG); // shouldReset checks — immediate
@@ -86,7 +89,7 @@ describe('aria2Client singleton', () => {
 	});
 
 	test('subsequent calls return the cached instance without re-creating', async () => {
-		const getConfiguration = jest
+		const getConfiguration = vi
 			.fn<() => Promise<Config>>()
 			.mockResolvedValue(BASE_CONFIG);
 		const { aria2Client, MockAria2Client } = await loadModule({
@@ -104,12 +107,12 @@ describe('aria2Client singleton', () => {
 
 	test('creates a new instance when shouldReset returns true and closes the old one', async () => {
 		// shouldReset: first call stable, second call config changed.
-		const shouldReset = jest
+		const shouldReset = vi
 			.fn<() => boolean>()
 			.mockReturnValueOnce(false)
 			.mockReturnValueOnce(true);
 
-		const getConfiguration = jest
+		const getConfiguration = vi
 			.fn<() => Promise<Config>>()
 			.mockResolvedValueOnce(BASE_CONFIG) // factory
 			.mockResolvedValueOnce(BASE_CONFIG) // first shouldReset check → stable
@@ -130,12 +133,12 @@ describe('aria2Client singleton', () => {
 
 	test('after reset the new instance becomes the singleton for future calls', async () => {
 		// Call 1 triggers reset; calls 2 and 3 should all get the new instance.
-		const shouldReset = jest
+		const shouldReset = vi
 			.fn<() => boolean>()
 			.mockReturnValueOnce(true) // call 1: old instance is stale
 			.mockReturnValue(false); // call 2+: new instance is stable
 
-		const getConfiguration = jest
+		const getConfiguration = vi
 			.fn<() => Promise<Config>>()
 			.mockResolvedValueOnce(BASE_CONFIG) // factory
 			.mockResolvedValue(NEW_CONFIG); // all shouldReset checks use new config
@@ -155,12 +158,12 @@ describe('aria2Client singleton', () => {
 	});
 
 	test('creates a new instance when isAlive returns false without closing', async () => {
-		const isAlive = jest
+		const isAlive = vi
 			.fn<() => boolean>()
 			.mockReturnValueOnce(true) // first call: connection alive
 			.mockReturnValueOnce(false); // second call: connection dead
 
-		const getConfiguration = jest
+		const getConfiguration = vi
 			.fn<() => Promise<Config>>()
 			.mockResolvedValue(BASE_CONFIG);
 

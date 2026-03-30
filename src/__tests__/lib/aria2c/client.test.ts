@@ -13,14 +13,7 @@
  *   - Token: prepended to every request's params when set
  *   - multiCall error handling: faultString and empty-result propagate as thrown errors
  */
-import {
-	afterEach,
-	beforeEach,
-	describe,
-	expect,
-	jest,
-	test,
-} from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { Aria2Client } from '@/lib/aria2c/client';
 import { client as browserClient } from '@/lib/browser';
@@ -28,18 +21,18 @@ import type { Config } from '@/types';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 
-jest.mock('@/lib/browser', () => ({
+vi.mock('@/lib/browser', () => ({
 	client: {
-		notify: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
+		notify: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
 	},
 }));
 
-jest.mock('webextension-polyfill', () => ({}));
+vi.mock('webextension-polyfill', () => ({}));
 
-const mockRequest = jest.fn<(...args: any[]) => Promise<any>>();
+const mockRequest = vi.fn<(...args: any[]) => Promise<any>>();
 
-jest.mock('@/lib/aria2c/connector', () => ({
-	createConnector: jest.fn().mockImplementation(() => ({
+vi.mock('@/lib/aria2c/connector', () => ({
+	createConnector: vi.fn().mockImplementation(() => ({
 		request: mockRequest,
 	})),
 }));
@@ -95,10 +88,10 @@ function multicallResult(...values: any[]) {
 }
 
 beforeEach(() => {
-	jest.clearAllMocks();
+	vi.clearAllMocks();
 });
 afterEach(() => {
-	jest.clearAllMocks();
+	vi.clearAllMocks();
 });
 
 // ─── shouldReset ──────────────────────────────────────────────────────────
@@ -309,7 +302,7 @@ describe('Aria2Client.addUri', () => {
 	test('notifies user with filename on success', async () => {
 		mockRequest.mockResolvedValueOnce(GID_A);
 		await makeClient().addUri('https://example.com/f.zip', 'f.zip');
-		expect(jest.mocked(browserClient.notify)).toHaveBeenCalledWith(
+		expect(vi.mocked(browserClient.notify)).toHaveBeenCalledWith(
 			expect.stringContaining('f.zip'),
 		);
 	});
@@ -317,7 +310,7 @@ describe('Aria2Client.addUri', () => {
 	test('notifies user of failure on RPC error', async () => {
 		mockRequest.mockRejectedValueOnce(new Error('Unauthorized'));
 		await makeClient().addUri('https://example.com/f.zip', 'f.zip');
-		expect(jest.mocked(browserClient.notify)).toHaveBeenCalledWith(
+		expect(vi.mocked(browserClient.notify)).toHaveBeenCalledWith(
 			expect.stringContaining('Fail'),
 		);
 	});
@@ -327,7 +320,7 @@ describe('Aria2Client.addUri', () => {
 			new Error('Internal RPC stack trace here'),
 		);
 		await makeClient().addUri('https://example.com/f.zip', 'f.zip');
-		const msg = jest.mocked(browserClient.notify).mock.calls[0][0];
+		const msg = vi.mocked(browserClient.notify).mock.calls[0][0];
 		expect(msg).not.toContain('Internal RPC stack trace here');
 	});
 });
@@ -339,7 +332,7 @@ describe('Aria2Client.addUris', () => {
 	test('does nothing and sends no notification when called with no URIs', async () => {
 		await makeClient().addUris();
 		expect(mockRequest).not.toHaveBeenCalled();
-		expect(jest.mocked(browserClient.notify)).not.toHaveBeenCalled();
+		expect(vi.mocked(browserClient.notify)).not.toHaveBeenCalled();
 	});
 
 	test('maps each URI to {methodName: aria2.addUri, params: [[uri]]} in multicall', async () => {
@@ -369,7 +362,7 @@ describe('Aria2Client.addUris', () => {
 			'https://b.com/2',
 			'https://c.com/3',
 		);
-		expect(jest.mocked(browserClient.notify)).toHaveBeenCalledWith(
+		expect(vi.mocked(browserClient.notify)).toHaveBeenCalledWith(
 			expect.stringContaining('3'),
 		);
 	});
@@ -377,7 +370,7 @@ describe('Aria2Client.addUris', () => {
 	test('notifies user of failure on RPC error', async () => {
 		mockRequest.mockRejectedValueOnce(new Error('Unauthorized'));
 		await makeClient().addUris('https://a.com/f');
-		expect(jest.mocked(browserClient.notify)).toHaveBeenCalledWith(
+		expect(vi.mocked(browserClient.notify)).toHaveBeenCalledWith(
 			expect.stringContaining('Fail'),
 		);
 	});
@@ -387,7 +380,7 @@ describe('Aria2Client.addUris', () => {
 			new Error('Internal server error details'),
 		);
 		await makeClient().addUris('https://a.com/f');
-		const msg = jest.mocked(browserClient.notify).mock.calls[0][0];
+		const msg = vi.mocked(browserClient.notify).mock.calls[0][0];
 		expect(msg).not.toContain('Internal server error details');
 	});
 });

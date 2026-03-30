@@ -1,17 +1,14 @@
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import browser from 'webextension-polyfill';
 
 import { cacheRemove, cacheSet } from '@/lib/session-cache';
 
-jest.mock('webextension-polyfill', () => ({
-	storage: {
-		session: {
-			set: jest.fn(),
-			get: jest.fn(),
-			remove: jest.fn(),
-		},
-	},
-}));
+vi.mock('webextension-polyfill', () => {
+	const mock = {
+		storage: { session: { set: vi.fn(), get: vi.fn(), remove: vi.fn() } },
+	};
+	return { default: mock, ...mock };
+});
 
 const PREFIX = 'aria2-signal:';
 
@@ -20,25 +17,24 @@ describe('session-cache', () => {
 
 	beforeEach(() => {
 		store = {};
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 
-		jest
-			.mocked(browser.storage.session.set)
-			.mockImplementation(async (obj: Record<string, unknown>) => {
+		vi.mocked(browser.storage.session.set).mockImplementation(
+			async (obj: Record<string, unknown>) => {
 				Object.assign(store, obj);
-			});
+			},
+		);
 
-		jest
-			.mocked(browser.storage.session.get)
-			.mockImplementation(async (key: string) =>
-				key in store ? { [key]: store[key] } : {},
-			);
+		vi.mocked(browser.storage.session.get).mockImplementation(async (keys) => {
+			const key = keys as string;
+			return key in store ? { [key]: store[key] } : {};
+		});
 
-		jest
-			.mocked(browser.storage.session.remove)
-			.mockImplementation(async (key: string) => {
-				delete store[key];
-			});
+		vi.mocked(browser.storage.session.remove).mockImplementation(
+			async (keys) => {
+				delete store[keys as string];
+			},
+		);
 	});
 
 	describe('set', () => {

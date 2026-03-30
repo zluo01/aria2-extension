@@ -1,9 +1,11 @@
-import { describe, expect, test } from '@jest/globals';
-import { Runtime } from 'webextension-polyfill';
+import { describe, expect, test, vi } from 'vitest';
+import type { Runtime } from 'webextension-polyfill';
 
 import { downloadToQueryString, parseBytes, verifyFileName } from '@/lib/utils';
 
-import PlatformOs = Runtime.PlatformOs;
+vi.mock('webextension-polyfill', () => ({}));
+
+type PlatformOs = Runtime.PlatformOs;
 
 describe('verifyFileName', () => {
 	describe('Basic validation', () => {

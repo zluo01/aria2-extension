@@ -2,51 +2,58 @@
  * Tests for FirefoxClient browser-specific logic.
  * Focus: getDownloadDetail filename extraction and getContentLength HEAD request.
  */
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import {
+	beforeEach,
+	describe,
+	expect,
+	type MockedFunction,
+	test,
+	vi,
+} from 'vitest';
 
 import { FirefoxClient } from '@/lib/browser/firefox';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 
-jest.mock('@/lib/session-cache', () => ({
-	cacheRemove: jest.fn<() => Promise<boolean>>().mockResolvedValue(false),
+vi.mock('@/lib/session-cache', () => ({
+	cacheRemove: vi.fn<() => Promise<boolean>>().mockResolvedValue(false),
 }));
 
-jest.mock('webextension-polyfill', () => ({
+vi.mock('webextension-polyfill', () => ({
 	storage: {
-		local: { get: jest.fn(), set: jest.fn() },
-		session: { get: jest.fn(), set: jest.fn(), remove: jest.fn() },
+		local: { get: vi.fn(), set: vi.fn() },
+		session: { get: vi.fn(), set: vi.fn(), remove: vi.fn() },
 	},
 	runtime: {
-		sendMessage: jest.fn(),
-		getPlatformInfo: jest.fn(),
-		openOptionsPage: jest.fn(),
-		getURL: jest.fn((p: unknown) => `moz-extension://test/${p}`),
+		sendMessage: vi.fn(),
+		getPlatformInfo: vi.fn(),
+		openOptionsPage: vi.fn(),
+		getURL: vi.fn((p: unknown) => `moz-extension://test/${p}`),
 	},
-	tabs: { query: jest.fn(), remove: jest.fn(), create: jest.fn() },
+	tabs: { query: vi.fn(), remove: vi.fn(), create: vi.fn() },
 	windows: {
-		getCurrent: jest.fn(),
-		remove: jest.fn(),
-		create: jest.fn(),
+		getCurrent: vi.fn(),
+		remove: vi.fn(),
+		create: vi.fn(),
 	},
-	notifications: { create: jest.fn() },
+	notifications: { create: vi.fn() },
 	action: {
-		setBadgeText: jest.fn(),
-		setBadgeBackgroundColor: jest.fn(),
+		setBadgeText: vi.fn(),
+		setBadgeBackgroundColor: vi.fn(),
 	},
 	downloads: {
-		cancel: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-		removeFile: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-		erase: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-		onCreated: { addListener: jest.fn() },
+		cancel: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+		removeFile: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+		erase: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+		onCreated: { addListener: vi.fn() },
 	},
 }));
 
-const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+const mockFetch = vi.fn() as MockedFunction<typeof fetch>;
 
 beforeEach(() => {
 	global.fetch = mockFetch as any;
-	jest.clearAllMocks();
+	vi.clearAllMocks();
 });
 
 // ─── helpers ──────────────────────────────────────────────────────────────

@@ -2,42 +2,46 @@
  * Tests for BaseBrowserClient shared logic.
  * Uses a minimal concrete subclass to exercise protected methods.
  */
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import browser from 'webextension-polyfill';
 
 import { BaseBrowserClient } from '@/lib/browser/base';
 import { type FileDetail, MessageType } from '@/types';
 
-jest.mock('webextension-polyfill', () => ({
-	storage: {
-		local: {
-			get: jest.fn(),
-			set: jest.fn(),
+vi.mock('webextension-polyfill', () => {
+	const mock = {
+		storage: {
+			local: {
+				get: vi.fn(),
+				set: vi.fn(),
+			},
+			session: {
+				get: vi.fn(),
+				set: vi.fn(),
+				remove: vi.fn(),
+			},
 		},
-		session: {
-			get: jest.fn(),
-			set: jest.fn(),
-			remove: jest.fn(),
+		runtime: {
+			sendMessage: vi.fn(),
+			getPlatformInfo: vi.fn(),
+			openOptionsPage: vi.fn(),
+			getURL: vi.fn((p: unknown) => `moz-extension://test/${p}`),
 		},
-	},
-	runtime: {
-		sendMessage: jest.fn(),
-		getPlatformInfo: jest.fn(),
-		openOptionsPage: jest.fn(),
-		getURL: jest.fn((p: unknown) => `moz-extension://test/${p}`),
-	},
-	tabs: { query: jest.fn(), remove: jest.fn(), create: jest.fn() },
-	windows: { getCurrent: jest.fn(), remove: jest.fn() },
-	notifications: { create: jest.fn() },
-	action: {
-		setBadgeText: jest.fn(),
-		setBadgeBackgroundColor: jest.fn(),
-	},
-	downloads: {
-		cancel: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-		removeFile: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-		erase: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-	},
-}));
+		tabs: { query: vi.fn(), remove: vi.fn(), create: vi.fn() },
+		windows: { getCurrent: vi.fn(), remove: vi.fn() },
+		notifications: { create: vi.fn() },
+		action: {
+			setBadgeText: vi.fn(),
+			setBadgeBackgroundColor: vi.fn(),
+		},
+		downloads: {
+			cancel: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+			removeFile: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+			erase: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+		},
+	};
+	return { default: mock, ...mock };
+});
 
 // ─── Test subclass ────────────────────────────────────────────────────────
 
@@ -142,19 +146,12 @@ describe('openDetail', () => {
 	let client: TestBrowserClient;
 
 	beforeEach(() => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		client = new TestBrowserClient();
 	});
 
-	function getBrowser() {
-		return jest.requireMock<typeof import('webextension-polyfill')>(
-			'webextension-polyfill',
-		);
-	}
-
 	test('builds AriaNg URL from stored config and opens a tab', async () => {
-		const browser = getBrowser();
-		jest.mocked(browser.storage.local.get).mockResolvedValue({
+		vi.mocked(browser.storage.local.get).mockResolvedValue({
 			config: {
 				protocol: 'ws',
 				host: '127.0.0.1',
@@ -163,7 +160,7 @@ describe('openDetail', () => {
 				path: '',
 			},
 		});
-		jest.mocked(browser.tabs.create).mockResolvedValue({} as any);
+		vi.mocked(browser.tabs.create).mockResolvedValue({} as any);
 
 		await client.openDetail(false);
 
@@ -173,9 +170,8 @@ describe('openDetail', () => {
 	});
 
 	test('uses DEFAULT_CONFIG when storage has no config', async () => {
-		const browser = getBrowser();
-		jest.mocked(browser.storage.local.get).mockResolvedValue({});
-		jest.mocked(browser.tabs.create).mockResolvedValue({} as any);
+		vi.mocked(browser.storage.local.get).mockResolvedValue({});
+		vi.mocked(browser.tabs.create).mockResolvedValue({} as any);
 
 		await client.openDetail(false);
 
@@ -185,9 +181,8 @@ describe('openDetail', () => {
 	});
 
 	test('does not throw when tabs.create fails', async () => {
-		const browser = getBrowser();
-		jest.mocked(browser.storage.local.get).mockResolvedValue({});
-		jest.mocked(browser.tabs.create).mockRejectedValue(new Error('no tab'));
+		vi.mocked(browser.storage.local.get).mockResolvedValue({});
+		vi.mocked(browser.tabs.create).mockRejectedValue(new Error('no tab'));
 
 		await expect(client.openDetail(false)).resolves.toBeUndefined();
 	});
@@ -199,15 +194,9 @@ describe('getConfiguration', () => {
 	let client: TestBrowserClient;
 
 	beforeEach(() => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		client = new TestBrowserClient();
 	});
-
-	function getBrowser() {
-		return jest.requireMock<typeof import('webextension-polyfill')>(
-			'webextension-polyfill',
-		);
-	}
 
 	test('returns stored config from browser.storage.local', async () => {
 		const stored = {
@@ -217,7 +206,7 @@ describe('getConfiguration', () => {
 			token: 'tok',
 			path: '/dl',
 		};
-		jest.mocked(getBrowser().storage.local.get).mockResolvedValue({
+		vi.mocked(browser.storage.local.get).mockResolvedValue({
 			config: stored,
 		});
 
@@ -226,7 +215,7 @@ describe('getConfiguration', () => {
 	});
 
 	test('returns DEFAULT_CONFIG when storage is empty', async () => {
-		jest.mocked(getBrowser().storage.local.get).mockResolvedValue({});
+		vi.mocked(browser.storage.local.get).mockResolvedValue({});
 
 		const result = await client.getConfiguration();
 		expect(result).toEqual({
@@ -239,8 +228,7 @@ describe('getConfiguration', () => {
 	});
 
 	test('setConfiguration writes config to browser.storage.local', async () => {
-		const browser = getBrowser();
-		jest.mocked(browser.storage.local.set).mockResolvedValue(undefined as any);
+		vi.mocked(browser.storage.local.set).mockResolvedValue(undefined as any);
 
 		const newConfig = {
 			protocol: 'https' as const,
@@ -263,24 +251,18 @@ describe('download', () => {
 	let client: TestBrowserClient;
 
 	beforeEach(() => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		client = new TestBrowserClient();
 	});
 
 	function setupWindowMock() {
-		const browser = jest.requireMock<typeof import('webextension-polyfill')>(
-			'webextension-polyfill',
-		);
-		jest.mocked(browser.windows.getCurrent).mockResolvedValue({ id: 1 } as any);
-		jest.mocked(browser.windows.remove).mockResolvedValue(undefined as any);
-		jest.mocked(browser.runtime.sendMessage).mockResolvedValue(undefined);
+		vi.mocked(browser.windows.getCurrent).mockResolvedValue({ id: 1 } as any);
+		vi.mocked(browser.windows.remove).mockResolvedValue(undefined as any);
+		vi.mocked(browser.runtime.sendMessage).mockResolvedValue(undefined);
 	}
 
 	test('sends AddUri message with filename in options', async () => {
 		setupWindowMock();
-		const browser = jest.requireMock<typeof import('webextension-polyfill')>(
-			'webextension-polyfill',
-		);
 
 		await client.download('https://example.com/file.zip', 'file.zip', '');
 
@@ -294,9 +276,6 @@ describe('download', () => {
 
 	test('includes dir in options when filePath is provided', async () => {
 		setupWindowMock();
-		const browser = jest.requireMock<typeof import('webextension-polyfill')>(
-			'webextension-polyfill',
-		);
 
 		await client.download(
 			'https://example.com/file.zip',
@@ -314,9 +293,6 @@ describe('download', () => {
 
 	test('escapes backslashes in Windows file paths', async () => {
 		setupWindowMock();
-		const browser = jest.requireMock<typeof import('webextension-polyfill')>(
-			'webextension-polyfill',
-		);
 
 		await client.download(
 			'https://example.com/file.zip',

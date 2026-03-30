@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, type Mock, test, vi } from 'vitest';
 
 import { createConnector } from '@/lib/aria2c/connector';
 
@@ -9,8 +9,8 @@ let wsInstance: {
 	onclose: (() => void) | null;
 	onerror: ((e: any) => void) | null;
 	onmessage: ((e: { data: string }) => void) | null;
-	send: jest.Mock;
-	close: jest.Mock;
+	send: Mock;
+	close: Mock;
 	readyState: number;
 };
 
@@ -22,12 +22,15 @@ beforeEach(() => {
 		onclose: null,
 		onerror: null,
 		onmessage: null,
-		send: jest.fn(),
-		close: jest.fn(),
+		send: vi.fn(),
+		close: vi.fn(),
 		readyState: OPEN,
 	};
 
-	(globalThis as any).WebSocket = jest.fn(() => wsInstance);
+	// biome-ignore lint/complexity/useArrowFunction: must be constructable for `new WebSocket()`
+	(globalThis as any).WebSocket = vi.fn(function () {
+		return wsInstance;
+	});
 	(globalThis as any).WebSocket.OPEN = OPEN;
 });
 
@@ -52,7 +55,7 @@ function respondToLastRequest(result: any) {
 
 describe('WebSocket connector timeout', () => {
 	beforeEach(() => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 	});
 
 	test('request resolves before timeout', async () => {
@@ -68,7 +71,7 @@ describe('WebSocket connector timeout', () => {
 		const connector = makeWsConnector();
 
 		const promise = connector.request('aria2.getVersion', []);
-		jest.advanceTimersByTime(3_000);
+		vi.advanceTimersByTime(3_000);
 
 		await expect(promise).rejects.toThrow(
 			'Request timed out: aria2.getVersion',
@@ -79,7 +82,7 @@ describe('WebSocket connector timeout', () => {
 		const connector = makeWsConnector();
 
 		const promise = connector.request('aria2.getVersion', []);
-		jest.advanceTimersByTime(3_000);
+		vi.advanceTimersByTime(3_000);
 		await promise.catch(() => undefined);
 
 		// A second request should still work (map wasn't corrupted)
@@ -92,7 +95,7 @@ describe('WebSocket connector timeout', () => {
 		const connector = makeWsConnector();
 
 		const promise = connector.request('aria2.getVersion', []);
-		jest.advanceTimersByTime(3_000);
+		vi.advanceTimersByTime(3_000);
 		await expect(promise).rejects.toThrow('Request timed out');
 
 		// Late response arrives — should not throw
@@ -103,11 +106,11 @@ describe('WebSocket connector timeout', () => {
 describe('HTTP connector timeout', () => {
 	test('passes AbortSignal.timeout to fetch', async () => {
 		const mockSignal = {} as AbortSignal;
-		const timeoutSpy = jest
+		const timeoutSpy = vi
 			.spyOn(AbortSignal, 'timeout')
 			.mockReturnValue(mockSignal);
 
-		const mockFetch = jest.fn<typeof fetch>().mockResolvedValue(
+		const mockFetch = vi.fn<typeof fetch>().mockResolvedValue(
 			new Response(
 				JSON.stringify({
 					jsonrpc: '2.0',

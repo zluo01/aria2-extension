@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => ({
     makeManifest(),
     bundleAria(),
   ],
+  test: {},
   publicDir,
   build: {
     outDir,
