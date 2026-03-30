@@ -321,6 +321,15 @@ describe('Aria2Client.addUri', () => {
 			expect.stringContaining('Fail'),
 		);
 	});
+
+	test('error notification does not leak raw exception details', async () => {
+		mockRequest.mockRejectedValueOnce(
+			new Error('Internal RPC stack trace here'),
+		);
+		await makeClient().addUri('https://example.com/f.zip', 'f.zip');
+		const msg = jest.mocked(browserClient.notify).mock.calls[0][0];
+		expect(msg).not.toContain('Internal RPC stack trace here');
+	});
 });
 
 // ─── addUris ──────────────────────────────────────────────────────────────
@@ -371,6 +380,15 @@ describe('Aria2Client.addUris', () => {
 		expect(jest.mocked(browserClient.notify)).toHaveBeenCalledWith(
 			expect.stringContaining('Fail'),
 		);
+	});
+
+	test('error notification does not leak raw exception details', async () => {
+		mockRequest.mockRejectedValueOnce(
+			new Error('Internal server error details'),
+		);
+		await makeClient().addUris('https://a.com/f');
+		const msg = jest.mocked(browserClient.notify).mock.calls[0][0];
+		expect(msg).not.toContain('Internal server error details');
 	});
 });
 

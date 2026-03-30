@@ -25,7 +25,8 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 			const c = await aria2Client();
 			await c.addUri(url);
 		} catch (e) {
-			await client.notify(`Fail to download with Aria2: ${e}`);
+			console.error('Failed to download with Aria2', e);
+			await client.notify('Failed to download with Aria2.');
 		}
 	}
 });

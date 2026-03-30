@@ -129,7 +129,8 @@ export abstract class BaseBrowserClient<T extends { id: number }>
 				await browser.windows.remove(window.id);
 			}
 		} catch (e) {
-			await this.notify(`Fail to trigger browser download: ${e}`);
+			console.error('Failed to trigger browser download', e);
+			await this.notify('Failed to trigger browser download.');
 		}
 	}
 

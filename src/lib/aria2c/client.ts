@@ -83,7 +83,8 @@ export class Aria2Client {
 			await this.multiCall(multiCallItems);
 			await client.notify(`Start downloading ${uris.length} files using Aria2`);
 		} catch (e) {
-			await client.notify(`Fail to add URIs. ${e}`);
+			console.error('Failed to add URIs', e);
+			await client.notify('Failed to add URIs.');
 		}
 	}
 
@@ -96,7 +97,8 @@ export class Aria2Client {
 			await this.call('addUri', [link], options || {});
 			await client.notify(`Start downloading ${filename || ''} using Aria2`);
 		} catch (e) {
-			await client.notify(`Fail to add URI. ${e}`);
+			console.error('Failed to add URI', e);
+			await client.notify('Failed to add URI.');
 		}
 	}
 
