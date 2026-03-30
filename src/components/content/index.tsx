@@ -24,7 +24,7 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList) {
 
 	function getProgress(job: IJob): number {
 		const total = parseFloat(job.totalLength);
-		if (!(total > 0)) return 0;
+		if (total <= 0 || Number.isNaN(total)) return 0;
 		return (parseFloat(job.completedLength) / total) * 100;
 	}
 
