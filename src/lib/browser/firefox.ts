@@ -1,16 +1,16 @@
 import browser, { type Downloads, type Windows } from 'webextension-polyfill';
 
 import { downloadToQueryString } from '@/lib/utils';
-import type { IFileDetail } from '@/types';
+import type { FileDetail } from '@/types';
 
-import { IBaseBrowserClient } from './base';
+import { BaseBrowserClient } from './base';
 
-export class FirefoxClient extends IBaseBrowserClient<Downloads.DownloadItem> {
+export class FirefoxClient extends BaseBrowserClient<Downloads.DownloadItem> {
 	/**
 	 * https://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
 	 * @param detail
 	 */
-	async createDownloadPanel(detail: IFileDetail): Promise<void> {
+	async createDownloadPanel(detail: FileDetail): Promise<void> {
 		try {
 			const w = 560;
 			const h = 365;
@@ -77,7 +77,7 @@ export class FirefoxClient extends IBaseBrowserClient<Downloads.DownloadItem> {
    */
 	protected async getDownloadDetail(
 		item: Downloads.DownloadItem,
-	): Promise<IFileDetail> {
+	): Promise<FileDetail> {
 		return {
 			filename: item.filename.split(/[/\\]/).pop() || 'UNKNOWN',
 			fileSize: await this.getContentLength(item.url),

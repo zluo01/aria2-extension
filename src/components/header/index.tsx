@@ -13,17 +13,17 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { client } from '@/lib/browser';
 import { pauseJobs, removeJobs, startJobs } from '@/lib/queries';
-import { ACTIVE_JOB, type IJob, PAUSED_JOB } from '@/types';
+import { ACTIVE_JOB, type Job, PAUSED_JOB } from '@/types';
 
-interface IHeader {
-	jobs: IJob[];
+interface HeaderProps {
+	jobs: Job[];
 	checked: string[];
 	show: boolean;
 	setShow: () => void;
 	setCheck: (value: string[]) => void;
 }
 
-function Header({ jobs, checked, show, setShow, setCheck }: IHeader) {
+function Header({ jobs, checked, show, setShow, setCheck }: HeaderProps) {
 	const disabled = checked.length === 0;
 
 	const [isChecked, setIsChecked] = useState<CheckedState>(false);

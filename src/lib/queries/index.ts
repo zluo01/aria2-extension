@@ -2,7 +2,7 @@ import { QueryClient, queryOptions } from '@tanstack/react-query';
 import browser from 'webextension-polyfill';
 
 import { client } from '@/lib/browser';
-import { type IDownload, type IJob, MessageType, type Theme } from '@/types';
+import { type Download, type Job, MessageType, type Theme } from '@/types';
 
 enum FetchKey {
 	TASKS = 'tasks',
@@ -32,9 +32,9 @@ export const getThemeQueryOptions = queryOptions({
 	staleTime: Infinity,
 });
 
-async function getJobs(): Promise<IJob[]> {
+async function getJobs(): Promise<Job[]> {
 	const jobs = await client
-		.sendMessage<IJob[]>({ type: MessageType.GetJobs })
+		.sendMessage<Job[]>({ type: MessageType.GetJobs })
 		.catch(() => null);
 	return jobs ?? [];
 }
@@ -42,7 +42,7 @@ async function getJobs(): Promise<IJob[]> {
 export async function addUri(
 	link: string,
 	filename?: string,
-	options?: IDownload,
+	options?: Download,
 ) {
 	return client.sendMessage({
 		type: MessageType.AddUri,

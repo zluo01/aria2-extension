@@ -1,13 +1,13 @@
 import { type Aria2Connector, createConnector } from '@/lib/aria2c/connector';
 import type { Aria2ClientType } from '@/lib/aria2c/types';
 import { client } from '@/lib/browser';
-import type { IConfig, IDownload, IJob } from '@/types';
+import type { Config, Download, Job } from '@/types';
 
 export class Aria2Client {
-	private readonly config: IConfig;
+	private readonly config: Config;
 	private readonly connector: Aria2Connector;
 
-	constructor(config: IConfig) {
+	constructor(config: Config) {
 		const protocol: Aria2ClientType =
 			config.protocol === 'ws' || config.protocol === 'wss' ? 'ws' : 'http';
 		const secure = config.protocol === 'https' || config.protocol === 'wss';
@@ -29,7 +29,7 @@ export class Aria2Client {
 		return this.connector.isAlive();
 	}
 
-	shouldReset(config: IConfig): boolean {
+	shouldReset(config: Config): boolean {
 		return (
 			this.config.path !== config.path ||
 			this.config.protocol !== config.protocol ||
@@ -39,7 +39,7 @@ export class Aria2Client {
 		);
 	}
 
-	async getJobs(): Promise<IJob[]> {
+	async getJobs(): Promise<Job[]> {
 		const multiCallItems = [['tellActive'], ['tellWaiting', 0, 25]];
 		const data = await this.multiCall(multiCallItems);
 		return data.flat();
@@ -90,7 +90,7 @@ export class Aria2Client {
 	async addUri(
 		link: string,
 		filename?: string,
-		options?: IDownload,
+		options?: Download,
 	): Promise<void> {
 		try {
 			await this.call('addUri', [link], options || {});

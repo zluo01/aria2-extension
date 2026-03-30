@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Runtime } from 'webextension-polyfill';
 
-import type { IFileDetail } from '@/types';
+import type { FileDetail } from '@/types';
 
 import PlatformOs = Runtime.PlatformOs;
 
@@ -34,7 +34,7 @@ export function verifyFileName(name: string, os: PlatformOs): boolean {
 	return true;
 }
 
-export function downloadToQueryString(detail: IFileDetail): string {
+export function downloadToQueryString(detail: FileDetail): string {
 	return new URLSearchParams(
 		Object.entries(detail)
 			.filter(([, v]) => v !== undefined)

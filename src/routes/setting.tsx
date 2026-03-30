@@ -22,7 +22,7 @@ import { client } from '@/lib/browser';
 import { getConfigurationQueryOptions, queryClient } from '@/lib/queries';
 import { useTheme } from '@/lib/theme';
 import { Chrome } from '@/manifest';
-import type { IConfig, Protocol } from '@/types';
+import type { Config, Protocol } from '@/types';
 
 export const Route = createFileRoute('/setting')({
 	loader: ({ context: { queryClient } }) =>
@@ -81,7 +81,7 @@ function Setting() {
 		}
 	}
 
-	async function updateConfig(config: IConfig) {
+	async function updateConfig(config: Config) {
 		try {
 			await client.setConfiguration(config);
 			await queryClient.invalidateQueries({

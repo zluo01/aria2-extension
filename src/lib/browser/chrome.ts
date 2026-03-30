@@ -1,10 +1,10 @@
 import { downloadToQueryString } from '@/lib/utils';
-import type { IFileDetail } from '@/types';
+import type { FileDetail } from '@/types';
 
-import { IBaseBrowserClient } from './base';
+import { BaseBrowserClient } from './base';
 
-export class ChromeClient extends IBaseBrowserClient<chrome.downloads.DownloadItem> {
-	async createDownloadPanel(detail: IFileDetail): Promise<void> {
+export class ChromeClient extends BaseBrowserClient<chrome.downloads.DownloadItem> {
+	async createDownloadPanel(detail: FileDetail): Promise<void> {
 		try {
 			const w = 560;
 			const h = 365;
@@ -48,7 +48,7 @@ export class ChromeClient extends IBaseBrowserClient<chrome.downloads.DownloadIt
    */
 	protected async getDownloadDetail(
 		item: chrome.downloads.DownloadItem,
-	): Promise<IFileDetail> {
+	): Promise<FileDetail> {
 		return {
 			filename: item.filename,
 			fileSize: item.fileSize,

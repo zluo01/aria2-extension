@@ -11,7 +11,7 @@ export enum MessageType {
 	RemoveJobs = 'removeJobs',
 }
 
-export const IDownloadSchema = z.object({
+export const DownloadSchema = z.object({
 	out: z.string(),
 	dir: z.string().optional(),
 	header: z.array(z.string()).optional(),
@@ -25,7 +25,7 @@ export const MessageSchema = z.discriminatedUnion('type', [
 		type: z.literal(MessageType.AddUri),
 		link: z.string(),
 		filename: z.string().optional(),
-		options: IDownloadSchema.optional(),
+		options: DownloadSchema.optional(),
 	}),
 	z.object({ type: z.literal(MessageType.AddUris), uris: z.array(z.string()) }),
 	z.object({
@@ -44,7 +44,7 @@ export const MessageSchema = z.discriminatedUnion('type', [
 
 export type Message = z.infer<typeof MessageSchema>;
 
-export interface IJob {
+export interface Job {
 	gid: string;
 	downloadSpeed: string;
 	completedLength: string;
@@ -58,9 +58,9 @@ export interface IJob {
 	files: { path: string }[];
 }
 
-export type IDownload = z.infer<typeof IDownloadSchema>;
+export type Download = z.infer<typeof DownloadSchema>;
 
-export interface IFileDetail {
+export interface FileDetail {
 	url: string;
 	filename: string;
 	fileSize: number;
@@ -74,7 +74,7 @@ export type Theme = 'dark' | 'light' | 'system';
 
 export type Protocol = 'ws' | 'wss' | 'http' | 'https';
 
-export interface IConfig {
+export interface Config {
 	path: string;
 	protocol: Protocol;
 	host: string;
@@ -82,7 +82,7 @@ export interface IConfig {
 	token: string;
 }
 
-export const DEFAULT_CONFIG: IConfig = {
+export const DEFAULT_CONFIG: Config = {
 	path: '',
 	protocol: 'ws',
 	host: '127.0.0.1',
@@ -90,7 +90,7 @@ export const DEFAULT_CONFIG: IConfig = {
 	token: '',
 };
 
-export const SKIP_DOWNLOAD_SCHEMA = [
+export const SKIP_DOWNLOAD_SCHEMES = [
 	'blob:',
 	'data:',
 	'file:',

@@ -5,16 +5,16 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { pauseJobs, startJobs } from '@/lib/queries';
 import { parseBytes } from '@/lib/utils';
-import { ACTIVE_JOB, type IJob, PAUSED_JOB } from '@/types';
+import { ACTIVE_JOB, type Job, PAUSED_JOB } from '@/types';
 
-interface IDownloadList {
-	jobs: IJob[];
+interface DownloadListProps {
+	jobs: Job[];
 	checked: string[];
 	toggle: (value: string) => () => void;
 }
 
-function DownloadList({ jobs, checked, toggle }: IDownloadList) {
-	function getFileName(job: IJob): string {
+function DownloadList({ jobs, checked, toggle }: DownloadListProps) {
+	function getFileName(job: Job): string {
 		if (job.bittorrent?.info) {
 			return job.bittorrent.info.name;
 		}
@@ -22,13 +22,13 @@ function DownloadList({ jobs, checked, toggle }: IDownloadList) {
 		return path.split('/').at(-1) || 'UNKNOWN';
 	}
 
-	function getProgress(job: IJob): number {
+	function getProgress(job: Job): number {
 		const total = parseFloat(job.totalLength);
 		if (total <= 0 || Number.isNaN(total)) return 0;
 		return (parseFloat(job.completedLength) / total) * 100;
 	}
 
-	async function jobAction(job: IJob) {
+	async function jobAction(job: Job) {
 		switch (job.status) {
 			case ACTIVE_JOB:
 				await pauseJobs(job.gid);

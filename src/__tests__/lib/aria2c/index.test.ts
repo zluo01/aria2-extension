@@ -9,9 +9,9 @@
  */
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 
-import type { IConfig } from '@/types';
+import type { Config } from '@/types';
 
-const BASE_CONFIG: IConfig = {
+const BASE_CONFIG: Config = {
 	host: '127.0.0.1',
 	port: 6800,
 	protocol: 'ws',
@@ -26,7 +26,7 @@ const NEW_CONFIG = { ...BASE_CONFIG, host: '192.168.1.1' };
 // jest.resetModules() + jest.doMock() + dynamic import.
 
 async function loadModule(opts: {
-	getConfiguration: jest.Mock<() => Promise<IConfig>>;
+	getConfiguration: jest.Mock<() => Promise<Config>>;
 	shouldReset?: jest.Mock<() => boolean>;
 	isAlive?: jest.Mock<() => boolean>;
 }) {
@@ -64,7 +64,7 @@ describe('aria2Client singleton', () => {
 		});
 
 		const getConfiguration = jest
-			.fn<() => Promise<IConfig>>()
+			.fn<() => Promise<Config>>()
 			.mockReturnValueOnce(deferred) // factory call — held pending
 			.mockResolvedValue(BASE_CONFIG); // shouldReset checks — immediate
 
@@ -87,7 +87,7 @@ describe('aria2Client singleton', () => {
 
 	test('subsequent calls return the cached instance without re-creating', async () => {
 		const getConfiguration = jest
-			.fn<() => Promise<IConfig>>()
+			.fn<() => Promise<Config>>()
 			.mockResolvedValue(BASE_CONFIG);
 		const { aria2Client, MockAria2Client } = await loadModule({
 			getConfiguration,
@@ -110,7 +110,7 @@ describe('aria2Client singleton', () => {
 			.mockReturnValueOnce(true);
 
 		const getConfiguration = jest
-			.fn<() => Promise<IConfig>>()
+			.fn<() => Promise<Config>>()
 			.mockResolvedValueOnce(BASE_CONFIG) // factory
 			.mockResolvedValueOnce(BASE_CONFIG) // first shouldReset check → stable
 			.mockResolvedValue(NEW_CONFIG); // second shouldReset check → changed
@@ -136,7 +136,7 @@ describe('aria2Client singleton', () => {
 			.mockReturnValue(false); // call 2+: new instance is stable
 
 		const getConfiguration = jest
-			.fn<() => Promise<IConfig>>()
+			.fn<() => Promise<Config>>()
 			.mockResolvedValueOnce(BASE_CONFIG) // factory
 			.mockResolvedValue(NEW_CONFIG); // all shouldReset checks use new config
 
@@ -161,7 +161,7 @@ describe('aria2Client singleton', () => {
 			.mockReturnValueOnce(false); // second call: connection dead
 
 		const getConfiguration = jest
-			.fn<() => Promise<IConfig>>()
+			.fn<() => Promise<Config>>()
 			.mockResolvedValue(BASE_CONFIG);
 
 		const { aria2Client, MockAria2Client, closeFn } = await loadModule({

@@ -2,22 +2,22 @@ import browser, { type Action, type Windows } from 'webextension-polyfill';
 
 import { cacheRemove } from '@/lib/session-cache';
 import {
+	type Config,
 	DEFAULT_CONFIG,
-	type IConfig,
-	type IDownload,
-	type IFileDetail,
+	type Download,
+	type FileDetail,
 	type Message,
 	MessageType,
-	SKIP_DOWNLOAD_SCHEMA,
+	SKIP_DOWNLOAD_SCHEMES,
 } from '@/types';
 
 import type { BrowserClient } from './types';
 
-export abstract class IBaseBrowserClient<T extends { id: number }>
+export abstract class BaseBrowserClient<T extends { id: number }>
 	implements BrowserClient
 {
-	protected abstract getDownloadDetail(item: T): Promise<IFileDetail>;
-	protected abstract createDownloadPanel(detail: IFileDetail): Promise<void>;
+	protected abstract getDownloadDetail(item: T): Promise<FileDetail>;
+	protected abstract createDownloadPanel(detail: FileDetail): Promise<void>;
 	protected abstract initializeBrowserDownload(
 		filename: string,
 		saveAs: boolean,
@@ -31,12 +31,12 @@ export abstract class IBaseBrowserClient<T extends { id: number }>
 		return browser.runtime.getPlatformInfo();
 	}
 
-	async getConfiguration(): Promise<IConfig> {
+	async getConfiguration(): Promise<Config> {
 		const config = await browser.storage.local.get('config');
-		return (config.config as IConfig) || DEFAULT_CONFIG;
+		return (config.config as Config) || DEFAULT_CONFIG;
 	}
 
-	async setConfiguration(config: IConfig): Promise<void> {
+	async setConfiguration(config: Config): Promise<void> {
 		return browser.storage.local.set({ config });
 	}
 
@@ -44,7 +44,7 @@ export abstract class IBaseBrowserClient<T extends { id: number }>
 		browser.storage.local
 			.get('config')
 			.then((data) => {
-				const config = (data.config as IConfig) || DEFAULT_CONFIG;
+				const config = (data.config as Config) || DEFAULT_CONFIG;
 				return `manager/index.html#!/settings/rpc/set/${config.protocol}/${config.host}/${config.port}/jsonrpc/${btoa(config.token)}`;
 			})
 			.then((url) => browser.tabs.create({ url }))
@@ -90,7 +90,7 @@ export abstract class IBaseBrowserClient<T extends { id: number }>
 		filePath: string,
 	): Promise<void> {
 		try {
-			const options: IDownload = {
+			const options: Download = {
 				out: filename,
 			};
 			if (filePath) {
@@ -153,12 +153,12 @@ export abstract class IBaseBrowserClient<T extends { id: number }>
 	}
 
 	protected shouldIgnoreDownloadURL(url: string) {
-		return SKIP_DOWNLOAD_SCHEMA.some((scheme) =>
+		return SKIP_DOWNLOAD_SCHEMES.some((scheme) =>
 			url.toLowerCase().startsWith(scheme),
 		);
 	}
 
-	protected async prepareDownload(detail: IFileDetail): Promise<void> {
+	protected async prepareDownload(detail: FileDetail): Promise<void> {
 		await this.removeBlankTab();
 		await this.createDownloadPanel(detail);
 	}

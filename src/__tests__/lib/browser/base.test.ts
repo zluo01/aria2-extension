@@ -1,11 +1,11 @@
 /**
- * Tests for IBaseBrowserClient shared logic.
+ * Tests for BaseBrowserClient shared logic.
  * Uses a minimal concrete subclass to exercise protected methods.
  */
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 
-import { IBaseBrowserClient } from '@/lib/browser/base';
-import { type IFileDetail, MessageType } from '@/types';
+import { BaseBrowserClient } from '@/lib/browser/base';
+import { type FileDetail, MessageType } from '@/types';
 
 jest.mock('webextension-polyfill', () => ({
 	storage: {
@@ -41,14 +41,14 @@ jest.mock('webextension-polyfill', () => ({
 
 // ─── Test subclass ────────────────────────────────────────────────────────
 
-class TestBrowserClient extends IBaseBrowserClient<{ id: number }> {
+class TestBrowserClient extends BaseBrowserClient<{ id: number }> {
 	protected async getDownloadDetail(_item: {
 		id: number;
-	}): Promise<IFileDetail> {
+	}): Promise<FileDetail> {
 		return { url: '', filename: '', fileSize: 0, incognito: false };
 	}
 
-	protected async createDownloadPanel(_detail: IFileDetail): Promise<void> {
+	protected async createDownloadPanel(_detail: FileDetail): Promise<void> {
 		return Promise.resolve();
 	}
 

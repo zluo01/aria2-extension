@@ -387,7 +387,7 @@ describe('parseBytes', () => {
 });
 
 describe('downloadToQueryString', () => {
-	test('serialises all IFileDetail fields to query string', () => {
+	test('serialises all FileDetail fields to query string', () => {
 		const detail = {
 			url: 'https://example.com/file.zip',
 			filename: 'file.zip',
