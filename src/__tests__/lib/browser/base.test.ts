@@ -136,6 +136,63 @@ describe('shouldIgnoreDownloadURL', () => {
 	});
 });
 
+// ─── openDetail ──────────────────────────────────────────────────────────
+
+describe('openDetail', () => {
+	let client: TestBrowserClient;
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		client = new TestBrowserClient();
+	});
+
+	function getBrowser() {
+		return jest.requireMock<typeof import('webextension-polyfill')>(
+			'webextension-polyfill',
+		);
+	}
+
+	test('builds AriaNg URL from stored config and opens a tab', async () => {
+		const browser = getBrowser();
+		jest.mocked(browser.storage.local.get).mockResolvedValue({
+			config: {
+				protocol: 'ws',
+				host: '127.0.0.1',
+				port: 6800,
+				token: 'secret',
+				path: '',
+			},
+		});
+		jest.mocked(browser.tabs.create).mockResolvedValue({} as any);
+
+		await client.openDetail(false);
+
+		expect(browser.tabs.create).toHaveBeenCalledWith({
+			url: `manager/index.html#!/settings/rpc/set/ws/127.0.0.1/6800/jsonrpc/${btoa('secret')}`,
+		});
+	});
+
+	test('uses DEFAULT_CONFIG when storage has no config', async () => {
+		const browser = getBrowser();
+		jest.mocked(browser.storage.local.get).mockResolvedValue({});
+		jest.mocked(browser.tabs.create).mockResolvedValue({} as any);
+
+		await client.openDetail(false);
+
+		expect(browser.tabs.create).toHaveBeenCalledWith({
+			url: `manager/index.html#!/settings/rpc/set/ws/127.0.0.1/6800/jsonrpc/${btoa('')}`,
+		});
+	});
+
+	test('does not throw when tabs.create fails', async () => {
+		const browser = getBrowser();
+		jest.mocked(browser.storage.local.get).mockResolvedValue({});
+		jest.mocked(browser.tabs.create).mockRejectedValue(new Error('no tab'));
+
+		await expect(client.openDetail(false)).resolves.toBeUndefined();
+	});
+});
+
 // ─── download ────────────────────────────────────────────────────────────
 
 describe('download', () => {

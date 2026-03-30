@@ -40,16 +40,16 @@ export abstract class BaseBrowserClient<T extends { id: number }>
 		return browser.storage.local.set({ config });
 	}
 
-	openDetail(fromExtension: boolean): void {
-		browser.storage.local
-			.get('config')
-			.then((data) => {
-				const config = (data.config as Config) || DEFAULT_CONFIG;
-				return `manager/index.html#!/settings/rpc/set/${config.protocol}/${config.host}/${config.port}/jsonrpc/${btoa(config.token)}`;
-			})
-			.then((url) => browser.tabs.create({ url }))
-			.then(() => fromExtension && window.close())
-			.catch((err) => console.error('Open Detail Page', err));
+	async openDetail(fromExtension: boolean): Promise<void> {
+		try {
+			const data = await browser.storage.local.get('config');
+			const config = (data.config as Config) || DEFAULT_CONFIG;
+			const url = `manager/index.html#!/settings/rpc/set/${config.protocol}/${config.host}/${config.port}/jsonrpc/${btoa(config.token)}`;
+			await browser.tabs.create({ url });
+			if (fromExtension) window.close();
+		} catch (err) {
+			console.error('Open Detail Page', err);
+		}
 	}
 
 	async openSetting(): Promise<void> {
