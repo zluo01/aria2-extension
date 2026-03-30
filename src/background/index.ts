@@ -44,11 +44,12 @@ browser.runtime.onMessage.addListener(async (data: unknown) => {
 		console.error('Invalid message', result.error);
 		return;
 	}
+	if (result.data.type === MessageType.Signal) {
+		return cacheSet(result.data.message);
+	}
 	try {
 		const c = await aria2Client();
 		switch (result.data.type) {
-			case MessageType.Signal:
-				return cacheSet(result.data.message);
 			case MessageType.GetJobs:
 				return c.getJobs();
 			case MessageType.GetNumJobs:
