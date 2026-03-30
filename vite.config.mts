@@ -1,9 +1,9 @@
+import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
-import react from '@vitejs/plugin-react';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 import bundleAria from './plugins/bundle-aria';
 import cleanBuildScript from './plugins/clean-build';
@@ -18,18 +18,17 @@ export default defineConfig(({ mode }) => ({
   define: {
     __TARGET__: JSON.stringify(process.env.TARGET ?? 'FIREFOX'),
   },
+  resolve: {
+    tsconfigPaths: true,
+  },
   plugins: [
     tanstackRouter({
       target: 'react',
       autoCodeSplitting: true,
     }),
-    react({
-      babel: {
-        plugins: ['babel-plugin-react-compiler'],
-      },
-    }),
+    react(),
+    babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),
-    tsconfigPaths(),
     cleanBuildScript(),
     moveEntryScript(),
     makeManifest(),
@@ -41,7 +40,7 @@ export default defineConfig(({ mode }) => ({
     sourcemap: mode === 'dev',
     minify: mode !== 'dev',
     emptyOutDir: false,
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         main: resolve(root, 'main', 'index.html'),
         background: resolve(root, 'background', 'index.ts'),
