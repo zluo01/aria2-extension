@@ -5,13 +5,7 @@
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 
 import { IBaseBrowserClient } from '@/lib/browser/base';
-import type { IFileDetail } from '@/types';
-
-// ─── Mocks ────────────────────────────────────────────────────────────────
-
-jest.mock('@/lib/queries', () => ({
-	addUri: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-}));
+import { type IFileDetail, MessageType } from '@/types';
 
 jest.mock('webextension-polyfill', () => ({
 	storage: {
@@ -137,5 +131,84 @@ describe('shouldIgnoreDownloadURL', () => {
 		expect(client.testShouldIgnore('https://example.com/?u=blob:foo')).toBe(
 			false,
 		);
+	});
+});
+
+// ─── download ────────────────────────────────────────────────────────────
+
+describe('download', () => {
+	let client: TestBrowserClient;
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		client = new TestBrowserClient();
+	});
+
+	function setupWindowMock() {
+		const browser = jest.requireMock<typeof import('webextension-polyfill')>(
+			'webextension-polyfill',
+		);
+		jest.mocked(browser.windows.getCurrent).mockResolvedValue({ id: 1 } as any);
+		jest.mocked(browser.windows.remove).mockResolvedValue(undefined as any);
+		jest.mocked(browser.runtime.sendMessage).mockResolvedValue(undefined);
+	}
+
+	test('sends AddUri message with filename in options', async () => {
+		setupWindowMock();
+		const browser = jest.requireMock<typeof import('webextension-polyfill')>(
+			'webextension-polyfill',
+		);
+
+		await client.download('https://example.com/file.zip', 'file.zip', '');
+
+		expect(browser.runtime.sendMessage).toHaveBeenCalledWith({
+			type: MessageType.AddUri,
+			link: 'https://example.com/file.zip',
+			filename: 'file.zip',
+			options: { out: 'file.zip' },
+		});
+	});
+
+	test('includes dir in options when filePath is provided', async () => {
+		setupWindowMock();
+		const browser = jest.requireMock<typeof import('webextension-polyfill')>(
+			'webextension-polyfill',
+		);
+
+		await client.download(
+			'https://example.com/file.zip',
+			'file.zip',
+			'/home/user/downloads',
+		);
+
+		expect(browser.runtime.sendMessage).toHaveBeenCalledWith({
+			type: MessageType.AddUri,
+			link: 'https://example.com/file.zip',
+			filename: 'file.zip',
+			options: { out: 'file.zip', dir: '/home/user/downloads' },
+		});
+	});
+
+	test('escapes backslashes in Windows file paths', async () => {
+		setupWindowMock();
+		const browser = jest.requireMock<typeof import('webextension-polyfill')>(
+			'webextension-polyfill',
+		);
+
+		await client.download(
+			'https://example.com/file.zip',
+			'file.zip',
+			'C:\\Users\\test\\Downloads',
+		);
+
+		expect(browser.runtime.sendMessage).toHaveBeenCalledWith({
+			type: MessageType.AddUri,
+			link: 'https://example.com/file.zip',
+			filename: 'file.zip',
+			options: {
+				out: 'file.zip',
+				dir: 'C:\\\\Users\\\\test\\\\Downloads',
+			},
+		});
 	});
 });

@@ -1,6 +1,5 @@
 import browser, { type Action, type Windows } from 'webextension-polyfill';
 
-import { addUri } from '@/lib/queries';
 import {
 	DEFAULT_CONFIG,
 	type IConfig,
@@ -94,7 +93,12 @@ export abstract class IBaseBrowserClient<T> implements BrowserClient {
 			if (filePath) {
 				options.dir = filePath.replace(/\\/g, '\\\\');
 			}
-			await addUri(url, filename, options);
+			await this.sendMessage({
+				type: MessageType.AddUri,
+				link: url,
+				filename,
+				options,
+			});
 			const windowInfo = await this.getCurrentWindow();
 			if (windowInfo.id) {
 				await browser.windows.remove(windowInfo.id);
