@@ -6,7 +6,7 @@ export function augmentDownloadLink(input: string): string {
 	// Remove any leading or trailing whitespace before any check
 	input = input.trim();
 
-	if (input.startsWith('http') || input.startsWith('https')) {
+	if (input.startsWith('http')) {
 		return input;
 	}
 
