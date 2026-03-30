@@ -1,6 +1,5 @@
 import browser, { type Downloads, type Windows } from 'webextension-polyfill';
 
-import { cacheRemove } from '@/lib/session-cache';
 import { downloadToQueryString } from '@/lib/utils';
 import type { IFileDetail } from '@/types';
 
@@ -120,20 +119,7 @@ export class FirefoxClient extends IBaseBrowserClient<Downloads.DownloadItem> {
 	registerDownloadInterceptor(): void {
 		browser.downloads.onCreated.addListener(async (downloadItem) => {
 			try {
-				const id = downloadItem.id;
-
-				const fileDetail = await this.getDownloadDetail(downloadItem);
-				if (this.shouldIgnoreDownloadURL(fileDetail.url)) {
-					return;
-				}
-
-				// do nothing when user choose to download with built-in downloader
-				if (await cacheRemove(fileDetail.url)) {
-					return;
-				}
-
-				await this.cancelDownload(id);
-				await this.prepareDownload(fileDetail);
+				await this.handleDownloadIntercept(downloadItem);
 			} catch (e) {
 				console.error('Download interceptor error', e);
 			}

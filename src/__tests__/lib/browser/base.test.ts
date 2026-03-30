@@ -41,8 +41,10 @@ jest.mock('webextension-polyfill', () => ({
 
 // ─── Test subclass ────────────────────────────────────────────────────────
 
-class TestBrowserClient extends IBaseBrowserClient<unknown> {
-	protected async getDownloadDetail(_item: unknown): Promise<IFileDetail> {
+class TestBrowserClient extends IBaseBrowserClient<{ id: number }> {
+	protected async getDownloadDetail(_item: {
+		id: number;
+	}): Promise<IFileDetail> {
 		return { url: '', filename: '', fileSize: 0, incognito: false };
 	}
 

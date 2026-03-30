@@ -8,10 +8,6 @@ import { FirefoxClient } from '@/lib/browser/firefox';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 
-jest.mock('@/lib/queries', () => ({
-	addUri: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-}));
-
 jest.mock('@/lib/session-cache', () => ({
 	cacheRemove: jest.fn<() => Promise<boolean>>().mockResolvedValue(false),
 }));

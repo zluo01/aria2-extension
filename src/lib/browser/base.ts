@@ -1,5 +1,6 @@
 import browser, { type Action, type Windows } from 'webextension-polyfill';
 
+import { cacheRemove } from '@/lib/session-cache';
 import {
 	DEFAULT_CONFIG,
 	type IConfig,
@@ -12,7 +13,9 @@ import {
 
 import type { BrowserClient } from './types';
 
-export abstract class IBaseBrowserClient<T> implements BrowserClient {
+export abstract class IBaseBrowserClient<T extends { id: number }>
+	implements BrowserClient
+{
 	protected abstract getDownloadDetail(item: T): Promise<IFileDetail>;
 	protected abstract createDownloadPanel(detail: IFileDetail): Promise<void>;
 	protected abstract initializeBrowserDownload(
@@ -158,6 +161,19 @@ export abstract class IBaseBrowserClient<T> implements BrowserClient {
 	protected async prepareDownload(detail: IFileDetail): Promise<void> {
 		await this.removeBlankTab();
 		await this.createDownloadPanel(detail);
+	}
+
+	protected async handleDownloadIntercept(item: T): Promise<void> {
+		const id = item.id;
+		const fileDetail = await this.getDownloadDetail(item);
+		if (this.shouldIgnoreDownloadURL(fileDetail.url)) {
+			return;
+		}
+		if (await cacheRemove(fileDetail.url)) {
+			return;
+		}
+		await this.cancelDownload(id);
+		await this.prepareDownload(fileDetail);
 	}
 
 	protected async cancelDownload(id: number) {

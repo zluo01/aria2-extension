@@ -13,10 +13,6 @@ import { ChromeClient } from '@/lib/browser/chrome';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 
-jest.mock('@/lib/queries', () => ({
-	addUri: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-}));
-
 jest.mock('@/lib/session-cache', () => ({
 	cacheRemove: jest.fn<() => Promise<boolean>>().mockResolvedValue(false),
 }));
