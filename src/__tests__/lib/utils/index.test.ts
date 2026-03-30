@@ -375,6 +375,15 @@ describe('parseBytes', () => {
 		expect(parseBytes(1000)).toBe('1000.00 B');
 		expect(parseBytes(1100)).toBe('1.07 KB');
 	});
+
+	test('returns 0.00 B for negative values', () => {
+		expect(parseBytes(-1)).toBe('0.00 B');
+		expect(parseBytes(-1024)).toBe('0.00 B');
+	});
+
+	test('returns 0.00 B for NaN', () => {
+		expect(parseBytes(NaN)).toBe('0.00 B');
+	});
 });
 
 describe('downloadToQueryString', () => {

@@ -43,6 +43,7 @@ export function downloadToQueryString(detail: IFileDetail): string {
 }
 
 export function parseBytes(value: number): string {
+	if (value <= 0 || Number.isNaN(value)) return '0.00 B';
 	const symbol = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 	let speed = value;
 	let order = 0;
