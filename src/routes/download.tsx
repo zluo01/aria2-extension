@@ -45,7 +45,7 @@ function DownloadPanel() {
 		onSubmit: async ({ value, meta }) => {
 			switch (meta.submitAction) {
 				case 'download':
-					await downloadFile(data.url, value.fileName, value.filePath);
+					await client.download(data.url, value.fileName, value.filePath);
 					break;
 				case 'save':
 					await client.saveFile(data.url, value.fileName, false);
@@ -56,10 +56,6 @@ function DownloadPanel() {
 			}
 		},
 	});
-
-	async function downloadFile(url: string, fileName: string, filePath: string) {
-		await client.download(url, fileName, filePath);
-	}
 
 	return (
 		<form
