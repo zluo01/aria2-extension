@@ -147,10 +147,8 @@ function DownloadPanel() {
 									{data.fileSize > 0 ? parseBytes(data.fileSize) : 'UNKNOWN B'}
 								</span>
 							</div>
-							<form.Subscribe
-								selector={(state) => [state.canSubmit, state.isSubmitting]}
-							>
-								{([canSubmit, _isSubmitting]) => (
+							<form.Subscribe selector={(state) => [state.canSubmit]}>
+								{([canSubmit]) => (
 									<Field
 										orientation="horizontal"
 										className="justify-between mt-1"
