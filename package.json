@@ -48,12 +48,12 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.9",
+    "@biomejs/biome": "2.4.10",
     "@rolldown/plugin-babel": "0.2.2",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "1.167.9",
     "@types/chrome": "0.1.38",
-    "@types/node": "25.5.0",
+    "@types/node": "25.5.2",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@types/webextension-polyfill": "0.12.5",
