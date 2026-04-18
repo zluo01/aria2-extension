@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.11",
-    "@rolldown/plugin-babel": "0.2.2",
+    "@rolldown/plugin-babel": "0.2.3",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "1.167.18",
     "@types/chrome": "0.1.40",
