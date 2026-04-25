@@ -117,6 +117,43 @@ async function fetchAriaNgHtml(): Promise<string> {
   return extractFromZip(zipBuf, 'index.html').toString('utf-8');
 }
 
+/**
+ * AngularJS bundled inside AriaNg sanitises `<a href>` and `<img src>` URLs
+ * against a hard-coded scheme whitelist. The `chrome-extension:` scheme is
+ * not on it, so any link AriaNg renders to its own page (e.g. a shareable
+ * task detail URL) gets prefixed with `unsafe:` and the browser then refuses
+ * to navigate there ("Could not read file unsafe:chrome-extension://...").
+ *
+ * We patch the two regex literals shipped by AngularJS to also accept
+ * `chrome-extension:` so links work when AriaNg is loaded as part of a
+ * web extension.
+ */
+const ANGULAR_SANITIZE_PATCHES: Array<{ from: string; to: string }> = [
+  {
+    from: '/^\\s*(https?|s?ftp|mailto|tel|file):/',
+    to: '/^\\s*(https?|s?ftp|mailto|tel|file|chrome-extension):/',
+  },
+  {
+    from: '/^\\s*((https?|ftp|file|blob):|data:image\\/)/',
+    to: '/^\\s*((https?|ftp|file|blob|chrome-extension):|data:image\\/)/',
+  },
+];
+
+function patchAngularSanitizer(content: string): {
+  patched: string;
+  applied: number;
+} {
+  let patched = content;
+  let applied = 0;
+  for (const { from, to } of ANGULAR_SANITIZE_PATCHES) {
+    if (patched.includes(from)) {
+      patched = patched.split(from).join(to);
+      applied++;
+    }
+  }
+  return { patched, applied };
+}
+
 function extractInlineScripts(html: string): {
   modifiedHtml: string;
   chunks: Array<{ filename: string; content: string }>;
@@ -130,13 +167,14 @@ function extractInlineScripts(html: string): {
         return `<script${attrs}>${content}</script>`;
       }
 
+      const { patched } = patchAngularSanitizer(content);
       const hash = crypto
         .createHash('sha256')
-        .update(content)
+        .update(patched)
         .digest('hex')
         .slice(0, 12);
       const filename = `aria-${hash}.js`;
-      chunks.push({ filename, content });
+      chunks.push({ filename, content: patched });
       return `<script${attrs} src="chunks/${filename}"></script>`;
     },
   );
