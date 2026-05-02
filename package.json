@@ -48,7 +48,7 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.13",
+    "@biomejs/biome": "2.4.14",
     "@rolldown/plugin-babel": "0.2.3",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "1.167.27",
