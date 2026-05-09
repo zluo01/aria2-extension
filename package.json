@@ -52,7 +52,7 @@
     "@rolldown/plugin-babel": "0.2.3",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "1.167.32",
-    "@types/chrome": "0.1.40",
+    "@types/chrome": "0.1.42",
     "@types/node": "25.6.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
