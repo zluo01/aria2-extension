@@ -48,12 +48,12 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.16",
+    "@biomejs/biome": "2.5.0",
     "@rolldown/plugin-babel": "0.2.3",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "1.168.11",
     "@types/chrome": "0.1.42",
-    "@types/node": "25.9.1",
+    "@types/node": "25.9.3",
     "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3",
     "@types/webextension-polyfill": "0.12.5",
@@ -65,7 +65,7 @@
     "typescript": "6.0.3",
     "vite": "8.0.14",
     "vite-bundle-visualizer": "1.2.1",
-    "vitest": "4.1.7",
+    "vitest": "4.1.9",
     "web-ext": "10.3.0",
     "webextension-polyfill": "0.12.0"
   }
