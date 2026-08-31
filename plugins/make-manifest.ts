@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { PluginOption } from 'vite';
+import type { PluginOption } from 'vite';
 
-import { Chrome, Firefox } from '../src/manifest';
+import { Chrome, Firefox } from '../manifest.config.ts';
 
 const { resolve } = path;
 
-const outDir = resolve(__dirname, '..', 'build');
+const outDir = resolve(import.meta.dirname, '..', 'build');
 
 export default function makeManifest(): PluginOption {
   return {

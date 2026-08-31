@@ -4,7 +4,10 @@
     "skipLibCheck": true,
     "module": "esnext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
+    "declaration": true,
+    "emitDeclarationOnly": true
   },
-  "include": ["vite.config.mts"]
+  "include": ["vite.config.mts", "plugins", "manifest.config.ts", "package.json"]
 }

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import type { ChangeEvent } from 'react';
+import browser from 'webextension-polyfill';
 
 import {
 	Field,
@@ -20,7 +21,6 @@ import { Separator } from '@/components/ui/separator';
 import { client } from '@/lib/browser';
 import { getConfigurationQueryOptions, queryClient } from '@/lib/queries';
 import { useTheme } from '@/lib/theme';
-import { Chrome } from '@/manifest';
 import type { Config, Protocol } from '@/types';
 
 const protocol: Record<Protocol, string> = {
@@ -179,7 +179,7 @@ function SettingForm({ config }: { config: Config }) {
 				<Separator className="mt-2" />
 				<div className="flex flex-row justify-end items-center">
 					<span className="text-sm text-muted-foreground">
-						v{Chrome.version}
+						v{browser.runtime.getManifest().version}
 					</span>
 				</div>
 			</div>

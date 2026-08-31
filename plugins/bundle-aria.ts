@@ -2,9 +2,9 @@ import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import { resolve } from 'node:path';
 import * as zlib from 'node:zlib';
-import { PluginOption } from 'vite';
+import type { PluginOption } from 'vite';
 
-const outDir = resolve(__dirname, '..', 'build');
+const outDir = resolve(import.meta.dirname, '..', 'build');
 
 /**
  * Matches <script> tags that have no src attribute.

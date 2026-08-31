@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import { resolve } from 'path';
-import { PluginOption } from 'vite';
+import type { PluginOption } from 'vite';
 
-const outDir = resolve(__dirname, '..', 'build');
+const outDir = resolve(import.meta.dirname, '..', 'build');
 
 export default function cleanBuildScript(): PluginOption {
   return {

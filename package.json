@@ -3,6 +3,7 @@
   "displayName": "Aria2 Integration Extension",
   "version": "0.7.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "analyze": "npx vite-bundle-visualizer",
     "build": "tsc && vite build",

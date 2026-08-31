@@ -1,6 +1,6 @@
 import type { Manifest } from 'webextension-polyfill';
 
-import pkg from '../package.json';
+import pkg from './package.json' with { type: 'json' };
 
 const base = {
 	manifest_version: 3,

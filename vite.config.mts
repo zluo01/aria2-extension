@@ -4,14 +4,14 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
-import bundleAria from './plugins/bundle-aria';
-import cleanBuildScript from './plugins/clean-build';
-import makeManifest from './plugins/make-manifest';
-import moveEntryScript from './plugins/move-entry';
+import bundleAria from './plugins/bundle-aria.ts';
+import cleanBuildScript from './plugins/clean-build.ts';
+import makeManifest from './plugins/make-manifest.ts';
+import moveEntryScript from './plugins/move-entry.ts';
 
-const root = resolve(__dirname, 'src');
-const outDir = resolve(__dirname, 'build');
-const publicDir = resolve(__dirname, 'public');
+const root = resolve(import.meta.dirname, 'src');
+const outDir = resolve(import.meta.dirname, 'build');
+const publicDir = resolve(import.meta.dirname, 'public');
 
 export default defineConfig(({ mode }) => ({
   define: {
