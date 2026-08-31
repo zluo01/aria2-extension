@@ -15,7 +15,7 @@ export class FirefoxClient extends BaseBrowserClient<Downloads.DownloadItem> {
 			const w = 560;
 			const h = 365;
 
-			const baseUrl = browser.runtime.getURL('index.html');
+			const baseUrl = browser.runtime.getURL('download.html');
 
 			// Fixes dual-screen position
 			const dualScreenLeft = window.screenLeft ?? window.screenX;
@@ -37,7 +37,7 @@ export class FirefoxClient extends BaseBrowserClient<Downloads.DownloadItem> {
 			const left = Math.round((width - w) / 2 / systemZoom + dualScreenLeft);
 
 			const createOptions: Windows.CreateCreateDataType = {
-				url: `${baseUrl}#/download?${downloadToQueryString(detail)}`,
+				url: `${baseUrl}?${downloadToQueryString(detail)}`,
 				type: 'popup',
 				top,
 				left,

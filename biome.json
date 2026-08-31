@@ -11,8 +11,7 @@
 			"**/src/**/*",
 			"**/index.html",
 			"**/vite.config.ts",
-			"!**/build",
-			"!**/src/routeTree.gen.ts"
+			"!**/build"
 		]
 	},
 	"formatter": {

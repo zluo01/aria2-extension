@@ -1,5 +1,4 @@
 import { useForm } from '@tanstack/react-form';
-import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -20,10 +19,12 @@ const downloadSearchSchema = z.object({
 	fileSize: z.coerce.number(),
 });
 
-export const Route = createFileRoute('/download')({
-	validateSearch: downloadSearchSchema,
-	component: DownloadPanel,
-});
+type DownloadSearch = z.infer<typeof downloadSearchSchema>;
+
+function parseSearch() {
+	const params = new URLSearchParams(window.location.search);
+	return downloadSearchSchema.safeParse(Object.fromEntries(params));
+}
 
 type FormMeta = {
 	submitAction: 'download' | 'save' | 'saveAs' | null;
@@ -34,8 +35,20 @@ const defaultMeta: FormMeta = {
 };
 
 function DownloadPanel() {
-	const data = Route.useSearch();
+	const search = parseSearch();
 
+	if (!search.success) {
+		return (
+			<div className="size-full p-4 text-sm text-destructive">
+				Invalid download request: {z.prettifyError(search.error)}
+			</div>
+		);
+	}
+
+	return <DownloadForm data={search.data} />;
+}
+
+function DownloadForm({ data }: { data: DownloadSearch }) {
 	const form = useForm({
 		defaultValues: {
 			fileName: data.filename,
@@ -189,3 +202,5 @@ function DownloadPanel() {
 		</form>
 	);
 }
+
+export default DownloadPanel;

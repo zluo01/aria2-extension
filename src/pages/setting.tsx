@@ -1,5 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import type { ChangeEvent } from 'react';
 
 import {
@@ -24,12 +23,6 @@ import { useTheme } from '@/lib/theme';
 import { Chrome } from '@/manifest';
 import type { Config, Protocol } from '@/types';
 
-export const Route = createFileRoute('/setting')({
-	loader: ({ context: { queryClient } }) =>
-		queryClient.ensureQueryData(getConfigurationQueryOptions),
-	component: Setting,
-});
-
 const protocol: Record<Protocol, string> = {
 	ws: 'WebSocket',
 	wss: 'WebSocket (Security)',
@@ -38,31 +31,47 @@ const protocol: Record<Protocol, string> = {
 };
 
 function Setting() {
-	const { theme, setTheme } = useTheme();
+	const {
+		data: config,
+		isPending,
+		isError,
+	} = useQuery(getConfigurationQueryOptions);
 
-	const { data: config } = useSuspenseQuery(getConfigurationQueryOptions);
+	if (isError) {
+		return (
+			<div className="p-4 text-sm text-destructive">
+				Failed to load configuration from browser storage.
+			</div>
+		);
+	}
+
+	if (isPending) {
+		return null;
+	}
+
+	return <SettingForm config={config} />;
+}
+
+function SettingForm({ config }: { config: Config }) {
+	const { theme, setTheme } = useTheme();
 
 	async function updateDownloadPath(
 		e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
 	): Promise<void> {
-		if (config) {
-			await updateConfig({ ...config, path: e.target.value });
-		}
+		await updateConfig({ ...config, path: e.target.value });
 	}
 
 	async function updateHost(
 		e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
 	): Promise<void> {
-		if (config) {
-			await updateConfig({ ...config, host: e.target.value });
-		}
+		await updateConfig({ ...config, host: e.target.value });
 	}
 
 	async function updatePort(
 		e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
 	): Promise<void> {
 		const port = parseInt(e.target.value, 10);
-		if (config && !Number.isNaN(port) && port >= 1 && port <= 65535) {
+		if (!Number.isNaN(port) && port >= 1 && port <= 65535) {
 			await updateConfig({ ...config, port });
 		}
 	}
@@ -70,15 +79,11 @@ function Setting() {
 	async function updateToken(
 		e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
 	): Promise<void> {
-		if (config) {
-			await updateConfig({ ...config, token: e.target.value });
-		}
+		await updateConfig({ ...config, token: e.target.value });
 	}
 
 	async function updateProtocol(protocol: Protocol): Promise<void> {
-		if (config) {
-			await updateConfig({ ...config, protocol });
-		}
+		await updateConfig({ ...config, protocol });
 	}
 
 	async function updateConfig(config: Config) {
@@ -114,7 +119,7 @@ function Setting() {
 							</Field>
 							<Field>
 								<FieldLabel>Default Download Path</FieldLabel>
-								<Input value={config?.path} onChange={updateDownloadPath} />
+								<Input value={config.path} onChange={updateDownloadPath} />
 								<FieldDescription>
 									Download path of Aria2(only), optional
 								</FieldDescription>
@@ -123,7 +128,7 @@ function Setting() {
 								<FieldLabel>Protocol</FieldLabel>
 								<Select
 									onValueChange={(v) => updateProtocol(v as Protocol)}
-									value={config?.protocol}
+									value={config.protocol}
 								>
 									<SelectTrigger>
 										<SelectValue />
@@ -142,7 +147,7 @@ function Setting() {
 							</Field>
 							<Field>
 								<FieldLabel>Host</FieldLabel>
-								<Input value={config?.host} onChange={updateHost} required />
+								<Input value={config.host} onChange={updateHost} required />
 								<FieldDescription>
 									RPC host of Aria2. You can use ip or domain name.
 								</FieldDescription>
@@ -153,7 +158,7 @@ function Setting() {
 									type="number"
 									min={1}
 									max={65535}
-									value={config?.port}
+									value={config.port}
 									onChange={updatePort}
 									required
 								/>
@@ -163,7 +168,7 @@ function Setting() {
 								<FieldLabel>Token</FieldLabel>
 								<Input
 									type="password"
-									value={config?.token}
+									value={config.token}
 									onChange={updateToken}
 								/>
 								<FieldDescription>Aria2 RPC secret, optional.</FieldDescription>
@@ -181,3 +186,5 @@ function Setting() {
 		</div>
 	);
 }
+
+export default Setting;

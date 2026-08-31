@@ -1,5 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import DownloadList from '@/components/content';
@@ -7,14 +6,8 @@ import CreationArea from '@/components/create';
 import Header from '@/components/header';
 import { getTasksQueryOptions } from '@/lib/queries';
 
-export const Route = createFileRoute('/')({
-	loader: ({ context: { queryClient } }) =>
-		queryClient.ensureQueryData(getTasksQueryOptions),
-	component: Display,
-});
-
-function Display() {
-	const { data: jobs } = useSuspenseQuery(getTasksQueryOptions);
+function Popup() {
+	const { data: jobs = [] } = useQuery(getTasksQueryOptions);
 
 	const [checked, setChecked] = useState<string[]>([]);
 	const [show, setShow] = useState(false);
@@ -35,7 +28,7 @@ function Display() {
 	return (
 		<div className="w-105 h-auto max-h-192 overflow-auto">
 			<Header
-				jobs={jobs || []}
+				jobs={jobs}
 				checked={checked}
 				show={show}
 				setShow={() => setShow((prevState) => !prevState)}
@@ -44,12 +37,10 @@ function Display() {
 			{show ? (
 				<CreationArea close={() => setShow(false)} />
 			) : (
-				<DownloadList
-					jobs={jobs || []}
-					checked={checked}
-					toggle={handleToggle}
-				/>
+				<DownloadList jobs={jobs} checked={checked} toggle={handleToggle} />
 			)}
 		</div>
 	);
 }
+
+export default Popup;

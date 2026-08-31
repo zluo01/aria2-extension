@@ -31,7 +31,7 @@ const base = {
 		default_title: 'Aria2Ex',
 	},
 	options_ui: {
-		page: 'index.html#/setting',
+		page: 'setting.html',
 		open_in_tab: true,
 	},
 };

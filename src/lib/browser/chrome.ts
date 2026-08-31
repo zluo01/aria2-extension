@@ -9,10 +9,10 @@ export class ChromeClient extends BaseBrowserClient<chrome.downloads.DownloadIte
 			const w = 560;
 			const h = 365;
 
-			const baseUrl = chrome.runtime.getURL('index.html');
+			const baseUrl = chrome.runtime.getURL('download.html');
 
 			const createOptions: chrome.windows.CreateData = {
-				url: `${baseUrl}#/download?${downloadToQueryString(detail)}`,
+				url: `${baseUrl}?${downloadToQueryString(detail)}`,
 				type: 'popup',
 				width: w,
 				height: h,
