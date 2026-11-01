@@ -39,11 +39,11 @@
     "@biomejs/biome": "2.6.4",
     "@rolldown/plugin-babel": "0.3.0",
     "@tailwindcss/vite": "^4.2.2",
-    "@types/chrome": "0.2.7",
+    "@types/chrome": "0.3.7",
     "@types/node": "25.9.9",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
-    "@types/webextension-polyfill": "0.12.5",
+    "@types/webextension-polyfill": "0.12.6",
     "@vitejs/plugin-react": "6.0.4",
     "babel-plugin-react-compiler": "1.0.0",
     "husky": "9.1.7",
@@ -53,7 +53,7 @@
     "vite": "8.3.5",
     "vite-bundle-visualizer": "1.2.1",
     "vitest": "4.1.12",
-    "web-ext": "10.6.0",
+    "web-ext": "10.8.0",
     "webextension-polyfill": "0.12.0"
   }
 }
