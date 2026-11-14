@@ -27,6 +27,7 @@ function CreationArea({ close }: ICreationArea) {
 			<Textarea
 				className="min-h-32"
 				placeholder="Support multiple URLS, one URL per line"
+				aria-label="Links to download, one per line"
 				value={text}
 				onChange={(e) => setText(e.target.value)}
 				autoFocus
