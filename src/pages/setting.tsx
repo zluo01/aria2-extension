@@ -106,7 +106,7 @@ function SettingForm({ config }: { config: Config }) {
 							<Field>
 								<FieldLabel>Theme</FieldLabel>
 								<Select onValueChange={setTheme} value={theme}>
-									<SelectTrigger>
+									<SelectTrigger aria-label="Theme">
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
@@ -119,7 +119,11 @@ function SettingForm({ config }: { config: Config }) {
 							</Field>
 							<Field>
 								<FieldLabel>Default Download Path</FieldLabel>
-								<Input value={config.path} onChange={updateDownloadPath} />
+								<Input
+									value={config.path}
+									onChange={updateDownloadPath}
+									aria-label="Default download path"
+								/>
 								<FieldDescription>
 									Download path of Aria2(only), optional
 								</FieldDescription>
@@ -130,7 +134,7 @@ function SettingForm({ config }: { config: Config }) {
 									onValueChange={(v) => updateProtocol(v as Protocol)}
 									value={config.protocol}
 								>
-									<SelectTrigger>
+									<SelectTrigger aria-label="Protocol">
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
@@ -147,7 +151,12 @@ function SettingForm({ config }: { config: Config }) {
 							</Field>
 							<Field>
 								<FieldLabel>Host</FieldLabel>
-								<Input value={config.host} onChange={updateHost} required />
+								<Input
+									value={config.host}
+									onChange={updateHost}
+									required
+									aria-label="Host"
+								/>
 								<FieldDescription>
 									RPC host of Aria2. You can use ip or domain name.
 								</FieldDescription>
@@ -155,6 +164,7 @@ function SettingForm({ config }: { config: Config }) {
 							<Field>
 								<FieldLabel>Port</FieldLabel>
 								<Input
+									aria-label="Port"
 									type="number"
 									min={1}
 									max={65535}
@@ -167,6 +177,7 @@ function SettingForm({ config }: { config: Config }) {
 							<Field>
 								<FieldLabel>Token</FieldLabel>
 								<Input
+									aria-label="Token"
 									type="password"
 									value={config.token}
 									onChange={updateToken}

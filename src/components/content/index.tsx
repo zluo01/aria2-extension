@@ -55,7 +55,7 @@ function DownloadList({ jobs, checked, toggle }: DownloadListProps) {
 						<Checkbox
 							className="ml-2"
 							checked={checked.indexOf(o.gid) !== -1}
-							tabIndex={-1}
+							aria-label={`Select ${getFileName(o)}`}
 						/>
 						<div className="flex flex-row flex-nowrap items-center justify-end gap-x-2 w-4/5">
 							<div className="flex flex-col w-full flex-nowrap justify-around py-1 truncate">
@@ -65,7 +65,11 @@ function DownloadList({ jobs, checked, toggle }: DownloadListProps) {
 									<span>{`${parseBytes(parseFloat(o.downloadSpeed))}/s`}</span>
 								</div>
 								<div className="w-full flex flex-row flex-nowrap justify-end items-center">
-									<Progress value={progress} className="mr-1 h-1 w-full" />
+									<Progress
+										value={progress}
+										className="mr-1 h-1 w-full"
+										aria-label={`${getFileName(o)}, ${progress.toFixed(0)} percent`}
+									/>
 									<span className="min-w-9 text-muted-foreground text-sm">{`${progress.toFixed(1)}%`}</span>
 								</div>
 							</div>
@@ -74,6 +78,7 @@ function DownloadList({ jobs, checked, toggle }: DownloadListProps) {
 								size="icon"
 								className="rounded-full z-10"
 								onClick={() => jobAction(o)}
+								aria-label={`${o.status === ACTIVE_JOB ? 'Pause' : 'Resume'} ${getFileName(o)}`}
 							>
 								{o.status === ACTIVE_JOB ? <PauseIcon /> : <PlayIcon />}
 							</Button>

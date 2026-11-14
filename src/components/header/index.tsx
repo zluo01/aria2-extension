@@ -70,6 +70,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: HeaderProps) {
 				checked={isChecked}
 				disabled={show}
 				onCheckedChange={handleChange}
+				aria-label="Select all downloads"
 			/>
 			<div className="flex flex-row flex-nowrap justify-end items-center space-x-1">
 				<Button
@@ -77,6 +78,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: HeaderProps) {
 					size="icon"
 					className="rounded-full"
 					onClick={() => setShow()}
+					aria-label="Add downloads"
 				>
 					<PlusIcon />
 				</Button>
@@ -86,6 +88,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: HeaderProps) {
 					className="rounded-full"
 					disabled={disabled}
 					onClick={() => start()}
+					aria-label="Resume selected downloads"
 				>
 					<PlayIcon />
 				</Button>
@@ -95,6 +98,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: HeaderProps) {
 					className="rounded-full"
 					disabled={disabled}
 					onClick={() => pause()}
+					aria-label="Pause selected downloads"
 				>
 					<PauseIcon />
 				</Button>
@@ -104,6 +108,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: HeaderProps) {
 					className="rounded-full"
 					disabled={disabled}
 					onClick={() => remove()}
+					aria-label="Remove selected downloads"
 				>
 					<TrashIcon />
 				</Button>
@@ -112,6 +117,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: HeaderProps) {
 					size="icon"
 					className="rounded-full"
 					onClick={() => client.openSetting()}
+					aria-label="Settings"
 				>
 					<SettingsIcon />
 				</Button>
@@ -120,6 +126,7 @@ function Header({ jobs, checked, show, setShow, setCheck }: HeaderProps) {
 					size="icon"
 					className="rounded-full"
 					onClick={() => client.openDetail(true)}
+					aria-label="Open the full download manager"
 				>
 					<EllipsisVerticalIcon />
 				</Button>

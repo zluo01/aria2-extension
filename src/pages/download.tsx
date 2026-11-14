@@ -149,7 +149,7 @@ function DownloadForm({ data }: { data: DownloadSearch }) {
 								<FieldLabel className="text-sm text-muted-foreground">
 									From
 								</FieldLabel>
-								<Input value={data.url} disabled />
+								<Input value={data.url} disabled aria-label="From" />
 							</Field>
 							<div className="flex flex-row justify-end items-center">
 								<span className="text-xs text-muted-foreground">
